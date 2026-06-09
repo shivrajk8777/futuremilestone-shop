@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { products } from '@/data/products';
+import { useCollections } from '@/context/CollectionContext';
 
 interface Hotspot {
   top: string;
@@ -29,6 +30,7 @@ const saleBadges: Record<string, string> = {
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
+  const { state: { collections, loading, error, fetched } } = useCollections();
 
   // Slideshow config with hotspots coordinates and images extracted from index.html
   const slides: Slide[] = [
@@ -346,97 +348,108 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 6. Section Collections Header Card */}
-      <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
-        <h2 className="font-dm-sans text-base font-bold text-fg-primary tracking-tight">Collections</h2>
-      </div>
-
-      {/* 7. Section Collections (Asymmetric layout) */}
-      <section className="w-full flex flex-col md:flex-row gap-3">
-        {/* Left Column - Wood collection (Large Card) */}
-        <div className="w-full md:w-1/2 h-[450px] md:h-[776px] rounded-xl overflow-hidden relative border border-border-accent/40 group">
-          <img
-            src="/images/4edEXYzlI9czhhBmZMvj3fhSs_7dc234.webp"
-            alt="Wood Collection"
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
-          />
-          <div className="absolute inset-0 bg-black/5" />
-
-          {/* Floating Bottom-Left Card */}
-          <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 w-[260px] bg-bg-primary rounded-xl p-8 flex flex-col gap-6 shadow-xl transition-theme">
-            <div className="flex flex-col gap-2">
-              <h3 className="font-dm-sans text-xl font-bold text-fg-primary">Wood</h3>
-              <p className="text-xs text-fg-secondary leading-[1.6]">Our Wood Collection celebrates the natural beauty of wood.</p>
-            </div>
-            <div>
-              <Link
-                href="/shop?category=wood"
-                className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
-              >
-                View Collection
-                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/link:bg-fg-secondary" />
-              </Link>
-            </div>
+      {/* 6 & 7. Dynamic Section Collections (Asymmetric layout) */}
+      {fetched && !error && collections.length >= 3 && (
+        <>
+          {/* 6. Section Collections Header Card */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
+            <h2 className="font-dm-sans text-base font-bold text-fg-primary tracking-tight">Collections</h2>
           </div>
-        </div>
 
-        {/* Right Column - Dark and Modern (2 rows of side-by-side) */}
-        <div className="w-full md:w-1/2 flex flex-col gap-3 justify-between">
+          {/* 7. Section Collections (Asymmetric layout) */}
+          <section className="w-full flex flex-col md:flex-row gap-3">
+            {/* Left Column - Wood collection (Large Card) */}
+            <div className="w-full md:w-1/2 h-[450px] md:h-[776px] rounded-xl overflow-hidden relative border border-border-accent/40 group">
+              {collections[0].imageUrl && (
+                <img
+                  src={collections[0].imageUrl}
+                  alt={collections[0].name}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+                />
+              )}
+              <div className="absolute inset-0 bg-black/5" />
 
-          {/* Row 1 - Dark Collection (Image left, Card right) */}
-          <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
-            {/* Image (Left) */}
-            <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
-              <img
-                src="/images/oaJMCWVJsdqXc6aQzq9Tl9QeDAc_24347b.webp"
-                alt="Dark Collection"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
-              />
-            </div>
-            {/* Card Content (Right - Solid Dark Inverse background) */}
-            <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
-              <h3 className="font-dm-sans text-xl font-bold text-bg-primary">Dark</h3>
-              <p className="text-xs text-bg-secondary/80 leading-[1.6]">Rrefined finishes bring an air of sophistication and drama to any room.</p>
-              <div className="mt-4">
-                <Link
-                  href="/shop?category=dark"
-                  className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
-                >
-                  View Collection
-                  <span className="absolute bottom-0 left-0 w-full h-[1px] bg-bg-primary transition-colors group-hover/link:bg-bg-secondary" />
-                </Link>
+              {/* Floating Bottom-Left Card */}
+              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 w-[260px] bg-bg-primary rounded-xl p-8 flex flex-col gap-6 shadow-xl transition-theme">
+                <div className="flex flex-col gap-2">
+                  <h3 className="font-dm-sans text-xl font-bold text-fg-primary">{collections[0].name}</h3>
+                  <p className="text-xs text-fg-secondary leading-[1.6]">{collections[0].description}</p>
+                </div>
+                <div>
+                  <Link
+                    href={`/shop?category=${collections[0].slug}`}
+                    className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
+                  >
+                    View Collection
+                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/link:bg-fg-secondary" />
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Row 2 - Modern Collection (Card left, Image right) */}
-          <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
-            {/* Card Content (Left - Solid Dark Inverse background) */}
-            <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 order-last sm:order-first transition-theme">
-              <h3 className="font-dm-sans text-xl font-bold text-bg-primary">Modern</h3>
-              <p className="text-xs text-bg-secondary/80 leading-[1.6]">The Modern Collection brings together graceful lines and luxurious finishes.</p>
-              <div className="mt-4">
-                <Link
-                  href="/shop?category=modern"
-                  className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
-                >
-                  View Collection
-                  <span className="absolute bottom-0 left-0 w-full h-[1px] bg-bg-primary transition-colors group-hover/link:bg-bg-secondary" />
-                </Link>
+            {/* Right Column - Dark and Modern (2 rows of side-by-side) */}
+            <div className="w-full md:w-1/2 flex flex-col gap-3 justify-between">
+
+              {/* Row 1 - Dark Collection (Image left, Card right) */}
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+                {/* Image (Left) */}
+                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                  {collections[1].imageUrl && (
+                    <img
+                      src={collections[1].imageUrl}
+                      alt={collections[1].name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+                    />
+                  )}
+                </div>
+                {/* Card Content (Right - Solid Dark Inverse background) */}
+                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
+                  <h3 className="font-dm-sans text-xl font-bold text-bg-primary">{collections[1].name}</h3>
+                  <p className="text-xs text-bg-secondary/80 leading-[1.6]">{collections[1].description}</p>
+                  <div className="mt-4">
+                    <Link
+                      href={`/shop?category=${collections[1].slug}`}
+                      className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
+                    >
+                      View Collection
+                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-bg-primary transition-colors group-hover/link:bg-bg-secondary" />
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-            {/* Image (Right) */}
-            <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
-              <img
-                src="/images/w5m4XOOnjmRFKQEUeSndBEswbw4_d8f1da.webp"
-                alt="Modern Collection"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
-              />
-            </div>
-          </div>
 
-        </div>
-      </section>
+              {/* Row 2 - Modern Collection (Card left, Image right) */}
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+                {/* Card Content (Left - Solid Dark Inverse background) */}
+                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 order-last sm:order-first transition-theme">
+                  <h3 className="font-dm-sans text-xl font-bold text-bg-primary">{collections[2].name}</h3>
+                  <p className="text-xs text-bg-secondary/80 leading-[1.6]">{collections[2].description}</p>
+                  <div className="mt-4">
+                    <Link
+                      href={`/shop?category=${collections[2].slug}`}
+                      className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
+                    >
+                      View Collection
+                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-bg-primary transition-colors group-hover/link:bg-bg-secondary" />
+                    </Link>
+                  </div>
+                </div>
+                {/* Image (Right) */}
+                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                  {collections[2].imageUrl && (
+                    <img
+                      src={collections[2].imageUrl}
+                      alt={collections[2].name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+                    />
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </section>
+        </>
+      )}
 
       {/* 8. Section About Header Card */}
       <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
