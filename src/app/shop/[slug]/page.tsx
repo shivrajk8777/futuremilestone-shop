@@ -23,9 +23,9 @@ function ProductDetailSkeleton() {
       <div className="w-full flex flex-col lg:flex-row gap-3 relative lg:h-screen -mt-24">
         {/* Left Column: Image placeholder */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0">
-          <div className="h-full rounded-xl w-full bg-bg-secondary/40 animate-pulse border border-border-accent/10" />
+          <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave" />
         </section>
-
+ 
         {/* Right Column: Details card skeleton */}
         <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 lg:h-full justify-center">
           <div className="w-full bg-[#0e1011] rounded-xl p-8 md:p-12 lg:pt-28 lg:pb-12 lg:px-12 border border-white/5 space-y-6 flex-shrink-0 flex flex-col animate-pulse">
@@ -34,13 +34,13 @@ function ProductDetailSkeleton() {
               <div className="h-4 w-16 bg-white/10 rounded-md" />
               <div className="h-8 w-28 bg-white/10 rounded-md" />
             </div>
-
+ 
             {/* Title & Tagline */}
             <div className="space-y-3">
               <div className="h-10 w-3/4 bg-white/10 rounded-md" />
               <div className="h-5 w-1/2 bg-white/10 rounded-md" />
             </div>
-
+ 
             {/* Material selector divider */}
             <div className="space-y-3 pt-4 border-t border-white/10">
               <div className="h-3 w-12 bg-white/10 rounded-md" />
@@ -49,7 +49,7 @@ function ProductDetailSkeleton() {
                 <div className="h-9 w-16 bg-white/10 rounded-xl" />
               </div>
             </div>
-
+ 
             {/* Dimension selector divider */}
             <div className="space-y-3 pt-4 border-t border-white/10">
               <div className="h-3 w-16 bg-white/10 rounded-md" />
@@ -58,7 +58,7 @@ function ProductDetailSkeleton() {
                 <div className="h-9 w-24 bg-white/10 rounded-xl" />
               </div>
             </div>
-
+ 
             {/* Quantity / Cart divider */}
             <div className="space-y-3 pt-4 border-t border-white/10">
               <div className="h-3 w-16 bg-white/10 rounded-md" />
@@ -68,10 +68,10 @@ function ProductDetailSkeleton() {
               </div>
             </div>
           </div>
-
+ 
           {/* Marquee slider placeholder */}
-          <div className="h-10 w-full bg-bg-secondary rounded-xl animate-pulse border border-border-accent/10" />
-
+          <div className="h-10 w-full rounded-xl border border-border-accent/40 animate-wave" />
+ 
           {/* Accordion list placeholder */}
           <div className="w-full bg-[#0e1011] rounded-xl p-8 border border-white/5 space-y-4 animate-pulse">
             <div className="h-6 w-full bg-white/10 rounded-md" />

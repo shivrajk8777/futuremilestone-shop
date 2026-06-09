@@ -61,13 +61,32 @@ export default function Blog() {
   if (loading) {
     return (
       <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary transition-theme relative lg:h-screen">
-        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] lg:h-[calc(100vh-24px)] flex-shrink-0">
-          <div className="h-full rounded-xl w-full bg-bg-secondary/40 animate-pulse border border-border-accent/10" />
+        {/* Left Column: Sticky Featured Post Skeleton */}
+        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
+          <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave relative">
+            {/* Floating Top-Left "New" Tab Skeleton */}
+            <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl select-none z-10 transition-theme border-r border-b border-border-accent/10 w-20 h-10">
+              <div className="h-3 bg-border-accent/30 rounded w-10 mt-1" />
+            </div>
+          </div>
         </section>
-        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 flex flex-col gap-3">
-          <div className="h-36 rounded-xl bg-bg-secondary/40 animate-pulse border border-border-accent/10" />
-          <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map(i => <div key={i} className="aspect-[3/4] rounded-xl bg-bg-secondary/40 animate-pulse border border-border-accent/10" />)}
+
+        {/* Right Column Skeleton */}
+        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
+          {/* Header Skeleton */}
+          <div className="bg-bg-secondary p-8 md:p-12 rounded-xl border border-border-accent/40 transition-theme flex flex-col gap-4">
+            <div className="h-10 w-32 bg-border-accent/30 rounded animate-wave" />
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-3/4 bg-border-accent/20 rounded animate-wave" />
+            </div>
+          </div>
+
+          {/* Grid of other posts skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-12">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="aspect-[3/4] rounded-xl border border-border-accent/40 animate-wave" />
+            ))}
           </div>
         </div>
       </div>

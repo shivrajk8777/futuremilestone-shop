@@ -96,6 +96,7 @@
   --font-inter: "Inter", sans-serif;
   
   --animate-marquee: marquee 25s linear infinite;
+  --animate-wave: wave 1.6s infinite linear;
 
   @keyframes marquee {
     from {
@@ -105,6 +106,26 @@
       transform: translateX(-50%);
     }
   }
+
+  @keyframes wave {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@utility animate-wave {
+  background: linear-gradient(
+    90deg,
+    var(--background-secondary) 25%,
+    var(--border-accent) 50%,
+    var(--background-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-wave);
 }
 
 body {

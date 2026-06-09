@@ -91,11 +91,60 @@ export default function BlogPost({ params }: PageProps) {
   if (loading) {
     return (
       <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary transition-theme relative lg:h-screen">
-        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] lg:h-[calc(100vh-24px)] flex-shrink-0">
-          <div className="h-full rounded-xl w-full bg-bg-secondary/40 animate-pulse border border-border-accent/10" />
+        {/* Left Column: Post Image Skeleton */}
+        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
+          <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave relative">
+            {/* Date Tag Skeleton */}
+            <div className="absolute bottom-0 right-0 bg-bg-primary pr-5 pb-3.5 pt-3.5 pl-6 rounded-tl-2xl select-none z-10 transition-theme border-t border-l border-border-accent/10 w-24 h-10">
+              <div className="h-3 bg-border-accent/30 rounded w-12 mt-1 mx-auto" />
+            </div>
+          </div>
         </section>
-        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 flex flex-col gap-3">
-          {[1,2,3].map(i => <div key={i} className="h-32 rounded-xl bg-bg-secondary/40 animate-pulse border border-border-accent/10" />)}
+
+        {/* Right Column: Scrollable Content Skeleton */}
+        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
+          {/* Post Header Card Skeleton */}
+          <div className="bg-bg-secondary p-8 md:p-12 rounded-xl border border-border-accent/40 transition-theme flex flex-col gap-6">
+            <div>
+              <div className="h-6 w-16 bg-border-accent/30 rounded-full animate-wave" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-8 w-3/4 bg-border-accent/30 rounded animate-wave" />
+              <div className="h-8 w-1/2 bg-border-accent/30 rounded animate-wave" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-5/6 bg-border-accent/20 rounded animate-wave" />
+            </div>
+            <div>
+              <div className="h-10 w-32 bg-border-accent/30 rounded animate-wave" />
+            </div>
+          </div>
+
+          {/* Metadata Card Skeleton */}
+          <div className="bg-bg-secondary border border-border-accent/40 rounded-xl p-6 flex justify-between items-center transition-theme">
+            <div className="flex flex-col gap-2 w-24">
+              <div className="h-3 w-12 bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-16 bg-border-accent/30 rounded animate-wave" />
+            </div>
+            <div className="flex flex-col gap-2 items-end w-24">
+              <div className="h-3 w-16 bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-12 bg-border-accent/30 rounded animate-wave" />
+            </div>
+          </div>
+
+          {/* Content Card Skeleton */}
+          <div className="bg-bg-secondary p-8 md:p-12 rounded-xl border border-border-accent/40 transition-theme flex flex-col gap-4">
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-full bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-4/5 bg-border-accent/20 rounded animate-wave" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-4 w-full bg-border-accent/20 rounded animate-wave" />
+              <div className="h-4 w-5/6 bg-border-accent/20 rounded animate-wave" />
+            </div>
+          </div>
         </div>
       </div>
     );

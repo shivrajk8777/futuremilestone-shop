@@ -18,15 +18,11 @@ function ShopSkeletonGrid() {
       {Array.from({ length: 8 }).map((_, idx) => (
         <div
           key={idx}
-          className="w-full bg-bg-secondary/20 rounded-xl overflow-hidden h-[600px] relative border border-border-accent/40 animate-pulse"
+          className="w-full rounded-xl overflow-hidden h-[600px] relative border border-border-accent/40 animate-wave"
         >
           {/* Top Left Title Tab Skeleton */}
           <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-32 h-10 select-none z-10">
-            <div className="h-4 bg-border-accent/50 rounded w-20 mt-1" />
-          </div>
-          {/* Main Area Placeholder */}
-          <div className="w-full h-full bg-border-accent/5 flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full border-t-2 border-b-2 border-fg-primary/30 animate-spin" />
+            <div className="h-4 bg-border-accent/30 rounded w-20 mt-1" />
           </div>
         </div>
       ))}
@@ -43,7 +39,9 @@ function ShopContent() {
 
   const { state: productState, fetchMoreProducts } = useProducts();
   const productsList = productState.productsByCategory[selectedCategory] || [];
-  const isPage1Loading = productState.loading[selectedCategory] && productsList.length === 0;
+  const isPage1Loading =
+    !productState.initialFetched ||
+    (productState.loading[selectedCategory] && productsList.length === 0);
   const isMoreLoading = productState.loading[selectedCategory] && productsList.length > 0;
   const hasMore = productState.hasMore[selectedCategory];
 
@@ -250,8 +248,15 @@ function ShopContent() {
 export default function Shop() {
   return (
     <Suspense fallback={
-      <div className="min-h-[500px] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-fg-primary" />
+      <div className="space-y-3">
+        {/* Skeleton Header mimicking the page header */}
+        <div className="-mt-24 px-6 md:px-12 bg-bg-secondary pt-32 pb-10 border-b border-border-accent transition-theme">
+          <div className="h-12 w-48 bg-border-accent/30 rounded animate-wave" />
+          <div className="h-4 w-64 bg-border-accent/20 rounded mt-3 animate-wave" />
+        </div>
+        <div className="pb-3">
+          <ShopSkeletonGrid />
+        </div>
       </div>
     }>
       <ShopContent />

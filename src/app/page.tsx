@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { products } from '@/data/products';
 import { useCollections } from '@/context/CollectionContext';
+import { useProducts } from '@/context/ProductContext';
 
 interface Hotspot {
   top: string;
@@ -31,6 +32,7 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
   const { state: { collections, loading, error, fetched } } = useCollections();
+  const { state: productState } = useProducts();
 
   // Slideshow config with hotspots coordinates and images extracted from index.html
   const slides: Slide[] = [
@@ -79,8 +81,10 @@ export default function Home() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  // Section Products: 8 Favorites (Skala, Nest, Runa, Lykke, Holt, Kapp, Sol, Elm)
-  const favorites = products.filter(p => ['skala', 'nest', 'runa', 'lykke', 'holt', 'kapp', 'sol', 'elm'].includes(p.slug));
+  // Section Products: latest 8 products dynamically
+  const dynamicProducts = productState.productsByCategory['all'] || [];
+  const favorites = dynamicProducts.slice(0, 8);
+  const isProductsLoading = productState.loading['all'] || !productState.initialFetched;
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (favoritesCarouselRef.current) {
@@ -263,93 +267,176 @@ export default function Home() {
 
       {/* 5. Section Products Carousel */}
       <section className="w-full relative px-0">
-        {/* Scroll Buttons - Overlay Floating on Carousel */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-4 z-20 hidden md:block">
-          <button
-            onClick={() => scrollCarousel('left')}
-            className="p-3 rounded-full border border-border-accent hover:border-fg-primary transition-colors bg-bg-primary/90 text-fg-primary shadow-md"
-            aria-label="Previous Products"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        </div>
-        <div className="absolute top-1/2 -translate-y-1/2 right-4 z-20 hidden md:block">
-          <button
-            onClick={() => scrollCarousel('right')}
-            className="p-3 rounded-full border border-border-accent hover:border-fg-primary transition-colors bg-bg-primary/90 text-fg-primary shadow-md"
-            aria-label="Next Products"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Carousel Grid wrapper */}
-        <div
-          ref={favoritesCarouselRef}
-          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory w-full"
-        >
-          {favorites.map((product) => (
-            <div
-              key={product.slug}
-              className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 snap-start bg-bg-secondary/40 rounded-xl overflow-hidden group h-[600px] relative border border-border-accent/40"
-            >
-              {/* Product Background Image */}
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
-              />
-
-              {/* Top-Right Sale Badge */}
-              {saleBadges[product.slug] && (
-                <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase">
-                  {saleBadges[product.slug]}
+        {isProductsLoading ? (
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-none w-full">
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 rounded-xl overflow-hidden h-[600px] relative border border-border-accent/40 animate-wave"
+              >
+                {/* Floating Top-Left Title Tab Skeleton */}
+                <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-36 h-12 select-none z-10">
+                  {/* Curved Edge SVG - Right */}
+                  <div className="absolute top-0 -right-[18px] w-[18px] h-[18px] pointer-events-none rotate-90">
+                    <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
+                      <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
+                    </svg>
+                  </div>
+                  {/* Curved Edge SVG - Bottom */}
+                  <div className="absolute -bottom-[18px] left-0 w-[18px] h-[18px] pointer-events-none rotate-90">
+                    <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
+                      <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
+                    </svg>
+                  </div>
+                  <div className="h-4 bg-border-accent/30 rounded w-24 mt-1" />
                 </div>
-              )}
-
-              {/* Floating Top-Left Title Tab */}
-              <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl select-none z-10 transition-all duration-300">
-                {/* Curved Edge SVG - Right */}
-                <div className="absolute top-0 -right-[18px] w-[18px] h-[18px] pointer-events-none rotate-90">
-                  <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
-                    <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
-                  </svg>
-                </div>
-                {/* Curved Edge SVG - Bottom */}
-                <div className="absolute -bottom-[18px] left-0 w-[18px] h-[18px] pointer-events-none rotate-90">
-                  <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
-                    <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
-                  </svg>
-                </div>
-                <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-tight flex items-center transition-all duration-300">
-                  <span>{product.name}</span>
-                  <span className="opacity-0 max-w-0 inline-block overflow-hidden translate-x-[-4px] group-hover:opacity-100 group-hover:max-w-[20px] group-hover:translate-x-0 group-hover:ml-1.5 transition-all duration-300 ease-out">
-                    ↗
-                  </span>
-                </span>
               </div>
-
-              {/* Animated Pop-up Bottom Price Bar */}
-              <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
-                <span className="text-sm font-bold text-fg-primary">${product.price}</span>
-                <Link
-                  href={`/shop/${product.slug}`}
-                  className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
-                >
-                  View
-                </Link>
-              </div>
+            ))}
+          </div>
+        ) : favorites.length > 0 ? (
+          <>
+            {/* Scroll Buttons - Overlay Floating on Carousel */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-4 z-20 hidden md:block">
+              <button
+                onClick={() => scrollCarousel('left')}
+                className="p-3 rounded-full border border-border-accent hover:border-fg-primary transition-colors bg-bg-primary/90 text-fg-primary shadow-md"
+                aria-label="Previous Products"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
             </div>
-          ))}
-        </div>
+            <div className="absolute top-1/2 -translate-y-1/2 right-4 z-20 hidden md:block">
+              <button
+                onClick={() => scrollCarousel('right')}
+                className="p-3 rounded-full border border-border-accent hover:border-fg-primary transition-colors bg-bg-primary/90 text-fg-primary shadow-md"
+                aria-label="Next Products"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Carousel Grid wrapper */}
+            <div
+              ref={favoritesCarouselRef}
+              className="flex gap-3 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory w-full"
+            >
+              {favorites.map((product) => (
+                <div
+                  key={product.slug}
+                  className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 snap-start bg-bg-secondary/40 rounded-xl overflow-hidden group h-[600px] relative border border-border-accent/40"
+                >
+                  {/* Product Background Image */}
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
+                  />
+
+                  {/* Top-Right Sale Badge */}
+                  {saleBadges[product.slug] && (
+                    <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase">
+                      {saleBadges[product.slug]}
+                    </div>
+                  )}
+
+                  {/* Floating Top-Left Title Tab */}
+                  <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl select-none z-10 transition-all duration-300">
+                    {/* Curved Edge SVG - Right */}
+                    <div className="absolute top-0 -right-[18px] w-[18px] h-[18px] pointer-events-none rotate-90">
+                      <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
+                        <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
+                      </svg>
+                    </div>
+                    {/* Curved Edge SVG - Bottom */}
+                    <div className="absolute -bottom-[18px] left-0 w-[18px] h-[18px] pointer-events-none rotate-90">
+                      <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
+                        <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
+                      </svg>
+                    </div>
+                    <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-tight flex items-center transition-all duration-300">
+                      <span>{product.name}</span>
+                      <span className="opacity-0 max-w-0 inline-block overflow-hidden translate-x-[-4px] group-hover:opacity-100 group-hover:max-w-[20px] group-hover:translate-x-0 group-hover:ml-1.5 transition-all duration-300 ease-out">
+                        ↗
+                      </span>
+                    </span>
+                  </div>
+
+                  {/* Animated Pop-up Bottom Price Bar */}
+                  <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
+                    <span className="text-sm font-bold text-fg-primary">${product.price}</span>
+                    <Link
+                      href={`/shop/${product.slug}`}
+                      className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-20 border border-dashed border-border-accent rounded-xl">
+            <h3 className="text-lg font-bold text-fg-primary">No products found</h3>
+            <p className="text-sm text-fg-secondary mt-1">Try adding products to the database.</p>
+          </div>
+        )}
       </section>
 
       {/* 6 & 7. Dynamic Section Collections (Asymmetric layout) */}
-      {fetched && !error && collections.length >= 3 && (
+      {(!fetched || loading) && collections.length === 0 ? (
+        <>
+          {/* 6. Section Collections Header Card Skeleton */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme animate-pulse">
+            <div className="h-5 bg-border-accent/30 rounded w-28" />
+          </div>
+
+          {/* 7. Section Collections (Asymmetric layout) Skeleton */}
+          <section className="w-full flex flex-col md:flex-row gap-3">
+            {/* Left Column Skeleton */}
+            <div className="w-full md:w-1/2 h-[450px] md:h-[776px] rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave">
+              {/* Floating Bottom-Left Card Skeleton */}
+              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 w-[260px] bg-bg-primary rounded-xl p-8 flex flex-col gap-6 shadow-xl transition-theme animate-pulse">
+                <div className="flex flex-col gap-2">
+                  <div className="h-5 bg-border-accent/30 rounded w-24" />
+                  <div className="h-3 bg-border-accent/20 rounded w-full" />
+                  <div className="h-3 bg-border-accent/20 rounded w-5/6" />
+                </div>
+                <div className="h-3 bg-border-accent/30 rounded w-28 mt-2" />
+              </div>
+            </div>
+
+            {/* Right Column Skeleton */}
+            <div className="w-full md:w-1/2 flex flex-col gap-3 justify-between">
+              {/* Row 1 Skeleton */}
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+                <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave" />
+                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-[#0e1011] rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-white/5 animate-pulse">
+                  <div className="h-5 w-20 bg-white/10 rounded-md" />
+                  <div className="h-3 w-full bg-white/10 rounded-md mt-2" />
+                  <div className="h-3 w-4/5 bg-white/10 rounded-md" />
+                  <div className="h-3 w-24 bg-white/10 rounded-md mt-4" />
+                </div>
+              </div>
+
+              {/* Row 2 Skeleton */}
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-[#0e1011] rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-white/5 order-last sm:order-first animate-pulse">
+                  <div className="h-5 w-20 bg-white/10 rounded-md" />
+                  <div className="h-3 w-full bg-white/10 rounded-md mt-2" />
+                  <div className="h-3 w-4/5 bg-white/10 rounded-md" />
+                  <div className="h-3 w-24 bg-white/10 rounded-md mt-4" />
+                </div>
+                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave" />
+              </div>
+            </div>
+          </section>
+        </>
+      ) : fetched && !error && collections.length >= 3 ? (
         <>
           {/* 6. Section Collections Header Card */}
           <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
@@ -449,7 +536,7 @@ export default function Home() {
             </div>
           </section>
         </>
-      )}
+      ) : null}
 
       {/* 8. Section About Header Card */}
       <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
