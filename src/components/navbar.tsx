@@ -279,7 +279,7 @@ export default function Navbar() {
           }`}
       >
         {/* Left Block: Brand, Navigation Links, and Theme Switcher */}
-        <div className="pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-6 pr-8 py-3.5 flex items-center gap-8 shadow-sm transition-theme relative">
+        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-8 md:py-3.5 items-center gap-3 md:gap-8 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Left Block */}
           {/* Bottom-Left Edge Curve */}
@@ -296,7 +296,7 @@ export default function Navbar() {
           </div>
 
           {/* Logo link */}
-          <Link href="/" className="flex items-center gap-2 text-fg-primary font-dm-sans text-xl font-bold tracking-tight select-none group/logo">
+          <Link href="/" className="flex items-center gap-1.5 md:gap-2 text-fg-primary font-dm-sans text-[18px] md:text-xl font-bold tracking-tight select-none group/logo">
             {/* Logo Icon SVG (svg11873481083) */}
             <svg viewBox="0 0 15 15" className="w-[15px] h-[15px] fill-current">
               <path d="M 3.75 7.5 C 3.75 5.429 5.429 3.75 7.5 3.75 C 9.571 3.75 11.25 5.429 11.25 7.5 C 11.25 9.571 9.571 11.25 7.5 11.25 C 5.429 11.25 3.75 9.571 3.75 7.5 Z M 7.5 15 C 11.642 15 15 11.642 15 7.5 C 15 3.358 11.642 0 7.5 0 C 3.358 0 0 3.358 0 7.5 C 0 11.642 3.358 15 7.5 15 Z" />
@@ -473,7 +473,7 @@ export default function Navbar() {
         </div>
 
         {/* Right Block: Search and Cart Buttons */}
-        <div className="pointer-events-auto bg-bg-primary rounded-bl-2xl border-l border-b border-border-accent/40 pl-8 pr-6 py-3.5 flex items-center gap-4 shadow-sm transition-theme relative">
+        <div className={`pointer-events-auto bg-bg-primary rounded-bl-2xl border-l border-b border-border-accent/40 pl-4 pr-3 py-2.5 md:pl-8 md:pr-6 md:py-3.5 items-center gap-1.5 md:gap-4 shadow-sm transition-theme relative z-30 ml-auto ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Right Block */}
           {/* Bottom-Right Edge Curve */}
@@ -492,7 +492,7 @@ export default function Navbar() {
           {/* Search Button */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none cursor-pointer"
+            className={`p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none cursor-pointer ${isMobileMenuOpen ? 'hidden md:block' : ''}`}
             aria-label="Search"
           >
             <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -508,7 +508,7 @@ export default function Navbar() {
           {/* Cart Button */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none relative flex items-center cursor-pointer"
+            className={`p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none relative items-center cursor-pointer ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}
             aria-label="Cart"
           >
             <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -525,7 +525,7 @@ export default function Navbar() {
           </button>
 
           {/* User Button / Dropdown */}
-          <div className="relative" id="user-dropdown-container">
+          <div className="relative hidden md:block" id="user-dropdown-container">
             {user ? (
               <>
                 <button
@@ -594,10 +594,10 @@ export default function Navbar() {
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer"
+            className="md:hidden p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer"
             aria-label="Toggle Menu"
           >
-            <span className="text-xs font-bold uppercase tracking-wider">Menu</span>
+            <span className="text-xs font-bold uppercase tracking-wider">{isMobileMenuOpen ? 'Close' : 'Menu'}</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMobileMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -612,19 +612,65 @@ export default function Navbar() {
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
         <div
-          className={`absolute z-20 w-48 bg-bg-primary rounded-xl border border-border-accent/40 shadow-lg py-2 md:hidden animate-fade-in pointer-events-auto transition-theme right-[12px] ${pathname === '/' ? 'top-[91px]' : 'top-[53px]'
-            }`}
+          className="fixed z-[100] top-[12px] right-[12px] bottom-[12px] left-[12px] bg-bg-secondary rounded-2xl md:hidden animate-fade-in pointer-events-auto transition-theme overflow-y-auto"
         >
-          {mobileLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
+          {/* Custom Floating Close Pill */}
+          <div className="absolute top-4 right-4 z-[110]">
+            <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block px-4 py-2 text-xs font-semibold uppercase tracking-wider text-fg-secondary hover:text-fg-primary hover:bg-bg-secondary transition-colors"
+              className="bg-bg-primary px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider text-fg-secondary hover:text-fg-primary transition-colors flex items-center gap-1.5 shadow-md border border-border-accent/40 focus:outline-none"
             >
-              {link.name}
-            </Link>
-          ))}
+              Close
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-1.5 mx-auto max-w-sm pt-[80px] px-4 pb-20">
+            {/* Collections */}
+            {collectionsList.map((col) => (
+              <Link
+                key={col.slug}
+                href={`/shop?category=${col.slug}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between w-full p-2 bg-black/5 dark:bg-white/5 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 border border-border-accent/40 bg-bg-primary">
+                    {col.imageUrl ? (
+                      <img src={col.imageUrl} alt={col.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-border-accent" />
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-fg-primary">{col.name}</span>
+                </div>
+                <svg className="w-4 h-4 text-fg-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
+
+            {/* Static Links */}
+            {[
+              { name: 'Shop', href: '/shop' },
+              { name: 'About', href: '/about' },
+              { name: 'Blog', href: '/blog' },
+            ].map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center justify-between w-full p-4 bg-black/5 dark:bg-white/5 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              >
+                <span className="text-sm font-medium text-fg-primary ml-1">{link.name}</span>
+                <svg className="w-4 h-4 text-fg-primary mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

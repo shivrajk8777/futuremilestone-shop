@@ -128,7 +128,7 @@ export default function Home() {
       </section>
 
       {/* 2. Section Hero (Slideshow) */}
-      <section className="relative h-[100vh] md:h-[720px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
+      <section className="relative h-[450px] md:h-[720px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
         {/* Slides */}
         <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
           {slides.map((slide) => (
@@ -172,21 +172,19 @@ export default function Home() {
                 </div>
               ))}
 
-              {/* Product Content Card (Bottom-Left) */}
-              <div className="absolute bottom-12 left-6 md:left-12 max-w-[calc(100%-48px)] md:max-w-[400px] bg-bg-primary rounded-xl p-8 md:p-10 flex flex-col gap-6 md:gap-8 shadow-2xl transition-theme">
-                <div className="flex flex-col gap-2">
-                  <h2 className="font-dm-sans text-2xl md:text-[32px] font-bold leading-[1.2] text-fg-primary tracking-tight">{slide.name}</h2>
-                  <p className="text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
-                </div>
-                <div>
+              {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
+              <div className="absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-theme">
+                <div className="flex flex-row md:flex-col justify-between items-end md:items-start gap-4 md:gap-2">
+                  <h2 className="font-dm-sans text-lg md:text-[32px] font-bold leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
                   <Link
                     href={`/shop/${slide.slug}`}
-                    className="relative pb-0.5 text-xs md:text-sm font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn"
+                    className="relative pb-0.5 text-xs md:text-sm font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mb-1 md:mb-0"
                   >
-                    View Product
+                    View <span className="hidden md:inline">Product</span>
                     <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
                   </Link>
                 </div>
+                <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
               </div>
             </div>
           ))}
@@ -195,20 +193,20 @@ export default function Home() {
         {/* Slide navigation controls */}
         <button
           onClick={prevSlide}
-          className="absolute left-6 top-1/2 -translate-y-1/2 bg-bg-primary/90 text-fg-primary p-3 rounded-full border border-border-accent shadow-md opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
+          className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 md:bg-bg-primary/90 text-white md:text-fg-primary p-2 md:p-3 md:rounded-full md:border md:border-border-accent md:shadow-md opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
           aria-label="Previous Slide"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          <svg className="w-8 h-8 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-6 top-1/2 -translate-y-1/2 bg-bg-primary/90 text-fg-primary p-3 rounded-full border border-border-accent shadow-md opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
+          className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 md:bg-bg-primary/90 text-white md:text-fg-primary p-2 md:p-3 md:rounded-full md:border md:border-border-accent md:shadow-md opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
           aria-label="Next Slide"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+          <svg className="w-8 h-8 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
@@ -431,7 +429,7 @@ export default function Home() {
                   <div className="h-3 w-4/5 bg-white/10 rounded-md" />
                   <div className="h-3 w-24 bg-white/10 rounded-md mt-4" />
                 </div>
-                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave" />
+                <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave" />
               </div>
             </div>
           </section>
@@ -480,7 +478,7 @@ export default function Home() {
               {/* Row 1 - Dark Collection (Image left, Card right) */}
               <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
                 {/* Image (Left) */}
-                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                   {collections[1].imageUrl && (
                     <img
                       src={collections[1].imageUrl}
@@ -522,7 +520,7 @@ export default function Home() {
                   </div>
                 </div>
                 {/* Image (Right) */}
-                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                   {collections[2].imageUrl && (
                     <img
                       src={collections[2].imageUrl}
