@@ -31,6 +31,57 @@ const saleBadges: Record<string, string> = {
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setDimensions({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const getHotspotPosition = (leftStr: string, topStr: string) => {
+    const x = parseFloat(leftStr) / 100;
+    const y = parseFloat(topStr) / 100;
+    const { width, height } = dimensions;
+    if (width === 0 || height === 0) {
+      return { left: leftStr, top: topStr };
+    }
+
+    const containerRatio = width / height;
+    const imageRatio = 2; // Slide images are 2400x1200 (2:1 aspect ratio)
+
+    if (containerRatio < imageRatio) {
+      // Container is narrower than 2:1 (e.g. mobile)
+      const renderedWidth = height * imageRatio;
+      const xOffset = (width - renderedWidth) / 2;
+      const leftPx = xOffset + x * renderedWidth;
+      const topPx = y * height;
+      return {
+        left: `${(leftPx / width) * 100}%`,
+        top: `${(topPx / height) * 100}%`,
+      };
+    } else {
+      // Container is wider than 2:1
+      const renderedHeight = width / imageRatio;
+      const yOffset = (height - renderedHeight) / 2;
+      const leftPx = x * width;
+      const topPx = yOffset + y * renderedHeight;
+      return {
+        left: `${(leftPx / width) * 100}%`,
+        top: `${(topPx / height) * 100}%`,
+      };
+    }
+  };
+
   const { state: { collections, loading, error, fetched } } = useCollections();
   const { state: productState } = useProducts();
 
@@ -154,7 +205,7 @@ export default function Home() {
       </section>
 
       {/* 2. Section Hero (Slideshow) */}
-      <section className="relative h-[450px] md:h-[580px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
+      <section ref={containerRef} className="relative h-[450px] md:h-[580px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
         {/* Slides */}
         <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
           {slides.map((slide) => (
@@ -171,7 +222,7 @@ export default function Home() {
                 <div
                   key={idx}
                   className="absolute group/pin z-20 -translate-x-1/2 -translate-y-1/2"
-                  style={{ top: hotspot.top, left: hotspot.left }}
+                  style={getHotspotPosition(hotspot.left, hotspot.top)}
                 >
                   {/* + icon with expanding aura, rotates to × on hover */}
                   <div className="relative flex items-center justify-center cursor-pointer">
@@ -237,7 +288,7 @@ export default function Home() {
         </button>
 
         {/* Dot Indicators — bottom center */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+        <div className="absolute bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
           {slides.map((_, idx) => (
             <button
               key={idx}
