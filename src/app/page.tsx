@@ -205,7 +205,7 @@ export default function Home() {
       </section>
 
       {/* 2. Section Hero (Slideshow) */}
-      <section ref={containerRef} className="relative h-[450px] md:h-[580px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
+      <section ref={containerRef} className="relative h-[450px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
         {/* Slides */}
         <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
           {slides.map((slide) => (
