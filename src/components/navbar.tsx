@@ -279,7 +279,7 @@ export default function Navbar() {
           }`}
       >
         {/* Left Block: Brand, Navigation Links, and Theme Switcher */}
-        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-8 md:py-3.5 items-center gap-3 md:gap-8 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-8 md:py-1.5 items-center gap-3 md:gap-8 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Left Block */}
           {/* Bottom-Left Edge Curve */}
@@ -289,35 +289,35 @@ export default function Navbar() {
             </svg>
           </div>
           {/* Top-Right Edge Curve */}
-          <div className="absolute top-0 right-[-18px] w-[18px] h-[18px] overflow-hidden pointer-events-none z-10 select-none">
-            <svg viewBox="0 0 18 18" className="w-full h-full transition-theme" style={{ fill: 'var(--background-primary)' }}>
+          <div className="absolute top-[12px] right-[-18px] w-[18px] h-[18px] pointer-events-none z-10 select-none">
+            <div className="absolute top-0 left-[-1px] w-[2px] h-[18px] bg-bg-primary transition-theme" />
+            <svg viewBox="0 0 18 18" className="w-full h-full transition-theme relative z-10" style={{ fill: 'var(--background-primary)' }}>
               <path d="M 0 0 L 0 18 C 0 8.059 8.059 0 18 0 Z" />
+              <path d="M 0 18 C 0 8.059 8.059 0 18 0" fill="none" style={{ stroke: 'var(--border-accent)', strokeOpacity: 0.4 }} strokeWidth="1" />
             </svg>
           </div>
 
           {/* Logo link */}
-          <Link href="/" className="flex items-center gap-1.5 md:gap-2 text-fg-primary font-dm-sans text-[18px] md:text-xl font-bold tracking-tight select-none group/logo">
-            {/* Logo Icon SVG (svg11873481083) */}
-            <svg viewBox="0 0 15 15" className="w-[15px] h-[15px] fill-current">
-              <path d="M 3.75 7.5 C 3.75 5.429 5.429 3.75 7.5 3.75 C 9.571 3.75 11.25 5.429 11.25 7.5 C 11.25 9.571 9.571 11.25 7.5 11.25 C 5.429 11.25 3.75 9.571 3.75 7.5 Z M 7.5 15 C 11.642 15 15 11.642 15 7.5 C 15 3.358 11.642 0 7.5 0 C 3.358 0 0 3.358 0 7.5 C 0 11.642 3.358 15 7.5 15 Z" />
-            </svg>
+          <Link href="/" className="flex items-center gap-1.5 md:gap-2 text-fg-primary font-dm-sans text-[14px] font-bold tracking-tight select-none group/logo">
+            {/* Custom Logo Icon */}
+            <img src={theme === 'dark' ? '/images/menu-icon-light.svg' : '/images/menu-icon-dark.svg'} alt="Logo" className="w-[15px] h-[15px] md:w-[20px] md:h-[20px] object-contain transition-theme" />
             {/* Logo text: top-to-bottom slide — "Future Milestone" visible by default, "Home" slides in from top on hover */}
-            <span className="overflow-hidden h-[1.25rem] flex flex-col">
+            <span className="overflow-hidden h-[14px] flex flex-col">
               <span
-                className="flex flex-col transition-transform duration-300 -translate-y-[1.25rem] group-hover/logo:translate-y-0"
-                style={{ lineHeight: '1.25rem' }}
+                className="flex flex-col transition-transform duration-300 -translate-y-[14px] group-hover/logo:translate-y-0"
+                style={{ lineHeight: '14px' }}
               >
                 <span>Home</span>
-                <span>Fm</span>
+                <span>futuremilestone</span>
               </span>
             </span>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-4">
             <Link
               href="/shop"
-              className={`text-xs font-semibold tracking-wider uppercase group/shop overflow-hidden h-[14px] flex flex-col transition-colors duration-200 ${pathname === '/shop' ? 'text-fg-primary font-bold' : 'text-fg-secondary'
+              className={`text-xs font-semibold tracking-wider group/shop overflow-hidden h-[14px] flex flex-col transition-colors duration-200 ${pathname === '/shop' ? 'text-fg-primary font-bold' : 'text-fg-secondary'
                 }`}
             >
               <span className="flex flex-col transition-transform duration-300 group-hover/shop:-translate-y-[14px]">
@@ -333,7 +333,7 @@ export default function Navbar() {
               onMouseLeave={() => setHoveredLink(null)}
             >
               <button
-                className={`text-xs font-semibold tracking-wider uppercase transition-colors duration-200 hover:text-fg-primary flex items-center gap-1 cursor-pointer focus:outline-none group/col ${hoveredLink === 'collections' ? 'text-fg-primary' : 'text-fg-secondary'
+                className={`text-xs font-semibold tracking-wider  transition-colors duration-200 hover:text-fg-primary flex items-center gap-1 cursor-pointer focus:outline-none group/col ${hoveredLink === 'collections' ? 'text-fg-primary' : 'text-fg-secondary'
                   }`}
               >
                 <span className="overflow-hidden h-[14px] flex flex-col">
@@ -397,7 +397,7 @@ export default function Navbar() {
               onMouseLeave={() => setHoveredLink(null)}
             >
               <button
-                className={`text-xs font-semibold tracking-wider uppercase transition-colors duration-200 hover:text-fg-primary flex items-center gap-1 cursor-pointer focus:outline-none group/abt ${hoveredLink === 'about' ? 'text-fg-primary' : 'text-fg-secondary'
+                className={`text-xs font-semibold tracking-wider  transition-colors duration-200 hover:text-fg-primary flex items-center gap-1 cursor-pointer focus:outline-none group/abt ${hoveredLink === 'about' ? 'text-fg-primary' : 'text-fg-secondary'
                   }`}
               >
                 <span className="overflow-hidden h-[14px] flex flex-col">
@@ -447,7 +447,7 @@ export default function Navbar() {
 
             <Link
               href="/blog"
-              className={`text-xs font-semibold tracking-wider uppercase group/blog overflow-hidden h-[14px] flex flex-col transition-colors duration-200 ${pathname === '/blog' ? 'text-fg-primary font-bold' : 'text-fg-secondary'
+              className={`text-xs font-semibold tracking-wider  group/blog overflow-hidden h-[14px] flex flex-col transition-colors duration-200 ${pathname === '/blog' ? 'text-fg-primary font-bold' : 'text-fg-secondary'
                 }`}
             >
               <span className="flex flex-col transition-transform duration-300 group-hover/blog:-translate-y-[14px]">
@@ -473,7 +473,7 @@ export default function Navbar() {
         </div>
 
         {/* Right Block: Search and Cart Buttons */}
-        <div className={`pointer-events-auto bg-bg-primary rounded-bl-2xl border-l border-b border-border-accent/40 pl-4 pr-3 py-2.5 md:pl-8 md:pr-6 md:py-3.5 items-center gap-1.5 md:gap-4 shadow-sm transition-theme relative z-30 ml-auto ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`pointer-events-auto bg-bg-primary rounded-bl-2xl border-l border-b border-border-accent/40 pl-4 pr-3 py-2.5 md:pl-2 md:pr-6 md:py-1.5 items-center gap-1.5 md:gap-0 shadow-sm transition-theme relative z-30 ml-auto ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Right Block */}
           {/* Bottom-Right Edge Curve */}
@@ -483,9 +483,11 @@ export default function Navbar() {
             </svg>
           </div>
           {/* Top-Left Edge Curve */}
-          <div className="absolute top-0 left-[-18px] w-[18px] h-[18px] overflow-hidden pointer-events-none z-10 select-none">
-            <svg viewBox="0 0 18 18" className="w-full h-full transition-theme rotate-180" style={{ fill: 'var(--background-primary)' }}>
+          <div className="absolute top-[12px] left-[-18px] w-[18px] h-[18px] pointer-events-none z-10 select-none">
+            <div className="absolute top-0 right-[-1px] w-[2px] h-[18px] bg-bg-primary transition-theme" />
+            <svg viewBox="0 0 18 18" className="w-full h-full transition-theme rotate-180 relative z-10" style={{ fill: 'var(--background-primary)' }}>
               <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
+              <path d="M 18 18 C 8.059 18 0 9.941 0 0" fill="none" style={{ stroke: 'var(--border-accent)', strokeOpacity: 0.4 }} strokeWidth="1" />
             </svg>
           </div>
 

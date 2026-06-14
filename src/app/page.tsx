@@ -102,33 +102,59 @@ export default function Home() {
     <div className="flex flex-col gap-3 pb-3">
 
       {/* 1. Top Announcement Marquee */}
-      <section className="w-full overflow-hidden bg-fg-primary text-bg-primary py-2.5 rounded-xl border border-border-accent/40 select-none transition-theme">
-        <div className="flex whitespace-nowrap animate-marquee">
-          <div className="flex gap-8 px-4 text-xs font-bold uppercase tracking-wider">
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-          </div>
-          <div className="flex gap-8 px-4 text-xs font-bold uppercase tracking-wider" aria-hidden="true">
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-            <span>Save 20% on your first order</span>
-            <span>-</span>
-            <span>Save 20% on your first order</span>
-            <span>-</span>
+      <section className="overflow-hidden bg-fg-primary text-bg-primary py-2.5 rounded-xl border border-border-accent/40 select-none transition-theme">
+        <div className='w-[95%] md:w-1/2 mx-auto overflow-hidden '>
+          <div className="flex whitespace-nowrap animate-marquee">
+            <div className="flex gap-8 px-4 text-xs  tracking-wider shrink-0 min-w-max">
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+            </div>
+            <div className="flex gap-8 px-4 text-xs  tracking-wider shrink-0 min-w-max" aria-hidden="true">
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+              <span>Save 20% on your first order</span>
+              <span>-</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* 2. Section Hero (Slideshow) */}
-      <section className="relative h-[450px] md:h-[720px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
+      <section className="relative h-[450px] md:h-[580px] w-full overflow-hidden group rounded-xl border border-border-accent/40">
         {/* Slides */}
         <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
           {slides.map((slide) => (

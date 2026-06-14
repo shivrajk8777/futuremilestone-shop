@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased min-h-screen p-[12px] bg-bg-secondary transition-theme flex flex-col">
+      <body className="px-3 pt-6 antialiased min-h-screen p-[12px] bg-bg-secondary transition-theme flex flex-col">
         <CollectionProvider>
           <ProductProvider>
             <UserProvider>
