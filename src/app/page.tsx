@@ -224,6 +224,7 @@ export default function Home() {
                   className="absolute group/pin z-20 -translate-x-1/2 -translate-y-1/2"
                   style={getHotspotPosition(hotspot.left, hotspot.top)}
                 >
+
                   {/* + icon with expanding aura, rotates to × on hover */}
                   <div className="relative flex items-center justify-center cursor-pointer">
                     {/* Aura ring — small by default, grows on hover */}
