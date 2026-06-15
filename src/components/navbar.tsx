@@ -302,7 +302,7 @@ export default function Navbar() {
           {/* Logo link */}
           <Link href="/" className="flex items-center gap-1.5 md:gap-2 text-fg-primary font-dm-sans text-[14px] font-bold tracking-tight select-none group/logo">
             {/* Custom Logo Icon */}
-            <img src={theme === 'dark' ? '/images/menu-icon-light.svg' : '/images/menu-icon-dark.svg'} alt="Logo" className="w-[15px] h-[15px] md:w-[20px] md:h-[20px] object-contain transition-theme" />
+            <img src={theme === 'dark' ? '/images/menu-icon-light.svg' : '/images/menu-icon-dark.svg'} alt="Logo" className="w-[15px] h-[15px] md:w-[18px] md:h-[20px] object-contain transition-theme -translate-y-[2px]" />
             {/* Logo text: top-to-bottom slide — "Future Milestone" visible by default, "Home" slides in from top on hover */}
             <span className="overflow-hidden h-[14px] flex flex-col">
               <span
@@ -310,7 +310,7 @@ export default function Navbar() {
                 style={{ lineHeight: '14px' }}
               >
                 <span>Home</span>
-                <span>futuremilestone</span>
+                <span>future milestone</span>
               </span>
             </span>
           </Link>

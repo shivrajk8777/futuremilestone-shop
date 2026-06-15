@@ -6,10 +6,10 @@ import { useSearchParams } from 'next/navigation';
 import { useCollections } from '@/context/CollectionContext';
 import { useProducts } from '@/context/ProductContext';
 
-// Sale badge per slug — matches reference image (50% OFF shown on Sage)
 const saleBadges: Record<string, string> = {
   sage: '50% OFF',
   skala: '50% OFF',
+  lykke: '54% OFF',
 };
 
 function ShopSkeletonGrid() {
@@ -18,7 +18,7 @@ function ShopSkeletonGrid() {
       {Array.from({ length: 8 }).map((_, idx) => (
         <div
           key={idx}
-          className="w-full rounded-xl overflow-hidden h-[600px] relative border border-border-accent/40 animate-wave"
+          className="w-full rounded-xl overflow-hidden aspect-[8/11] relative border border-border-accent/40 animate-wave"
         >
           {/* Top Left Title Tab Skeleton */}
           <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-32 h-10 select-none z-10">
@@ -88,9 +88,9 @@ function ShopContent() {
   const currentHeader = selectedCollection
     ? { title: selectedCollection.name, desc: selectedCollection.description }
     : {
-        title: 'Shop',
-        desc: 'Explore our collections, where deep hues and refined finishes bring an air of sophistication and drama to any room.',
-      };
+      title: 'Shop',
+      desc: 'Explore our collections, where deep hues and refined finishes bring an air of sophistication and drama to any room.',
+    };
 
   return (
     <div className="space-y-3">
@@ -129,8 +129,8 @@ function ShopContent() {
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.slug)}
                 className={`flex-1 flex items-center justify-between px-6 py-4 rounded-xl border transition-colors ${isActive
-                    ? 'bg-bg-secondary border-border-accent text-fg-primary'
-                    : 'bg-bg-secondary border-border-accent text-fg-secondary hover:bg-fg-primary/5'
+                  ? 'bg-bg-secondary border-border-accent text-fg-primary'
+                  : 'bg-bg-secondary border-border-accent text-fg-secondary hover:bg-fg-primary/5'
                   }`}
               >
                 <span className="text-sm font-semibold">{cat.name}</span>
@@ -156,9 +156,10 @@ function ShopContent() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {filteredProducts.map((product) => (
-                <div
+                <Link
+                  href={`/shop/${product.slug}`}
                   key={product.slug}
-                  className="w-full bg-bg-secondary/40 rounded-xl overflow-hidden group h-[600px] relative border border-border-accent/40 animate-fade-in"
+                  className="block w-full bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40 animate-fade-in"
                 >
                   {/* Product Background Image */}
                   {product.images && product.images[0] ? (
@@ -173,7 +174,7 @@ function ShopContent() {
 
                   {/* Top-Right Sale Badge */}
                   {(product.discountBadge || saleBadges[product.slug]) && (
-                    <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase">
+                    <div className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase shadow-md">
                       {product.discountBadge || saleBadges[product.slug]}
                     </div>
                   )}
@@ -208,14 +209,13 @@ function ShopContent() {
                         <span className="text-[10px] text-fg-secondary line-through">${product.originalPrice}</span>
                       )}
                     </div>
-                    <Link
-                      href={`/shop/${product.slug}`}
+                    <span
                       className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
                     >
                       View
-                    </Link>
+                    </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

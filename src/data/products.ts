@@ -9,6 +9,8 @@ export interface Product {
   dimensions: string;
   shippingReturns: string;
   images: string[];
+  originalPrice?: number;
+  discountBadge?: string;
 }
 
 export const products: Product[] = [
@@ -225,11 +227,13 @@ export const products: Product[] = [
   },
   {
     slug: 'skala',
-    name: 'Skala Lounge Chair',
-    price: 390,
+    name: 'Skala',
+    price: 210,
+    originalPrice: 420,
+    discountBadge: '50% OFF',
     category: 'modern',
     tagline: 'Architectural Comfort',
-    description: 'The Skala Lounge Chair is defined by its bold, angular armrests and deep, reclined seat. Ideal for reading and relaxing, it serves as a stunning standalone feature piece in any room.',
+    description: 'Made from solid oak, this chair showcases the natural beauty of the wood with its smooth grain and warm finish.',
     features: [
       'Angular architectural oak frame',
       'Deep, angled seat cushion',

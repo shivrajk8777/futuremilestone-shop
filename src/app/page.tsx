@@ -9,10 +9,10 @@ import { useSettings } from '@/context/SettingsContext';
 
 
 
-// Sale badge per slug — matches reference image (50% OFF shown on Sage)
 const saleBadges: Record<string, string> = {
   sage: '50% OFF',
   skala: '50% OFF',
+  lykke: '54% OFF',
 };
 
 export default function Home() {
@@ -197,7 +197,7 @@ export default function Home() {
             {Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={idx}
-                className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 rounded-xl overflow-hidden h-[600px] relative border border-border-accent/40 animate-wave"
+                className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 rounded-xl overflow-hidden aspect-[8/11] relative border border-border-accent/40 animate-wave"
               >
                 {/* Floating Top-Left Title Tab Skeleton */}
                 <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-36 h-12 select-none z-10">
@@ -250,9 +250,10 @@ export default function Home() {
               className="flex gap-3 overflow-x-auto pb-4 scroll-smooth scrollbar-none snap-x snap-mandatory w-full"
             >
               {favorites.map((product) => (
-                <div
+                <Link
+                  href={`/shop/${product.slug}`}
                   key={product.slug}
-                  className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 snap-start bg-bg-secondary/40 rounded-xl overflow-hidden group h-[600px] relative border border-border-accent/40"
+                  className="block w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 snap-start bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40"
                 >
                   {/* Product Background Image */}
                   <img
@@ -262,9 +263,9 @@ export default function Home() {
                   />
 
                   {/* Top-Right Sale Badge */}
-                  {saleBadges[product.slug] && (
-                    <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase">
-                      {saleBadges[product.slug]}
+                  {(product.discountBadge || saleBadges[product.slug]) && (
+                    <div className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase shadow-md">
+                      {product.discountBadge || saleBadges[product.slug]}
                     </div>
                   )}
 
@@ -293,14 +294,13 @@ export default function Home() {
                   {/* Animated Pop-up Bottom Price Bar */}
                   <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
                     <span className="text-sm font-bold text-fg-primary">${product.price}</span>
-                    <Link
-                      href={`/shop/${product.slug}`}
+                    <span
                       className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
                     >
                       View
-                    </Link>
+                    </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </>
@@ -323,7 +323,7 @@ export default function Home() {
           {/* 7. Section Collections (Asymmetric layout) Skeleton */}
           <section className="w-full flex flex-col md:flex-row gap-3">
             {/* Left Column Skeleton */}
-            <div className="w-full md:w-1/2 h-[450px] md:h-[776px] rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave">
+            <div className="w-full md:w-1/2 h-[450px] md:h-[600px] rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave">
               {/* Floating Bottom-Left Card Skeleton */}
               <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 w-[260px] bg-bg-primary rounded-xl p-8 flex flex-col gap-6 shadow-xl transition-theme animate-pulse">
                 <div className="flex flex-col gap-2">
@@ -338,7 +338,7 @@ export default function Home() {
             {/* Right Column Skeleton */}
             <div className="w-full md:w-1/2 flex flex-col gap-3 justify-between">
               {/* Row 1 Skeleton */}
-              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[294px] w-full">
                 <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 animate-wave" />
                 <div className="w-full sm:w-1/2 h-auto sm:h-full bg-[#0e1011] rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-white/5 animate-pulse">
                   <div className="h-5 w-20 bg-white/10 rounded-md" />
@@ -349,7 +349,7 @@ export default function Home() {
               </div>
 
               {/* Row 2 Skeleton */}
-              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[294px] w-full">
                 <div className="w-full sm:w-1/2 h-auto sm:h-full bg-[#0e1011] rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-white/5 order-last sm:order-first animate-pulse">
                   <div className="h-5 w-20 bg-white/10 rounded-md" />
                   <div className="h-3 w-full bg-white/10 rounded-md mt-2" />
@@ -371,7 +371,7 @@ export default function Home() {
           {/* 7. Section Collections (Asymmetric layout) */}
           <section className="w-full flex flex-col md:flex-row gap-3">
             {/* Left Column - Wood collection (Large Card) */}
-            <div className="w-full md:w-1/2 h-[450px] md:h-[776px] rounded-xl overflow-hidden relative border border-border-accent/40 group">
+            <div className="w-full md:w-1/2 h-[450px] md:h-[600px] rounded-xl overflow-hidden relative border border-border-accent/40 group">
               {collections[0].imageUrl && (
                 <img
                   src={collections[0].imageUrl}
@@ -403,9 +403,9 @@ export default function Home() {
             <div className="w-full md:w-1/2 flex flex-col gap-3 justify-between">
 
               {/* Row 1 - Dark Collection (Image left, Card right) */}
-              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[294px] w-full">
                 {/* Image (Left) */}
-                <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                   {collections[1].imageUrl && (
                     <img
                       src={collections[1].imageUrl}
@@ -415,7 +415,7 @@ export default function Home() {
                   )}
                 </div>
                 {/* Card Content (Right - Solid Dark Inverse background) */}
-                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
+                <div className="w-full sm:w-1/3 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
                   <h3 className="font-dm-sans text-xl font-bold text-bg-primary">{collections[1].name}</h3>
                   <p className="text-xs text-bg-secondary/80 leading-[1.6]">{collections[1].description}</p>
                   <div className="mt-4">
@@ -431,9 +431,9 @@ export default function Home() {
               </div>
 
               {/* Row 2 - Modern Collection (Card left, Image right) */}
-              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[382px] w-full">
+              <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[294px] w-full">
                 {/* Card Content (Left - Solid Dark Inverse background) */}
-                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 order-last sm:order-first transition-theme">
+                <div className="w-full sm:w-1/3 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 order-last sm:order-first transition-theme">
                   <h3 className="font-dm-sans text-xl font-bold text-bg-primary">{collections[2].name}</h3>
                   <p className="text-xs text-bg-secondary/80 leading-[1.6]">{collections[2].description}</p>
                   <div className="mt-4">
@@ -447,7 +447,7 @@ export default function Home() {
                   </div>
                 </div>
                 {/* Image (Right) */}
-                <div className="w-full sm:w-1/2 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                <div className="w-full sm:w-1/1 h-[250px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                   {collections[2].imageUrl && (
                     <img
                       src={collections[2].imageUrl}
