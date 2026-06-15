@@ -6,11 +6,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { products, Product } from '@/data/products';
 import { useCollections } from '@/context/CollectionContext';
 import { useUser } from '@/context/UserContext';
+import { useSettings } from '@/context/SettingsContext';
 import AuthModal from '@/components/auth-modal';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { settings, loading } = useSettings();
   const { user, setAuthModalOpen, logout } = useUser();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -275,7 +277,7 @@ export default function Navbar() {
     <>
       {/* Floating Split-Block Navbar Container */}
       <div
-        className={`absolute left-0 right-0 z-30 w-full flex justify-between items-start pointer-events-none transition-all duration-300 ${pathname === '/' ? 'top-[38px]' : 'top-0'
+        className={`absolute left-0 right-0 z-30 w-full flex justify-between items-start pointer-events-none transition-all duration-300 ${(pathname === '/' && !loading && settings.marqueeVisible) ? 'top-[38px]' : 'top-0'
           }`}
       >
         {/* Left Block: Brand, Navigation Links, and Theme Switcher */}

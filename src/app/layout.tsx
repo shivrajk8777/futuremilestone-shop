@@ -4,9 +4,11 @@ import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import MainWrapper from '@/components/main-wrapper';
 import SocialBar from '@/components/social-bar';
+import DynamicBody from '@/components/dynamic-body';
 import { CollectionProvider } from '@/context/CollectionContext';
 import { ProductProvider } from '@/context/ProductContext';
 import { UserProvider } from '@/context/UserContext';
+import { SettingsProvider } from '@/context/SettingsContext';
 
 export const metadata: Metadata = {
   title: 'Future Milestone - Scandinavian Furniture',
@@ -25,22 +27,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="px-3 pt-6 antialiased min-h-screen p-[12px] bg-bg-secondary transition-theme flex flex-col">
-        <CollectionProvider>
-          <ProductProvider>
-            <UserProvider>
-              <div className="flex-grow flex flex-col bg-bg-primary rounded-2xl relative overflow-hidden transition-theme">
-                <Navbar />
-                <MainWrapper>
-                  {children}
-                </MainWrapper>
-                <SocialBar />
-                <Footer />
-              </div>
-            </UserProvider>
-          </ProductProvider>
-        </CollectionProvider>
-      </body>
+      <SettingsProvider>
+        <DynamicBody>
+          <CollectionProvider>
+            <ProductProvider>
+              <UserProvider>
+                <div className="flex-grow flex flex-col bg-bg-primary rounded-2xl relative overflow-hidden transition-theme">
+                  <Navbar />
+                  <MainWrapper>
+                    {children}
+                  </MainWrapper>
+                  <SocialBar />
+                  <Footer />
+                </div>
+              </UserProvider>
+            </ProductProvider>
+          </CollectionProvider>
+        </DynamicBody>
+      </SettingsProvider>
     </html>
   );
 }

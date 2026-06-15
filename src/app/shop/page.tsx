@@ -96,7 +96,7 @@ function ShopContent() {
     <div className="space-y-3">
 
       {/* ── Page Header — full-width, overlaps navbar ── */}
-      <div className="-mt-24 px-6 md:px-12 bg-bg-secondary pt-32 pb-10 border-b border-border-accent transition-theme">
+      <div className="-mt-[84px] px-6 md:px-12 bg-bg-secondary pt-32 pb-10 border-b border-border-accent transition-theme">
         <h1 className="font-dm-sans text-5xl md:text-6xl font-bold tracking-tight text-fg-primary">
           {currentHeader.title}
         </h1>
@@ -172,9 +172,9 @@ function ShopContent() {
                   )}
 
                   {/* Top-Right Sale Badge */}
-                  {saleBadges[product.slug] && (
+                  {(product.discountBadge || saleBadges[product.slug]) && (
                     <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase">
-                      {saleBadges[product.slug]}
+                      {product.discountBadge || saleBadges[product.slug]}
                     </div>
                   )}
 
@@ -202,7 +202,12 @@ function ShopContent() {
 
                   {/* Animated Pop-up Bottom Price Bar */}
                   <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
-                    <span className="text-sm font-bold text-fg-primary">${product.price}</span>
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-bold text-fg-primary">${product.price}</span>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-[10px] text-fg-secondary line-through">${product.originalPrice}</span>
+                      )}
+                    </div>
                     <Link
                       href={`/shop/${product.slug}`}
                       className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
@@ -250,7 +255,7 @@ export default function Shop() {
     <Suspense fallback={
       <div className="space-y-3">
         {/* Skeleton Header mimicking the page header */}
-        <div className="-mt-24 px-6 md:px-12 bg-bg-secondary pt-32 pb-10 border-b border-border-accent transition-theme">
+        <div className="-mt-[84px] px-6 md:px-12 bg-bg-secondary pt-32 pb-10 border-b border-border-accent transition-theme">
           <div className="h-12 w-48 bg-border-accent/30 rounded animate-wave" />
           <div className="h-4 w-64 bg-border-accent/20 rounded mt-3 animate-wave" />
         </div>

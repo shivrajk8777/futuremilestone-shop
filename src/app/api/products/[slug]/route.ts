@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
+import { getActiveDiscounts, applyDiscountsToProduct } from '@/lib/discounts';
 
 export async function GET(
   request: NextRequest,
@@ -18,14 +19,28 @@ export async function GET(
       );
     }
 
-    const price = product.dimensions && product.dimensions[0] ? Number(product.dimensions[0].price) || 0 : 0;
+    const basePrice = product.dimensions && product.dimensions[0] ? Number(product.dimensions[0].price) || 0 : 0;
     const dims = product.dimensions && product.dimensions[0] ? product.dimensions[0].label : 'Standard';
+
+    const activeDiscounts = await getActiveDiscounts();
+
+    const rawProduct = {
+      id: product._id.toString(),
+      collectionId: product.collectionId,
+      price: basePrice,
+      dimensionsList: product.dimensions || [],
+    };
+
+    const discounted = applyDiscountsToProduct(rawProduct, activeDiscounts);
 
     const formatted = {
       id: product._id.toString(),
       slug: product.slug ?? '',
       name: product.name ?? '',
-      price,
+      price: discounted.price,
+      originalPrice: discounted.originalPrice,
+      discountBadge: discounted.discountBadge,
+      discount: discounted.discount,
       category: product.collectionSlug ?? '',
       tagline: product.introText ?? '',
       description: product.description ?? '',
@@ -36,7 +51,7 @@ export async function GET(
         ? [product.imageUrl, ...product.galleryImages].filter(Boolean)
         : (product.imageUrl ? [product.imageUrl] : []),
       materialsList: Array.isArray(product.materials) ? product.materials : [],
-      dimensionsList: Array.isArray(product.dimensions) ? product.dimensions : [],
+      dimensionsList: discounted.dimensionsList,
     };
 
     return NextResponse.json({ success: true, product: formatted });

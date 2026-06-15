@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
+import { getActiveDiscounts, applyDiscountsToProduct } from '@/lib/discounts';
 
 export async function GET(request: NextRequest) {
   try {
@@ -46,18 +47,32 @@ export async function GET(request: NextRequest) {
         .toArray();
     }
 
+    const activeDiscounts = await getActiveDiscounts();
+
     // Map to the frontend shape
     const formatted = products.map((item) => {
-      const price =
+      const basePrice =
         item.dimensions && item.dimensions[0]
           ? Number(item.dimensions[0].price) || 0
           : 0;
+
+      const rawProduct = {
+        id: item._id.toString(),
+        collectionId: item.collectionId,
+        price: basePrice,
+        dimensionsList: item.dimensions || [],
+      };
+
+      const discounted = applyDiscountsToProduct(rawProduct, activeDiscounts);
 
       return {
         id: item._id.toString(),
         slug: item.slug ?? '',
         name: item.name ?? '',
-        price,
+        price: discounted.price,
+        originalPrice: discounted.originalPrice,
+        discountBadge: discounted.discountBadge,
+        discount: discounted.discount,
         category: item.collectionSlug ?? '',
         tagline: item.introText ?? '',
         images:

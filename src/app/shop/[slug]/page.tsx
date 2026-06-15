@@ -108,7 +108,7 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Active thumbnail observation index
   const [activeImgIdx, setActiveImgIdx] = useState(0);
-  const [selectedDimension, setSelectedDimension] = useState<{ id: string; label: string; price: number } | null>(null);
+  const [selectedDimension, setSelectedDimension] = useState<{ id: string; label: string; price: number; originalPrice?: number } | null>(null);
 
   // Fetch dynamic product from MongoDB
   useEffect(() => {
@@ -153,6 +153,7 @@ export default function ProductDetails({ params }: PageProps) {
     id: string;
     label: string;
     price: number;
+    originalPrice?: number;
   }
 
   // Active product definition combining database or static fallback details
@@ -160,6 +161,8 @@ export default function ProductDetails({ params }: PageProps) {
     slug: slug,
     name: dbProduct?.name || staticProduct?.name || 'Loading Product...',
     price: dbProduct?.price || staticProduct?.price || 0,
+    originalPrice: dbProduct?.originalPrice || staticProduct?.price || 0,
+    discountBadge: dbProduct?.discountBadge || '',
     category: (dbProduct?.category || staticProduct?.category || 'wood') as 'wood' | 'dark' | 'modern',
     tagline: dbProduct?.tagline || staticProduct?.tagline || '',
     description: dbProduct?.description || staticProduct?.description || '',
@@ -171,8 +174,8 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Default dimensions fallback for static products
   const defaultDimensions: DimensionItem[] = [
-    { id: '1', label: 'Standard', price: activeProduct.price },
-    { id: '2', label: 'Large', price: activeProduct.price + 150 },
+    { id: '1', label: 'Standard', price: activeProduct.price, originalPrice: activeProduct.price },
+    { id: '2', label: 'Large', price: activeProduct.price + 150, originalPrice: activeProduct.price + 150 },
   ];
 
   const dimensionsList: DimensionItem[] = dbProduct?.dimensionsList && dbProduct.dimensionsList.length > 0
@@ -180,6 +183,7 @@ export default function ProductDetails({ params }: PageProps) {
         id: String(d.id),
         label: String(d.label),
         price: Number(d.price) || 0,
+        originalPrice: Number(d.originalPrice) || Number(d.price) || 0,
       }))
     : defaultDimensions;
 
@@ -196,6 +200,7 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Compute active price
   const currentPrice = selectedDimension ? selectedDimension.price : activeProduct.price;
+  const currentOriginalPrice = selectedDimension ? (selectedDimension.originalPrice ?? selectedDimension.price) : activeProduct.originalPrice;
 
   // Update quantity/variant state if the product changes
   useEffect(() => {
@@ -410,18 +415,18 @@ export default function ProductDetails({ params }: PageProps) {
 
             {/* Sale tag and pricing */}
             <div className="space-y-3">
-              {saleBadges[activeProduct.slug] && (
+              {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
                 <div className="bg-[#ef4444] text-white text-[10px] font-bold px-2.5 py-1 rounded-lg w-fit uppercase tracking-wider">
-                  {saleBadges[activeProduct.slug]}
+                  {activeProduct.discountBadge || saleBadges[activeProduct.slug]}
                 </div>
               )}
               <div className="flex items-baseline gap-3 animate-fade-in">
                 <span className="text-3xl font-bold text-white">
                   ${currentPrice}
                 </span>
-                {saleBadges[activeProduct.slug] && (
+                {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
                   <span className="text-lg text-white/40 line-through">
-                    ${currentPrice * 2}
+                    ${currentOriginalPrice || (currentPrice * 2)}
                   </span>
                 )}
               </div>

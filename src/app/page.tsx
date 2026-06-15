@@ -1,26 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { products } from '@/data/products';
 import { useCollections } from '@/context/CollectionContext';
 import { useProducts } from '@/context/ProductContext';
+import { useSettings } from '@/context/SettingsContext';
 
-interface Hotspot {
-  top: string;
-  left: string;
-  text: string;
-  image: string;
-}
 
-interface Slide {
-  slug: string;
-  name: string;
-  tagline: string;
-  price: number;
-  bgImage: string;
-  hotspots: Hotspot[];
-}
 
 // Sale badge per slug — matches reference image (50% OFF shown on Sage)
 const saleBadges: Record<string, string> = {
@@ -29,107 +16,24 @@ const saleBadges: Record<string, string> = {
 };
 
 export default function Home() {
+  const { settings, loading: settingsLoading } = useSettings();
   const [currentSlide, setCurrentSlide] = useState(0);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        setDimensions({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
-    });
-    resizeObserver.observe(containerRef.current);
-    return () => resizeObserver.disconnect();
-  }, []);
-
-  const getHotspotPosition = (leftStr: string, topStr: string) => {
-    const x = parseFloat(leftStr) / 100;
-    const y = parseFloat(topStr) / 100;
-    const { width, height } = dimensions;
-    if (width === 0 || height === 0) {
-      return { left: leftStr, top: topStr };
-    }
-
-    const containerRatio = width / height;
-    const imageRatio = 2; // Slide images are 2400x1200 (2:1 aspect ratio)
-
-    if (containerRatio < imageRatio) {
-      // Container is narrower than 2:1 (e.g. mobile)
-      const renderedWidth = height * imageRatio;
-      const xOffset = (width - renderedWidth) / 2;
-      const leftPx = xOffset + x * renderedWidth;
-      const topPx = y * height;
-      return {
-        left: `${(leftPx / width) * 100}%`,
-        top: `${(topPx / height) * 100}%`,
-      };
-    } else {
-      // Container is wider than 2:1
-      const renderedHeight = width / imageRatio;
-      const yOffset = (height - renderedHeight) / 2;
-      const leftPx = x * width;
-      const topPx = yOffset + y * renderedHeight;
-      return {
-        left: `${(leftPx / width) * 100}%`,
-        top: `${(topPx / height) * 100}%`,
-      };
-    }
-  };
 
   const { state: { collections, loading, error, fetched } } = useCollections();
   const { state: productState } = useProducts();
 
-  // Slideshow config with hotspots coordinates and images extracted from index.html
-  const slides: Slide[] = [
-    {
-      slug: 'sona',
-      name: 'Crafting Comfort, Inspired by the North',
-      tagline: 'Crafted for style and lasting durability, perfect for any space.',
-      price: 650,
-      bgImage: '/images/s1Gw9pyuUEC9vViCqmou6hRgI_bc9f50.webp',
-      hotspots: [
-        { top: '51%', left: '66.2%', text: 'Soft leather, durable cushioning.', image: '/images/1c3s4XR0YhiP5U0jMudG8pcXqDA_692e67.webp' },
-        { top: '39%', left: '55.8%', text: 'Handcrafted wood finish.', image: '/images/vb8XKVhsi1CNqzR5Bozhb2yTXeo_ca005a.webp' },
-        { top: '27.7%', left: '38.4%', text: 'Ergonomic and supportive.', image: '/images/GbiVrsgrVhulfQoqpcQTKA1u4_a30742.webp' },
-      ],
-    },
-    {
-      slug: 'sage',
-      name: 'Natural Elegance in Every Detail',
-      tagline: 'Crafted from solid oak with a smooth finish, timeless and durable.',
-      price: 380,
-      bgImage: '/images/M8cpp44fcecDccZvJuknm85uc_a5408b.webp',
-      hotspots: [
-        { top: '24.9%', left: '55.8%', text: 'Smooth, curved wood for support.', image: '/images/ppC0TOwOtlTewHNf7WaCGikU_0452aa.webp' },
-        { top: '46.1%', left: '45.9%', text: 'Soft padding for added comfort.', image: '/images/iDjFIbeOY7plKQSKHHFlkGVJyg_cf2b8d.webp' },
-      ],
-    },
-    {
-      slug: 'nest',
-      name: 'Modern Minimalism, Maximum Comfort',
-      tagline: 'Simple, sleek, and built for a cozy, stylish lifestyle.',
-      price: 360,
-      bgImage: '/images/yWfiT9hCK49Xggoq1k9TvLHyUY_7361e6.webp',
-      hotspots: [
-        { top: '23.1%', left: '54.3%', text: 'Solid wood with metal accents.', image: '/images/VoEmH1ywV91w47wrTCDlGjxtk_682c4e.webp' },
-        { top: '46.4%', left: '41.9%', text: 'Sleek, minimalist tubular design.', image: '/images/AkTgfzbvVkgxks7FPF6tzFzn9E_c95bb0.webp' },
-      ],
-    },
-  ];
-
+  const activeSlides = settings.slides && settings.slides.length > 0 ? settings.slides : [];
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    if (activeSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    if (activeSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   };
 
   // Section Products: latest 8 products dynamically
@@ -149,160 +53,105 @@ export default function Home() {
 
 
 
+  const showMarquee = !settingsLoading && settings.marqueeVisible;
+
   return (
-    <div className="flex flex-col gap-3 pb-3">
+    <div className={`flex flex-col gap-3 pb-3 ${showMarquee ? '' : 'pt-3'}`}>
 
       {/* 1. Top Announcement Marquee */}
-      <section className="overflow-hidden bg-fg-primary text-bg-primary py-2.5 rounded-xl border border-border-accent/40 select-none transition-theme">
-        <div className='w-[95%] md:w-1/2 mx-auto overflow-hidden '>
-          <div className="flex whitespace-nowrap animate-marquee">
-            <div className="flex gap-8 px-4 text-xs  tracking-wider shrink-0 min-w-max">
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-            </div>
-            <div className="flex gap-8 px-4 text-xs  tracking-wider shrink-0 min-w-max" aria-hidden="true">
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-              <span>Save 20% on your first order</span>
-              <span>-</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Section Hero (Slideshow) */}
-      <section ref={containerRef} className="relative h-[450px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
-        {/* Slides */}
-        <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-          {slides.map((slide) => (
-            <div key={slide.slug} className="relative w-full h-full flex-shrink-0">
-              <img
-                src={slide.bgImage}
-                alt={slide.name}
-                className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
-              />
-              <div className="absolute inset-0 bg-black/10" />
-
-              {/* Hotspot Pins */}
-              {slide.hotspots.map((hotspot, idx) => (
-                <div
-                  key={idx}
-                  className="absolute group/pin z-20 -translate-x-1/2 -translate-y-1/2"
-                  style={getHotspotPosition(hotspot.left, hotspot.top)}
-                >
-
-                  {/* + icon with expanding aura, rotates to × on hover */}
-                  <div className="relative flex items-center justify-center cursor-pointer">
-                    {/* Aura ring — small by default, grows on hover */}
-                    <span className="absolute rounded-full bg-white/25 transition-all duration-300 ease-out w-9 h-9 group-hover/pin:w-14 group-hover/pin:h-14" />
-                    {/* Button circle */}
-                    <button className="relative w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-lg focus:outline-none">
-                      <span
-                        className="text-black font-light transition-transform duration-300 group-hover/pin:rotate-45 select-none leading-none"
-                        style={{ fontSize: '20px', lineHeight: 1 }}
-                      >+</span>
-                    </button>
-                  </div>
-
-                  {/* Tooltip Card (Hover-triggered) */}
-                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-56 bg-bg-primary/95 backdrop-blur-md rounded-xl border border-border-accent p-3 flex gap-3 shadow-xl opacity-0 group-hover/pin:opacity-100 pointer-events-none group-hover/pin:pointer-events-auto transition-all duration-300 transform translate-y-2 group-hover/pin:translate-y-0 transition-theme">
-                    <div className="w-12 h-12 bg-bg-secondary rounded-lg overflow-hidden flex-shrink-0 relative border border-border-accent/40">
-                      <img src={hotspot.image} alt={hotspot.text} className="object-cover w-full h-full" />
-                    </div>
-                    <div className="flex-1 flex items-center">
-                      <p className="text-[11px] font-bold text-fg-primary leading-tight">{hotspot.text}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
-              <div className="absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-theme">
-                <div className="flex flex-row md:flex-col justify-between items-end md:items-start gap-4 md:gap-2">
-                  <h2 className="font-dm-sans text-lg md:text-[32px] font-bold leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
-                  <Link
-                    href={`/shop/${slide.slug}`}
-                    className="relative pb-0.5 text-xs md:text-sm font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mb-1 md:mb-0"
-                  >
-                    View <span className="hidden md:inline">Product</span>
-                    <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
-                  </Link>
-                </div>
-                <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
+      {showMarquee && (
+        <section className="overflow-hidden bg-fg-primary text-bg-primary py-2.5 rounded-xl border border-border-accent/40 select-none transition-theme">
+          <div className="w-[95%] md:w-1/2 mx-auto overflow-hidden ">
+            <div className="flex whitespace-nowrap animate-marquee">
+              <div className="flex gap-8 px-4 text-xs  tracking-wider shrink-0 min-w-max">
+                {Array.from({ length: 10 }).map((_, idx) => (
+                  <React.Fragment key={idx}>
+                    <span>{settings.marqueeText}</span>
+                    <span>-</span>
+                  </React.Fragment>
+                ))}
+              </div>
+              <div className="flex gap-8 px-4 text-xs  tracking-wider shrink-0 min-w-max" aria-hidden="true">
+                {Array.from({ length: 10 }).map((_, idx) => (
+                  <React.Fragment key={idx}>
+                    <span>{settings.marqueeText}</span>
+                    <span>-</span>
+                  </React.Fragment>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        </section>
+      )}
 
-        {/* Slide navigation controls */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 md:bg-bg-primary/90 text-white md:text-fg-primary p-2 md:p-3 md:rounded-full md:border md:border-border-accent md:shadow-md opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
-          aria-label="Previous Slide"
-        >
-          <svg className="w-8 h-8 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 md:bg-bg-primary/90 text-white md:text-fg-primary p-2 md:p-3 md:rounded-full md:border md:border-border-accent md:shadow-md opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
-          aria-label="Next Slide"
-        >
-          <svg className="w-8 h-8 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+      {/* 2. Section Hero (Slideshow) */}
+      {!settingsLoading && settings.carouselVisible && activeSlides.length > 0 && (
+        <section className="relative h-[450px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
+          {/* Slides */}
+          <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+            {activeSlides.map((slide: any) => (
+              <div key={slide.slug} className="relative w-full h-full flex-shrink-0">
+                <img
+                  src={slide.bgImage}
+                  alt={slide.name}
+                  className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
+                />
+                <div className="absolute inset-0 bg-black/10" />
 
-        {/* Dot Indicators — bottom center */}
-        <div className="absolute bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-          {slides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              aria-label={`Go to slide ${idx + 1}`}
-              className={`rounded-full transition-all duration-300 focus:outline-none ${idx === currentSlide
-                ? 'w-2.5 h-2.5 bg-white'
-                : 'w-2 h-2 bg-white/40 hover:bg-white/70'
-                }`}
-            />
-          ))}
-        </div>
-      </section>
+                {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
+                <div className="absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-theme">
+                  <div className="flex flex-row md:flex-col justify-between items-end md:items-start gap-4 md:gap-2">
+                    <h2 className="font-dm-sans text-lg md:text-[32px] font-bold leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
+                    <Link
+                      href={`/shop/${slide.slug}`}
+                      className="relative pb-0.5 text-xs md:text-sm font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mb-1 md:mb-0"
+                    >
+                      View <span className="hidden md:inline">Product</span>
+                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
+                    </Link>
+                  </div>
+                  <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Slide navigation controls */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 md:bg-bg-primary/90 text-white md:text-fg-primary p-2 md:p-3 md:rounded-full md:border md:border-border-accent md:shadow-md opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
+            aria-label="Previous Slide"
+          >
+            <svg className="w-8 h-8 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 md:bg-bg-primary/90 text-white md:text-fg-primary p-2 md:p-3 md:rounded-full md:border md:border-border-accent md:shadow-md opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none z-30 transition-theme"
+            aria-label="Next Slide"
+          >
+            <svg className="w-8 h-8 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Dot Indicators — bottom center */}
+          <div className="absolute bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+            {activeSlides.map((_: any, idx: number) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSlide(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`rounded-full transition-all duration-300 focus:outline-none ${idx === currentSlide
+                  ? 'w-2.5 h-2.5 bg-white'
+                  : 'w-2 h-2 bg-white/40 hover:bg-white/70'
+                  }`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* 3. Section Benefits (Hidden on mobile) */}
       <section className="hidden md:flex bg-fg-primary text-bg-primary rounded-xl px-12 py-6 justify-center gap-16 items-center shadow-sm transition-theme">

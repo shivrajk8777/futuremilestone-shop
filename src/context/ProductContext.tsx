@@ -7,6 +7,9 @@ export interface DBProduct {
   slug: string;
   name: string;
   price: number;
+  originalPrice?: number;
+  discountBadge?: string;
+  discount?: any;
   category: string;
   tagline: string;
   description: string;
