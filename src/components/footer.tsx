@@ -25,15 +25,33 @@ export default function Footer() {
           {/* Brand and Actions column */}
           <div className="flex flex-col justify-between gap-8 max-w-sm">
             <div className="space-y-4">
-              <Link href="/" className="flex items-center gap-2 text-bg-primary font-dm-sans text-xl font-bold tracking-tight select-none">
+              <Link href="/" className="flex items-center gap-2 text-bg-primary font-dm-sans text-xl font-bold tracking-tight select-none group/logo">
                 {/* Logo Icon SVG */}
-                <svg viewBox="0 0 15 15" className="w-[15px] h-[15px] fill-current">
-                  <path d="M 3.75 7.5 C 3.75 5.429 5.429 3.75 7.5 3.75 C 9.571 3.75 11.25 5.429 11.25 7.5 C 11.25 9.571 9.571 11.25 7.5 11.25 C 5.429 11.25 3.75 9.571 3.75 7.5 Z M 7.5 15 C 11.642 15 15 11.642 15 7.5 C 15 3.358 11.642 0 7.5 0 C 3.358 0 0 3.358 0 7.5 C 0 11.642 3.358 15 7.5 15 Z" />
-                </svg>
-                <span>Future milestone</span>
+                <span className="relative w-[20px] h-[18px] flex items-center justify-center -translate-y-[1px]">
+                  <img
+                    src="/images/menu-icon-light.svg"
+                    alt="Logo"
+                    className="absolute inset-0 w-full h-full object-contain footer-logo-light"
+                  />
+                  <img
+                    src="/images/menu-icon-dark.svg"
+                    alt="Logo"
+                    className="absolute inset-0 w-full h-full object-contain footer-logo-dark"
+                  />
+                </span>
+                {/* Logo text: top-to-bottom slide — "future milestone" visible by default, "Home" slides in from top on hover */}
+                <span className="overflow-hidden h-[20px] flex flex-col">
+                  <span
+                    className="flex flex-col transition-transform duration-300 -translate-y-[20px] group-hover/logo:translate-y-0"
+                    style={{ lineHeight: '20px' }}
+                  >
+                    <span>Home</span>
+                    <span>future milestone</span>
+                  </span>
+                </span>
               </Link>
               <p className="text-sm text-bg-primary/70 leading-relaxed font-medium">
-                Scandinavian furniture, meticulously handcrafted to bring warmth and elegance into your home.
+                01 Scandinavian furniture, meticulously handcrafted to bring warmth and elegance into your home.
               </p>
             </div>
 
@@ -58,18 +76,38 @@ export default function Footer() {
             {/* Pages Column */}
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-bg-primary/40 select-none">Pages</h4>
-              <ul className="space-y-2.5 text-sm font-semibold">
-                <li>
-                  <Link href="/" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Home</Link>
+              <ul className="space-y-2.5 text-sm">
+                <li className='mb-4'>
+                  <Link href="/" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Home</span>
+                      <span>Home</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/about" className="hover:text-bg-primary/70 transition-colors text-bg-primary">About</Link>
+                <li className='mb-4'>
+                  <Link href="/about" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>About</span>
+                      <span>About</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/licensing" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Licensing</Link>
+                <li className='mb-4'>
+                  <Link href="/licensing" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Licensing</span>
+                      <span>Licensing</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/404" className="hover:text-bg-primary/70 transition-colors text-bg-primary">404</Link>
+                <li className='mb-4'>
+                  <Link href="/404" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>404</span>
+                      <span>404</span>
+                    </span>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -77,15 +115,30 @@ export default function Footer() {
             {/* Help Column */}
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-bg-primary/40 select-none">Help</h4>
-              <ul className="space-y-2.5 text-sm font-semibold">
-                <li>
-                  <Link href="/faq" className="hover:text-bg-primary/70 transition-colors text-bg-primary">FAQ</Link>
+              <ul className="space-y-2.5 text-sm ">
+                <li className='mb-4'>
+                  <Link href="/faq" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>FAQ</span>
+                      <span>FAQ</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/contact" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Contact</Link>
+                <li className='mb-4'>
+                  <Link href="/contact" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Contact</span>
+                      <span>Contact</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/terms" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Terms</Link>
+                <li className='mb-4'>
+                  <Link href="/terms" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Terms</span>
+                      <span>Terms</span>
+                    </span>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -93,21 +146,46 @@ export default function Footer() {
             {/* CMS Column */}
             <div className="space-y-4 col-span-2 sm:col-span-1">
               <h4 className="text-xs font-bold uppercase tracking-wider text-bg-primary/40 select-none">CMS</h4>
-              <ul className="space-y-2.5 text-sm font-semibold">
-                <li>
-                  <Link href="/shop" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Shop</Link>
+              <ul className="space-y-2.5 text-sm">
+                <li className='mb-4'>
+                  <Link href="/shop" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Shop</span>
+                      <span>Shop</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/shop/sona" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Shop Product</Link>
+                <li className='mb-4'>
+                  <Link href="/shop/sona" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Shop Product</span>
+                      <span>Shop Product</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/shop?category=wood" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Shop Category</Link>
+                <li className='mb-4'>
+                  <Link href="/shop?category=wood" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Shop Category</span>
+                      <span>Shop Category</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/blog" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Blog</Link>
+                <li className='mb-4'>
+                  <Link href="/blog" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Blog</span>
+                      <span>Blog</span>
+                    </span>
+                  </Link>
                 </li>
-                <li>
-                  <Link href="/blog/5-ways-scandinavian-design-can-transform-your-space" className="hover:text-bg-primary/70 transition-colors text-bg-primary">Blog Post</Link>
+                <li className='mb-4'>
+                  <Link href="/blog/5-ways-scandinavian-design-can-transform-your-space" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                      <span>Blog Post</span>
+                      <span>Blog Post</span>
+                    </span>
+                  </Link>
                 </li>
               </ul>
             </div>

@@ -25,7 +25,7 @@ export default function FAQ() {
       if (!el) return;
 
       const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      const atTop    = el.scrollTop <= 0;
+      const atTop = el.scrollTop <= 0;
       const pageAtTop = (window.scrollY || document.documentElement.scrollTop) <= 0;
 
       if (e.deltaY > 0) {
@@ -137,10 +137,10 @@ export default function FAQ() {
   };
 
   const socialCards = [
-    { name: 'Twitter', href: 'https://twitter.com' },
-    { name: 'Instagram', href: 'https://instagram.com' },
-    { name: 'Pinterest', href: 'https://pinterest.com' },
-    { name: 'Behance', href: 'https://behance.net' }
+    { name: 'Twitter', href: '/' },
+    { name: 'Instagram', href: '/' },
+    { name: 'Pinterest', href: '/' },
+    { name: 'Behance', href: '/' }
   ];
 
   return (
@@ -160,7 +160,7 @@ export default function FAQ() {
 
       {/* Right Column: Scrollable Content */}
       <div ref={rightColumnRef} className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
-        
+
         {/* Header Card */}
         <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-12 lg:p-16 rounded-xl transition-theme flex flex-col gap-4">
           <h1 className="font-dm-sans text-4xl md:text-5xl font-bold tracking-tight text-fg-primary">

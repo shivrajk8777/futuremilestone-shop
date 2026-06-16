@@ -164,3 +164,60 @@ body {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* Footer menu icon transition styling */
+.footer-logo-light {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.footer-logo-dark {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .footer-logo-light {
+    opacity: 0;
+  }
+  :root:not([data-theme="light"]) .footer-logo-dark {
+    opacity: 1;
+  }
+}
+
+[data-theme="dark"] .footer-logo-light {
+  opacity: 0;
+}
+[data-theme="dark"] .footer-logo-dark {
+  opacity: 1;
+}
+
+/* Footer menu link styling */
+.footer-menu-link {
+  color: #9f9fa0;
+  transition: color 0.3s ease;
+}
+
+.footer-menu-link:hover {
+  color: #ffffff;
+}
+
+/* In Dark Mode (since card is light) */
+[data-theme="dark"] .footer-menu-link {
+  color: rgba(14, 16, 17, 0.6);
+}
+
+[data-theme="dark"] .footer-menu-link:hover {
+  color: #0e1011;
+}
+
+/* System preferences dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .footer-menu-link {
+    color: rgba(14, 16, 17, 0.6);
+  }
+  :root:not([data-theme="light"]) .footer-menu-link:hover {
+    color: #0e1011;
+  }
+}
+
+

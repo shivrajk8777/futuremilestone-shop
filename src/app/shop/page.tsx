@@ -97,7 +97,7 @@ function ShopContent() {
 
       {/* ── Page Header — full-width, overlaps navbar ── */}
       <div className="-mt-[84px] px-6 md:px-12 bg-bg-secondary pt-32 pb-10 border-b border-border-accent transition-theme">
-        <h1 className="font-dm-sans text-5xl md:text-6xl font-bold tracking-tight text-fg-primary">
+        <h1 className="font-dm-sans text-5xl md:text-4xl tracking-tight text-fg-primary">
           {currentHeader.title}
         </h1>
         <p className="text-sm text-fg-secondary leading-relaxed max-w-sm mt-3">

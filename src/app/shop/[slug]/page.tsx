@@ -22,63 +22,68 @@ function ProductDetailSkeleton() {
       {/* Split Hero Section */}
       <div className="w-full flex flex-col lg:flex-row gap-3 relative lg:h-screen -mt-24">
         {/* Left Column: Image placeholder */}
-        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0">
+        <section className="w-full lg:w-[calc(60%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0">
           <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave" />
         </section>
- 
+
         {/* Right Column: Details card skeleton */}
-        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 lg:h-full justify-center">
-          <div className="w-full bg-[#0e1011] rounded-xl p-8 md:p-12 lg:pt-28 lg:pb-12 lg:px-12 border border-white/5 space-y-6 flex-shrink-0 flex flex-col animate-pulse">
+        <div className="w-full lg:w-[calc(40%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 lg:h-full justify-center">
+          <div className="w-full bg-[#f6f6f6] rounded-xl p-8 md:p-12 lg:pt-28 lg:pb-12 lg:px-12 space-y-6 flex-shrink-0 flex flex-col animate-pulse">
             {/* Sale Badge & Price */}
             <div className="space-y-3">
-              <div className="h-4 w-16 bg-white/10 rounded-md" />
-              <div className="h-8 w-28 bg-white/10 rounded-md" />
+              <div className="h-4 w-16 bg-black/10 rounded-md" />
+              <div className="h-8 w-28 bg-black/10 rounded-md" />
             </div>
- 
+
             {/* Title & Tagline */}
             <div className="space-y-3">
-              <div className="h-10 w-3/4 bg-white/10 rounded-md" />
-              <div className="h-5 w-1/2 bg-white/10 rounded-md" />
+              <div className="h-10 w-3/4 bg-black/10 rounded-md" />
+              <div className="h-5 w-1/2 bg-black/10 rounded-md" />
             </div>
- 
+
             {/* Material selector divider */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
-              <div className="h-3 w-12 bg-white/10 rounded-md" />
+            <div className="space-y-3 pt-4 border-t border-black/10">
+              <div className="h-3 w-12 bg-black/10 rounded-md" />
               <div className="flex gap-2">
-                <div className="h-9 w-16 bg-white/10 rounded-xl" />
-                <div className="h-9 w-16 bg-white/10 rounded-xl" />
+                <div className="h-9 w-16 bg-black/10 rounded-xl" />
+                <div className="h-9 w-16 bg-black/10 rounded-xl" />
               </div>
             </div>
- 
+
             {/* Dimension selector divider */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
-              <div className="h-3 w-16 bg-white/10 rounded-md" />
-              <div className="flex gap-2">
-                <div className="h-9 w-24 bg-white/10 rounded-xl" />
-                <div className="h-9 w-24 bg-white/10 rounded-xl" />
-              </div>
+            <div className="space-y-3 pt-4 border-t border-black/10">
+              <div className="h-3 w-16 bg-black/10 rounded-md" />
+              <div className="h-12 w-full bg-black/5 rounded-xl border border-black/10" />
             </div>
- 
+
             {/* Quantity / Cart divider */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
-              <div className="h-3 w-16 bg-white/10 rounded-md" />
-              <div className="flex gap-3">
-                <div className="h-12 w-32 bg-white/10 rounded-xl" />
-                <div className="h-12 flex-grow bg-white/10 rounded-xl" />
+            <div className="space-y-3 pt-4 border-t border-black/10">
+              <div className="h-3 w-16 bg-black/10 rounded-md" />
+              <div className="flex gap-3 items-center">
+                <div className="flex gap-1.5 items-center">
+                  <div className="h-11 w-11 bg-black/10 rounded-sm" />
+                  <div className="h-11 w-14 bg-black/5 rounded-sm border border-black/10" />
+                  <div className="h-11 w-11 bg-black/10 rounded-sm" />
+                </div>
+                <div className="h-11 flex-grow bg-black/10 rounded-sm" />
               </div>
             </div>
           </div>
- 
+
           {/* Marquee slider placeholder */}
           <div className="h-10 w-full rounded-xl border border-border-accent/40 animate-wave" />
- 
+
           {/* Accordion list placeholder */}
-          <div className="w-full bg-[#0e1011] rounded-xl p-8 border border-white/5 space-y-4 animate-pulse">
-            <div className="h-6 w-full bg-white/10 rounded-md" />
-            <div className="h-px bg-white/10" />
-            <div className="h-6 w-full bg-white/10 rounded-md" />
-            <div className="h-px bg-white/10" />
-            <div className="h-6 w-full bg-white/10 rounded-md" />
+          <div className="space-y-3 w-full flex flex-col">
+            <div className="w-full bg-[#f6f6f6] rounded-xl p-5 border border-black/5 animate-pulse">
+              <div className="h-6 w-full bg-black/10 rounded-md" />
+            </div>
+            <div className="w-full bg-[#f6f6f6] rounded-xl p-5 border border-black/5 animate-pulse">
+              <div className="h-6 w-full bg-black/10 rounded-md" />
+            </div>
+            <div className="w-full bg-[#f6f6f6] rounded-xl p-5 border border-black/5 animate-pulse">
+              <div className="h-6 w-full bg-black/10 rounded-md" />
+            </div>
           </div>
         </div>
       </div>
@@ -119,9 +124,6 @@ export default function ProductDetails({ params }: PageProps) {
           const data = await res.json();
           if (data.success && data.product) {
             setDbProduct(data.product);
-            if (data.product.dimensionsList && data.product.dimensionsList.length > 0) {
-              setSelectedDimension(data.product.dimensionsList[0]);
-            }
             if (data.product.materialsList && data.product.materialsList.length > 0) {
               setSelectedMaterial(data.product.materialsList[0].name);
             }
@@ -180,11 +182,11 @@ export default function ProductDetails({ params }: PageProps) {
 
   const dimensionsList: DimensionItem[] = dbProduct?.dimensionsList && dbProduct.dimensionsList.length > 0
     ? dbProduct.dimensionsList.map((d: any) => ({
-        id: String(d.id),
-        label: String(d.label),
-        price: Number(d.price) || 0,
-        originalPrice: Number(d.originalPrice) || Number(d.price) || 0,
-      }))
+      id: String(d.id),
+      label: String(d.label),
+      price: Number(d.price) || 0,
+      originalPrice: Number(d.originalPrice) || Number(d.price) || 0,
+    }))
     : defaultDimensions;
 
   const materialsList: string[] = dbProduct?.materialsList && dbProduct.materialsList.length > 0
@@ -193,8 +195,8 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Initialize selectedDimension if needed
   useEffect(() => {
-    if (dimensionsList.length > 0 && (!selectedDimension || !dimensionsList.some((d: DimensionItem) => d.id === selectedDimension.id))) {
-      setSelectedDimension(dimensionsList[0]);
+    if (selectedDimension && !dimensionsList.some((d: DimensionItem) => d.id === selectedDimension.id)) {
+      setSelectedDimension(null);
     }
   }, [dimensionsList, selectedDimension]);
 
@@ -205,6 +207,7 @@ export default function ProductDetails({ params }: PageProps) {
   // Update quantity/variant state if the product changes
   useEffect(() => {
     setQuantity(1);
+    setSelectedDimension(null);
     if (materialsList.length > 0) {
       setSelectedMaterial(materialsList[0]);
     } else {
@@ -244,12 +247,16 @@ export default function ProductDetails({ params }: PageProps) {
   };
 
   const handleAddToCart = async () => {
+    if (!selectedDimension) {
+      alert("Please select a dimension first.");
+      return;
+    }
     // Build cart entry
     const cartProduct = {
       ...activeProduct,
       price: currentPrice,
       selectedMaterial,
-      selectedDimension: selectedDimension ? selectedDimension.label : 'Standard',
+      selectedDimension: selectedDimension.label,
     };
 
     if (user) {
@@ -315,41 +322,7 @@ export default function ProductDetails({ params }: PageProps) {
     setTimeout(() => setAddedNotification(false), 4000);
   };
 
-  // Scroll priority wheel handler:
-  // ↓ Down: Scroll right details card stack first, then page
-  // ↑ Up: Scroll page back to top first, then scroll right details card stack
   const rightColumnRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      const el = rightColumnRef.current;
-      if (!el) return;
-
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      const atTop = el.scrollTop <= 0;
-      const pageAtTop = (window.scrollY || document.documentElement.scrollTop) <= 0;
-
-      if (e.deltaY > 0) {
-        // ↓ Scrolling DOWN — right column has priority
-        if (!atBottom) {
-          e.preventDefault();
-          el.scrollTop += e.deltaY;
-        }
-      } else if (e.deltaY < 0) {
-        // ↑ Scrolling UP — page has priority
-        if (!pageAtTop) {
-          return;
-        }
-        if (!atTop) {
-          e.preventDefault();
-          el.scrollTop += e.deltaY;
-        }
-      }
-    };
-
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, []);
 
   // Get related products (excluding current, capped at 4)
   const relatedProducts = products
@@ -372,7 +345,7 @@ export default function ProductDetails({ params }: PageProps) {
       <div className="w-full flex flex-col lg:flex-row gap-3 select-text transition-theme relative lg:h-screen -mt-24">
 
         {/* Left Column: Image gallery card */}
-        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0 transition-theme">
+        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0 transition-theme">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full bg-bg-secondary/40 shadow-sm flex flex-col">
             <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto scrollbar-none h-full snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
               {activeProduct.images.map((img, idx) => (
@@ -408,10 +381,10 @@ export default function ProductDetails({ params }: PageProps) {
         </section>
 
         {/* Right Column: Sticky / Scrollable Details Panel */}
-        <div ref={rightColumnRef} className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-full lg:overflow-y-auto scrollbar-none">
+        <div ref={rightColumnRef} className="w-full lg:w-[calc(41%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-full lg:overflow-y-auto scrollbar-none">
 
           {/* Main Details Card */}
-          <div className="w-full bg-[#0e1011] text-white rounded-xl p-8 md:p-12 lg:pt-28 lg:pb-12 lg:px-12 border border-white/5 space-y-6 flex-shrink-0 shadow-sm flex flex-col">
+          <div className="w-full bg-[#f6f6f6] text-[#0e1011] rounded-xl p-8 md:p-12 lg:pt-20 lg:pb-12 lg:px-12 border border-black/5 space-y-6 flex-shrink-0 shadow-sm flex flex-col transition-theme">
 
             {/* Sale tag and pricing */}
             <div className="space-y-3">
@@ -421,11 +394,11 @@ export default function ProductDetails({ params }: PageProps) {
                 </div>
               )}
               <div className="flex items-baseline gap-3 animate-fade-in">
-                <span className="text-3xl font-bold text-white">
+                <span className="text-3xl font-bold text-[#0e1011]">
                   ${currentPrice}
                 </span>
                 {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
-                  <span className="text-lg text-white/40 line-through">
+                  <span className="text-lg text-[#0e1011]/40 line-through">
                     ${currentOriginalPrice || (currentPrice * 2)}
                   </span>
                 )}
@@ -434,17 +407,17 @@ export default function ProductDetails({ params }: PageProps) {
 
             {/* Title & Tagline */}
             <div className="space-y-2">
-              <h1 className="font-dm-sans text-4xl lg:text-5xl font-bold tracking-tight text-white">
+              <h1 className="font-dm-sans text-4xl lg:text-5xl font-bold tracking-tight text-[#0e1011]">
                 {activeProduct.name}
               </h1>
-              <p className="text-base text-white/60 italic font-medium">
+              <p className="text-base text-[#0e1011]/60 italic font-medium">
                 {activeProduct.tagline}
               </p>
             </div>
 
             {/* Material Selector */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
-              <span className="text-xs uppercase font-bold tracking-wider text-white/60">Material</span>
+            <div className="space-y-3 pt-4 border-t border-[#0e1011]/10">
+              <span className="text-xs font-bold tracking-wider text-[#0e1011]/60">Material</span>
               <div className="flex gap-2">
                 {materialsList.map((mat) => {
                   const isActive = selectedMaterial === mat;
@@ -452,9 +425,9 @@ export default function ProductDetails({ params }: PageProps) {
                     <button
                       key={mat}
                       onClick={() => setSelectedMaterial(mat)}
-                      className={`px-5 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
-                          ? 'bg-white border-white text-black shadow-md'
-                          : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                      className={`px-5 py-2.5 rounded-sm border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
+                        ? 'bg-[#ececec] border-[#ececec] text-[#0e1011] shadow-md'
+                        : 'bg-[#0e1011]/5 border-[#0e1011]/10 text-[#0e1011] hover:bg-[#0e1011]/10'
                         }`}
                     >
                       {mat}
@@ -465,52 +438,63 @@ export default function ProductDetails({ params }: PageProps) {
             </div>
 
             {/* Dimension Selector */}
-            <div className="space-y-3 pt-4 border-t border-white/10 animate-fade-in">
-              <span className="text-xs uppercase font-bold tracking-wider text-white/60">Dimension</span>
-              <div className="flex flex-wrap gap-2">
-                {dimensionsList.map((dim) => {
-                  const isActive = selectedDimension?.id === dim.id;
-                  const firstPrice = dimensionsList[0]?.price || 0;
-                  const priceDiff = dim.price - firstPrice;
-                  
-                  return (
-                    <button
-                      key={dim.id}
-                      onClick={() => setSelectedDimension(dim)}
-                      className={`px-5 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
-                          ? 'bg-white border-white text-black shadow-md'
-                          : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-                        }`}
-                    >
-                      {dim.label} {priceDiff > 0 && `(+$${priceDiff})`}
-                    </button>
-                  );
-                })}
+            <div className="space-y-3 pt-4 border-t border-[#0e1011]/10 animate-fade-in relative">
+              <label htmlFor="dimension-select" className="text-xs font-bold tracking-wider text-[#0e1011]/60 block">
+                Dimension
+              </label>
+              <div className="relative">
+                <select
+                  id="dimension-select"
+                  value={selectedDimension?.id || ''}
+                  onChange={(e) => {
+                    const selected = dimensionsList.find((d) => d.id === e.target.value);
+                    if (selected) setSelectedDimension(selected);
+                  }}
+                  className="w-full bg-[#ececec] border border-border-accent text-fg-primary text-xs font-semibold rounded-sm py-3 px-4 pr-10 appearance-none cursor-pointer focus:outline-none focus:border-border-accent/80 transition-all shadow-sm transition-theme"
+                >
+                  <option value="" disabled>Select Dimension</option>
+                  {dimensionsList.map((dim) => {
+                    const firstPrice = dimensionsList[0]?.price || 0;
+                    const priceDiff = dim.price - firstPrice;
+                    return (
+                      <option key={dim.id} value={dim.id} className="bg-bg-primary text-fg-primary">
+                        {dim.label} {priceDiff > 0 ? `(+$${priceDiff})` : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-fg-secondary/60">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                  </svg>
+                </div>
               </div>
             </div>
 
             {/* Quantity & Cart Action */}
-            <div className="space-y-3 pt-4 border-t border-white/10">
+            <div className="space-y-3 pt-4 border-t border-[#0e1011]/10">
               <div className="flex items-center justify-between">
-                <span className="text-xs uppercase font-bold tracking-wider text-white/60">Quantity</span>
-                <span className="text-xs text-green-400 font-semibold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs uppercase font-bold tracking-wider text-[#0e1011]/60">Quantity</span>
+                <span className="text-xs text-green-600 font-semibold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse" />
                   8 in stock
                 </span>
               </div>
-              <div className="flex gap-3">
-                <div className="flex items-center justify-between border border-white/10 rounded-xl px-4 py-3 bg-white/5 w-32 flex-shrink-0 transition-theme">
+              <div className="flex gap-3 items-center">
+                <div className="flex gap-1.5 items-center">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="text-lg text-white/60 hover:text-white focus:outline-none cursor-pointer"
+                    className="w-11 h-11 flex items-center justify-center bg-[#0e1011]/5 hover:bg-[#0e1011]/10 rounded-sm text-lg text-[#0e1011]/60 hover:text-[#0e1011] focus:outline-none cursor-pointer transition-colors"
                     disabled={quantity <= 1}
                   >
-                    -
+                    &minus;
                   </button>
-                  <span className="font-semibold text-white text-sm select-none">{quantity}</span>
+                  <div className="w-14 h-11 flex items-center justify-center bg-white border border-[#0e1011]/10 rounded-sm text-sm font-semibold text-[#0e1011] select-none shadow-sm">
+                    {quantity}
+                  </div>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
-                    className="text-lg text-white/60 hover:text-white focus:outline-none cursor-pointer"
+                    className="w-11 h-11 flex items-center justify-center bg-[#0e1011]/5 hover:bg-[#0e1011]/10 rounded-sm text-lg text-[#0e1011]/60 hover:text-[#0e1011] focus:outline-none cursor-pointer transition-colors"
                   >
                     +
                   </button>
@@ -518,9 +502,9 @@ export default function ProductDetails({ params }: PageProps) {
 
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-white text-black py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer relative overflow-hidden"
+                  className="flex-1 h-11 bg-[#0e1011] text-white rounded-sm font-bold uppercase tracking-wider text-xs hover:bg-[#0e1011]/90 transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer relative overflow-hidden"
                 >
-                  <span>Add to Cart</span>
+                  <span>Add To Cart</span>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
@@ -530,7 +514,7 @@ export default function ProductDetails({ params }: PageProps) {
 
             {/* Add to Cart Feedback Notification */}
             {addedNotification && (
-              <div className="bg-green-500/20 text-green-300 border border-green-500/30 px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-bounce">
+              <div className="bg-green-500/10 text-green-700 border border-green-500/20 px-4 py-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-bounce">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
@@ -538,107 +522,160 @@ export default function ProductDetails({ params }: PageProps) {
               </div>
             )}
 
+            {/* Info Marquee Ticker Card */}
+            <div className="w-full h-12 overflow-hidden bg-[#0e1011] text-white border border-white/5 flex items-center select-none transition-theme text-[10px] font-bold uppercase tracking-wider rounded-xl mt-4">
+              <div className="flex whitespace-nowrap animate-marquee items-center">
+                <div className="flex gap-8 px-4 items-center">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                    </svg>
+                    <span>Free Returns</span>
+                  </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                    <span>Free Shipping over 500€</span>
+                  </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
+                    </svg>
+                    <span>Worldwide Shipping</span>
+                  </div>
+                  <span>•</span>
+                </div>
+                <div className="flex gap-8 px-4 items-center" aria-hidden="true">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                    </svg>
+                    <span>Free Returns</span>
+                  </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                    </svg>
+                    <span>Free Shipping over 500€</span>
+                  </div>
+                  <span>•</span>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
+                    </svg>
+                    <span>Worldwide Shipping</span>
+                  </div>
+                  <span>•</span>
+                </div>
+              </div>
+            </div>
+
           </div>
 
-          {/* Info Marquee Ticker Card */}
-          <div className="w-full overflow-hidden bg-bg-secondary border border-border-accent/40 py-2.5 rounded-xl select-none transition-theme text-[9px] font-bold uppercase tracking-wider text-fg-secondary/70">
-            <div className="flex whitespace-nowrap animate-marquee">
-              <div className="flex gap-8 px-4">
-                <span>Free Shipping over $500</span>
-                <span>•</span>
-                <span>Worldwide Delivery</span>
-                <span>•</span>
-                <span>30-Day Free Returns</span>
-                <span>•</span>
+          {/* Description Accordion Card */}
+          <div className="w-full bg-[#f6f6f6] text-[#0e1011] rounded-xl p-5 md:p-6 border border-black/5 flex-shrink-0 flex flex-col gap-1 transition-theme">
+            <button
+              onClick={() => setIsDescOpen(!isDescOpen)}
+              className="w-full flex items-center justify-between text-base font-medium text-[#0e1011] focus:outline-none cursor-pointer"
+            >
+              <span>Description</span>
+              <span className="text-xl font-light text-[#0e1011]/60">{isDescOpen ? '−' : '+'}</span>
+            </button>
+            {isDescOpen && (
+              <div className="mt-3 text-sm text-[#0e1011]/70 leading-relaxed pl-2  py-1">
+                Elevate your lifestyle experience with the {activeProduct.name}. A perfect blend of timeless design and modern craftsmanship. Designed to add warmth, comfort, and premium aesthetic value to your interior layouts.
               </div>
-              <div className="flex gap-8 px-4" aria-hidden="true">
-                <span>Free Shipping over $500</span>
-                <span>•</span>
-                <span>Worldwide Delivery</span>
-                <span>•</span>
-                <span>30-Day Free Returns</span>
-                <span>•</span>
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Collapsible Accordions Card */}
-          <div className="w-full bg-[#0e1011] text-white rounded-xl p-8 border border-white/5 divide-y divide-white/10 flex-shrink-0 flex flex-col gap-1">
-            {/* Description Accordion */}
-            <div className="pb-4">
-              <button
-                onClick={() => setIsDescOpen(!isDescOpen)}
-                className="w-full flex items-center justify-between text-sm font-bold uppercase tracking-wider text-white focus:outline-none cursor-pointer"
-              >
-                <span>Description</span>
-                <span className="text-lg font-normal text-white/60">{isDescOpen ? '−' : '+'}</span>
-              </button>
-              {isDescOpen && (
-                <div className="mt-3 text-sm text-white/70 leading-relaxed pl-2 border-l border-white/20 py-1">
-                  Elevate your lifestyle experience with the {activeProduct.name}. A perfect blend of timeless design and modern craftsmanship. Designed to add warmth, comfort, and premium aesthetic value to your interior layouts.
-                </div>
-              )}
-            </div>
+          {/* Dimensions Accordion Card */}
+          <div className="w-full bg-[#f6f6f6] text-[#0e1011] rounded-xl p-5 md:p-6 border border-black/5 flex-shrink-0 flex flex-col gap-1 transition-theme">
+            <button
+              onClick={() => setIsDimensionsOpen(!isDimensionsOpen)}
+              className="w-full flex items-center justify-between text-base font-medium text-[#0e1011] focus:outline-none cursor-pointer"
+            >
+              <span>Dimensions</span>
+              <span className="text-xl font-light text-[#0e1011]/60">{isDimensionsOpen ? '−' : '+'}</span>
+            </button>
+            {isDimensionsOpen && (
+              <div className="mt-3 text-sm text-[#0e1011]/70 pl-2 py-1">
+                <table className="w-full text-xs text-left text-[#0e1011]/70 border-collapse">
+                  <tbody>
+                    <tr className="border-b border-[#0e1011]/5">
+                      <td className="py-2 font-semibold text-[#0e1011] uppercase tracking-wide w-1/3">Material</td>
+                      <td className="py-2">{selectedMaterial === 'Oak' ? (activeProduct.category === 'wood' ? 'Solid Oak Frame' : 'Premium Oak') : 'Solid Teak Frame'}</td>
+                    </tr>
+                    <tr className="border-b border-[#0e1011]/5">
+                      <td className="py-2 font-semibold text-[#0e1011] uppercase tracking-wide">Finish</td>
+                      <td className="py-2">Natural Matte protective finish</td>
+                    </tr>
+                    <tr className="border-b border-[#0e1011]/5">
+                      <td className="py-2 font-semibold text-[#0e1011] uppercase tracking-wide">Dimensions</td>
+                      <td className="py-2">{activeProduct.dimensions}</td>
+                    </tr>
+                    <tr className="border-b border-[#0e1011]/5">
+                      <td className="py-2 font-semibold text-[#0e1011] uppercase tracking-wide">Weight</td>
+                      <td className="py-2">6.5 - 8.0 kg</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
-            {/* Dimensions Accordion */}
-            <div className="py-4">
-              <button
-                onClick={() => setIsDimensionsOpen(!isDimensionsOpen)}
-                className="w-full flex items-center justify-between text-sm font-bold uppercase tracking-wider text-white focus:outline-none cursor-pointer"
-              >
-                <span>Dimensions & Specs</span>
-                <span className="text-lg font-normal text-white/60">{isDimensionsOpen ? '−' : '+'}</span>
-              </button>
-              {isDimensionsOpen && (
-                <div className="mt-3 text-sm text-white/70 pl-2 border-l border-white/20 py-1">
-                  <table className="w-full text-xs text-left text-white/70 border-collapse">
-                    <tbody>
-                      <tr className="border-b border-white/5">
-                        <td className="py-2 font-semibold text-white uppercase tracking-wide w-1/3">Material</td>
-                        <td className="py-2">{selectedMaterial === 'Oak' ? (activeProduct.category === 'wood' ? 'Solid Oak Frame' : 'Premium Oak') : 'Solid Teak Frame'}</td>
-                      </tr>
-                      <tr className="border-b border-white/5">
-                        <td className="py-2 font-semibold text-white uppercase tracking-wide">Finish</td>
-                        <td className="py-2">Natural Matte protective finish</td>
-                      </tr>
-                      <tr className="border-b border-white/5">
-                        <td className="py-2 font-semibold text-white uppercase tracking-wide">Dimensions</td>
-                        <td className="py-2">{activeProduct.dimensions}</td>
-                      </tr>
-                      <tr className="border-b border-white/5">
-                        <td className="py-2 font-semibold text-white uppercase tracking-wide">Weight</td>
-                        <td className="py-2">6.5 - 8.0 kg</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+          {/* Shipping Accordion Card */}
+          <div className="w-full bg-[#f6f6f6] text-[#0e1011] rounded-xl p-5 md:p-6 border border-black/5 flex-shrink-0 flex flex-col gap-1 transition-theme">
+            <button
+              onClick={() => setIsShippingOpen(!isShippingOpen)}
+              className="w-full flex items-center justify-between text-base font-medium text-[#0e1011] focus:outline-none cursor-pointer"
+            >
+              <span>Shipping & Returns</span>
+              <span className="text-xl font-light text-[#0e1011]/60">{isShippingOpen ? '−' : '+'}</span>
+            </button>
+            {isShippingOpen && (
+              <div className="mt-3 text-sm text-[#0e1011]/70 leading-relaxed pl-2  py-1 space-y-2">
+                <p>{activeProduct.shippingReturns}</p>
+                <p>We ship securely within 14 business days. Delivery times vary by location, and tracking details are provided upon dispatch.</p>
+              </div>
+            )}
+          </div>
 
-            {/* Shipping Accordion */}
-            <div className="py-4">
-              <button
-                onClick={() => setIsShippingOpen(!isShippingOpen)}
-                className="w-full flex items-center justify-between text-sm font-bold uppercase tracking-wider text-white focus:outline-none cursor-pointer"
-              >
-                <span>Shipping & Returns</span>
-                <span className="text-lg font-normal text-white/60">{isShippingOpen ? '−' : '+'}</span>
-              </button>
-              {isShippingOpen && (
-                <div className="mt-3 text-sm text-white/70 leading-relaxed pl-2 border-l border-white/20 py-1 space-y-2">
-                  <p>{activeProduct.shippingReturns}</p>
-                  <p>We ship securely within 14 business days. Delivery times vary by location, and tracking details are provided upon dispatch.</p>
-                </div>
-              )}
-            </div>
-
-            {/* Share links */}
-            <div className="flex items-center gap-4 pt-4 text-xs font-bold uppercase tracking-wider text-white/60 border-t border-white/10">
-              <span>Share:</span>
-              <a href="#" className="hover:text-white transition-colors">Pinterest</a>
-              <span>•</span>
-              <a href="#" className="hover:text-white transition-colors">Instagram</a>
-            </div>
+          {/* Share links */}
+          <div className="grid grid-cols-2 gap-3 w-full flex-shrink-0">
+            <a
+              href="#"
+              className="flex items-center justify-between bg-[#f6f6f6] rounded-xl p-4 text-[#0e1011] hover:opacity-90 transition-all border border-black/5"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#0e1011]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.08 3.16 9.42 7.63 11.16-.1-.95-.2-2.4.04-3.43.22-.93 1.4-5.93 1.4-5.93s-.36-.72-.36-1.77c0-1.66.96-2.9 2.18-2.9 1.03 0 1.52.77 1.52 1.7 0 1.03-.66 2.58-.99 4-.28 1.2.6 2.18 1.78 2.18 2.13 0 3.77-2.25 3.77-5.5 0-2.88-2.07-4.9-5.03-4.9-3.43 0-5.44 2.57-5.44 5.22 0 1.04.4 2.15.9 2.75.1.12.11.23.08.35l-.33 1.34c-.05.21-.18.26-.41.15-1.52-.7-2.48-2.92-2.48-4.7 0-3.83 2.78-7.34 8.02-7.34 4.21 0 7.48 3 7.48 7 0 4.18-2.63 7.55-6.28 7.55-1.23 0-2.38-.64-2.77-1.4l-.76 2.9c-.27 1.04-.98 2.34-1.46 3.12C9.53 23.82 10.74 24 12 24c6.63 0 12-5.37 12-12S18.63 0 12 0z" />
+                </svg>
+                <span className="text-sm font-medium">Pinterest</span>
+              </div>
+              <svg className="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
+            </a>
+            <a
+              href="#"
+              className="flex items-center justify-between bg-[#f6f6f6] rounded-xl p-4 text-[#0e1011] hover:opacity-90 transition-all border border-black/5"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#0e1011]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+                <span className="text-sm font-medium">Instagram</span>
+              </div>
+              <svg className="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 17L17 7M17 7H7M17 7V17" />
+              </svg>
+            </a>
           </div>
 
         </div>
@@ -648,18 +685,100 @@ export default function ProductDetails({ params }: PageProps) {
       <div className="px-6 md:px-12 space-y-16 mt-8">
 
         {/* Storytelling craft details section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 border-t border-border-accent pt-16">
-          <div className="space-y-4">
-            <h2 className="font-dm-sans text-2xl lg:text-3xl font-bold tracking-tight text-fg-primary">Designed for Modern Living</h2>
-            <p className="text-sm text-fg-secondary leading-relaxed">
-              Our furniture is thoughtfully crafted to blend timeless Scandinavian design with modern functionality. Each piece is made with meticulous attention to detail, ensuring it fits seamlessly into your home. From the choice of premium materials to the sleek, minimalist aesthetic, we focus on creating furniture that is as practical as it is beautiful.
-            </p>
+        <section className="space-y-3">
+          {/* Centered Details Header Bar */}
+          <div className="w-full bg-[#f6f6f6] rounded-xl py-4 flex items-center justify-center transition-theme">
+            <h2 className="font-dm-sans text-base font-bold text-[#0e1011] tracking-wide">Details</h2>
           </div>
-          <div className="space-y-4">
-            <h2 className="font-dm-sans text-2xl lg:text-3xl font-bold tracking-tight text-fg-primary">Quality That Lasts a Lifetime</h2>
-            <p className="text-sm text-fg-secondary leading-relaxed">
-              At the heart of our philosophy is a commitment to quality and durability. We use sustainably sourced materials and expert craftsmanship to create furniture that stands the test of time. Every curve, joint, and finish is carefully considered to ensure lasting beauty and strength, bringing you sustainable warmth for generations to come.
-            </p>
+
+          {/* Zig-zag Split Grid Layout */}
+          <div className="flex flex-col gap-3">
+            {/* Row 1: Staged living room image (60%) & Designed for Modern Living text card (40%) */}
+            <div className="w-auto flex flex-col lg:flex-row gap-3 items-stretch -mx-6 md:-mx-12">
+              {/* Left Column: Image */}
+              <div className="w-full lg:w-[calc(60%-6px)] h-[350px] md:h-[450px] lg:h-[500px] rounded-r-xl rounded-l-none overflow-hidden border-y border-r border-black/5 relative">
+                <img
+                  src="/images/FbYhXBQykrdhhjH7YhWUNmGW2Y_082b76.webp"
+                  alt="Designed for Modern Living"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Right Column: Text Card */}
+              <div className="w-full lg:w-[calc(40%-6px)] bg-[#f6f6f6] text-[#0e1011] border-y border-l border-black/5 rounded-l-xl rounded-r-none p-8 md:p-12 flex flex-col justify-center gap-6 transition-theme">
+                <h3 className="font-dm-sans text-2xl lg:text-[32px] font-bold tracking-tight text-[#0e1011] leading-tight">
+                  Designed for Modern Living
+                </h3>
+                <div className="space-y-4 text-xs md:text-sm text-[#0e1011]/70 leading-relaxed font-normal">
+                  <p>
+                    Our furniture is thoughtfully crafted to blend timeless Scandinavian design with modern functionality. Each piece is made with meticulous attention to detail, ensuring it fits seamlessly into your home. From the choice of premium materials to the sleek, minimalist aesthetic, we focus on creating furniture that is as practical as it is beautiful.
+                  </p>
+                  <p>
+                    Whether you're hosting a gathering or enjoying a quiet evening, our designs are built to enhance your everyday moments with comfort and style.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Row 2: Quality That Lasts a Lifetime text card (40%) & Staged dining table image (60%) */}
+            <div className="w-auto flex flex-col lg:flex-row gap-3 items-stretch -mx-6 md:-mx-12">
+              {/* Left Column: Text Card (with miniature navbar mockup) */}
+              <div className="w-full lg:w-[calc(40%-6px)] bg-[#f6f6f6] text-[#0e1011] border-y border-r border-black/5 rounded-r-xl rounded-l-none p-8 md:p-12 flex flex-col justify-between gap-6 transition-theme">
+                {/* Miniature Navbar Mockup */}
+                <div className="w-full bg-[#f6f6f6]/80 backdrop-blur-sm rounded-lg border border-black/5 py-2 px-3 flex items-center justify-between text-[10px] font-semibold text-[#0e1011]/80 select-none shadow-sm transition-theme">
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-[12px] h-[12px] text-[#0e1011]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L2 22h20L12 2zM12 6l7.5 13h-15L12 6z" />
+                    </svg>
+                    <span className="font-bold tracking-tight text-[10px]">Fjord</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">Shop</span>
+                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">Collections</span>
+                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">About</span>
+                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-1">
+                      Blog
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6" />
+                    </svg>
+                    <div className="flex items-center gap-0.5">
+                      <svg className="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                      <span className="text-[9px] bg-[#0e1011] text-white rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">2</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="space-y-4 flex-grow flex flex-col justify-center">
+                  <h3 className="font-dm-sans text-2xl lg:text-[32px] font-bold tracking-tight text-[#0e1011] leading-tight">
+                    Quality That Lasts a Lifetime
+                  </h3>
+                  <div className="space-y-4 text-xs md:text-sm text-[#0e1011]/70 leading-relaxed font-normal">
+                    <p>
+                      At the heart of our philosophy is a commitment to quality and durability. We use sustainably sourced materials and expert craftsmanship to create furniture that stands the test of time. Every curve, joint, and finish is carefully considered to ensure lasting beauty and strength.
+                    </p>
+                    <p>
+                      Our pieces are more than just furniture—they're an investment in your home and lifestyle. With every product, we aim to deliver a blend of elegance and reliability that you can trust for years to come.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Image */}
+              <div className="w-full lg:w-[calc(60%-6px)] h-[350px] md:h-[450px] lg:h-[500px] rounded-l-xl rounded-r-none overflow-hidden border-y border-l border-black/5 relative">
+                <img
+                  src="/images/tTnxI9bEGHuPLga5HlUAYCJjneY_bc98a1.webp"
+                  alt="Quality That Lasts a Lifetime"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
         </section>
 

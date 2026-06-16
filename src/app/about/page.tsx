@@ -33,10 +33,10 @@ export default function About() {
   ];
 
   const socialCards = [
-    { name: 'Twitter', href: 'https://twitter.com' },
-    { name: 'Instagram', href: 'https://instagram.com' },
-    { name: 'Pinterest', href: 'https://pinterest.com' },
-    { name: 'Behance', href: 'https://behance.net' }
+    { name: 'Twitter', href: '/' },
+    { name: 'Instagram', href: '/' },
+    { name: 'Pinterest', href: '/' },
+    { name: 'Behance', href: '/' }
   ];
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
