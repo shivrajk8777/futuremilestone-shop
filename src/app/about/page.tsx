@@ -93,19 +93,8 @@ export default function About() {
 
           {/* Floating Bottom-Right Tag with Inset Rounded Curves */}
           <div className="absolute bottom-0 right-0 bg-bg-primary pr-5 pb-3.5 pt-3.5 pl-6 rounded-tl-2xl select-none z-10 transition-theme border-t border-l border-border-accent/10">
-            {/* Curved Edge SVG - Left */}
-            <div className="absolute bottom-0 -left-[18px] w-[18px] h-[18px] pointer-events-none">
-              <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
-                <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
-              </svg>
-            </div>
-            {/* Curved Edge SVG - Top */}
-            <div className="absolute -top-[18px] right-0 w-[18px] h-[18px] pointer-events-none rotate-180">
-              <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
-                <path d="M 0 18 L 18 18 C 8.059 18 0 9.941 0 0 Z" />
-              </svg>
-            </div>
-            <span className="font-dm-sans font-bold text-fg-primary text-xs uppercase tracking-wider">
+
+            <span className="font-dm-sans font-bold text-fg-primary text-xs tracking-wider">
               We are Future Milestone Furniture
             </span>
           </div>
@@ -147,7 +136,7 @@ export default function About() {
         <div className="w-full flex flex-col gap-3">
 
           {/* Mission Section */}
-          <section className="w-full flex flex-col gap-3">
+          <section className="w-full flex flex-col gap-3" id="about-content">
             {/* Title Card */}
             <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-5 flex items-center justify-center transition-theme">
               <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">Our Mission</h2>
