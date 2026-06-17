@@ -218,6 +218,7 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Handle intersection observer to highlight active thumbnail as user scrolls gallery
   useEffect(() => {
+    const scrollContainer = galleryScrollRef.current;
     const observers = activeProduct.images.map((_, idx) => {
       const observer = new IntersectionObserver(
         ([entry]) => {
@@ -225,7 +226,10 @@ export default function ProductDetails({ params }: PageProps) {
             setActiveImgIdx(idx);
           }
         },
-        { threshold: 0.5, rootMargin: '-10% 0px -50% 0px' }
+        {
+          root: scrollContainer,
+          threshold: 0.5,
+        }
       );
       const el = document.getElementById(`image-${idx}`);
       if (el) observer.observe(el);
@@ -240,6 +244,7 @@ export default function ProductDetails({ params }: PageProps) {
   }, [activeProduct.images]);
 
   const scrollToImage = (idx: number) => {
+    setActiveImgIdx(idx);
     const el = document.getElementById(`image-${idx}`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -323,6 +328,7 @@ export default function ProductDetails({ params }: PageProps) {
   };
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
+  const galleryScrollRef = useRef<HTMLDivElement>(null);
 
   // Get related products (excluding current, capped at 4)
   const relatedProducts = products
@@ -347,7 +353,7 @@ export default function ProductDetails({ params }: PageProps) {
         {/* Left Column: Image gallery card */}
         <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0 transition-theme">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full bg-bg-secondary/40 shadow-sm flex flex-col">
-            <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto scrollbar-none h-full snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
+            <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto scrollbar-none h-full snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
               {activeProduct.images.map((img, idx) => (
                 <div
                   key={idx}
@@ -361,14 +367,14 @@ export default function ProductDetails({ params }: PageProps) {
 
             {/* Floating Sticky Thumbnails panel */}
             <div className="absolute bottom-6 left-0 right-0 hidden lg:flex justify-center z-20 pointer-events-none">
-              <div className="bg-bg-primary/80 backdrop-blur-md px-4 py-2.5 rounded-full border border-border-accent/80 shadow-lg flex gap-2 pointer-events-auto transition-theme">
+              <div className="bg-bg-primary/95 backdrop-blur-md p-2.5 rounded-2xl border border-border-accent/80 shadow-lg flex gap-2 pointer-events-auto transition-theme">
                 {activeProduct.images.map((img, idx) => {
                   const isActive = activeImgIdx === idx;
                   return (
                     <button
                       key={idx}
                       onClick={() => scrollToImage(idx)}
-                      className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all cursor-pointer relative flex-shrink-0 ${isActive ? 'border-fg-primary scale-105 shadow-sm' : 'border-transparent opacity-60 hover:opacity-100'
+                      className={`w-12 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer relative flex-shrink-0 ${isActive ? 'border-fg-primary scale-105 shadow-sm' : 'border-transparent opacity-60 hover:opacity-100'
                         }`}
                     >
                       <img src={img} alt={`thumbnail ${idx}`} className="w-full h-full object-cover" />
@@ -522,58 +528,58 @@ export default function ProductDetails({ params }: PageProps) {
               </div>
             )}
 
-            {/* Info Marquee Ticker Card */}
-            <div className="w-full h-12 overflow-hidden bg-[#0e1011] text-white border border-white/5 flex items-center select-none transition-theme text-[10px] font-bold uppercase tracking-wider rounded-xl mt-4">
-              <div className="flex whitespace-nowrap animate-marquee items-center">
-                <div className="flex gap-8 px-4 items-center">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
-                    </svg>
-                    <span>Free Returns</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                    </svg>
-                    <span>Free Shipping over 500€</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
-                    </svg>
-                    <span>Worldwide Shipping</span>
-                  </div>
-                  <span>•</span>
+          </div>
+
+          {/* Info Marquee Ticker Card */}
+          <div className="flex-shrink-0 w-full h-12 overflow-hidden bg-[#0e1011] text-white border border-white/5 flex items-center select-none transition-theme text-[10px] font-bold uppercase tracking-wider rounded-xl mt-2">
+            <div className="flex whitespace-nowrap animate-marquee items-center">
+              <div className="flex gap-8 px-4 items-center">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                  </svg>
+                  <span>Free Returns</span>
                 </div>
-                <div className="flex gap-8 px-4 items-center" aria-hidden="true">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
-                    </svg>
-                    <span>Free Returns</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                    </svg>
-                    <span>Free Shipping over 500€</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
-                    </svg>
-                    <span>Worldwide Shipping</span>
-                  </div>
-                  <span>•</span>
+                <span>•</span>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  <span>Free Shipping over 40500€</span>
                 </div>
+                <span>•</span>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
+                  </svg>
+                  <span>Worldwide Shipping</span>
+                </div>
+                <span>•</span>
+              </div>
+              <div className="flex gap-8 px-4 items-center" aria-hidden="true">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                  </svg>
+                  <span>Free Returns</span>
+                </div>
+                <span>•</span>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  <span>Free Shipping over 500€</span>
+                </div>
+                <span>•</span>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9h18" />
+                  </svg>
+                  <span>Worldwide Shipping</span>
+                </div>
+                <span>•</span>
               </div>
             </div>
-
           </div>
 
           {/* Description Accordion Card */}
@@ -682,21 +688,21 @@ export default function ProductDetails({ params }: PageProps) {
       </div>
 
       {/* ── Outer Content Wrapper (Full width below hero split) ── */}
-      <div className="px-6 md:px-12 space-y-16 mt-8">
+      <div className="px-4 md:px-2 space-y-16 mt-8">
 
         {/* Storytelling craft details section */}
         <section className="space-y-3">
           {/* Centered Details Header Bar */}
           <div className="w-full bg-[#f6f6f6] rounded-xl py-4 flex items-center justify-center transition-theme">
-            <h2 className="font-dm-sans text-base font-bold text-[#0e1011] tracking-wide">Details</h2>
+            <h2 className="font-dm-sans text-base text-[#0e1011] tracking-wide">Details</h2>
           </div>
 
           {/* Zig-zag Split Grid Layout */}
           <div className="flex flex-col gap-3">
             {/* Row 1: Staged living room image (60%) & Designed for Modern Living text card (40%) */}
-            <div className="w-auto flex flex-col lg:flex-row gap-3 items-stretch -mx-6 md:-mx-12">
+            <div className="w-full flex flex-col lg:flex-row gap-3 items-stretch">
               {/* Left Column: Image */}
-              <div className="w-full lg:w-[calc(60%-6px)] h-[350px] md:h-[450px] lg:h-[500px] rounded-r-xl rounded-l-none overflow-hidden border-y border-r border-black/5 relative">
+              <div className="w-full lg:w-[calc(60%-6px)] h-[350px] md:h-[450px] lg:h-[690px] rounded-xl overflow-hidden border border-black/5 relative">
                 <img
                   src="/images/FbYhXBQykrdhhjH7YhWUNmGW2Y_082b76.webp"
                   alt="Designed for Modern Living"
@@ -705,7 +711,7 @@ export default function ProductDetails({ params }: PageProps) {
               </div>
 
               {/* Right Column: Text Card */}
-              <div className="w-full lg:w-[calc(40%-6px)] bg-[#f6f6f6] text-[#0e1011] border-y border-l border-black/5 rounded-l-xl rounded-r-none p-8 md:p-12 flex flex-col justify-center gap-6 transition-theme">
+              <div className="w-full lg:w-[calc(40%-6px)] bg-[#f6f6f6] text-[#0e1011] border border-black/5 rounded-xl p-8 md:p-12 flex flex-col justify-center gap-6 transition-theme">
                 <h3 className="font-dm-sans text-2xl lg:text-[32px] font-bold tracking-tight text-[#0e1011] leading-tight">
                   Designed for Modern Living
                 </h3>
@@ -721,39 +727,9 @@ export default function ProductDetails({ params }: PageProps) {
             </div>
 
             {/* Row 2: Quality That Lasts a Lifetime text card (40%) & Staged dining table image (60%) */}
-            <div className="w-auto flex flex-col lg:flex-row gap-3 items-stretch -mx-6 md:-mx-12">
-              {/* Left Column: Text Card (with miniature navbar mockup) */}
-              <div className="w-full lg:w-[calc(40%-6px)] bg-[#f6f6f6] text-[#0e1011] border-y border-r border-black/5 rounded-r-xl rounded-l-none p-8 md:p-12 flex flex-col justify-between gap-6 transition-theme">
-                {/* Miniature Navbar Mockup */}
-                <div className="w-full bg-[#f6f6f6]/80 backdrop-blur-sm rounded-lg border border-black/5 py-2 px-3 flex items-center justify-between text-[10px] font-semibold text-[#0e1011]/80 select-none shadow-sm transition-theme">
-                  <div className="flex items-center gap-1.5">
-                    <svg className="w-[12px] h-[12px] text-[#0e1011]" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L2 22h20L12 2zM12 6l7.5 13h-15L12 6z" />
-                    </svg>
-                    <span className="font-bold tracking-tight text-[10px]">Fjord</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">Shop</span>
-                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">Collections</span>
-                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">About</span>
-                    <span className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer flex items-center gap-1">
-                      Blog
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6" />
-                    </svg>
-                    <div className="flex items-center gap-0.5">
-                      <svg className="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                      <span className="text-[9px] bg-[#0e1011] text-white rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">2</span>
-                    </div>
-                  </div>
-                </div>
-
+            <div className="w-full flex flex-col lg:flex-row gap-3 items-stretch">
+              {/* Left Column: Text Card */}
+              <div className="w-full lg:w-[calc(40%-6px)] bg-[#f6f6f6] text-[#0e1011] border border-black/5 rounded-xl p-8 md:p-12 flex flex-col justify-between gap-6 transition-theme">
                 {/* Content */}
                 <div className="space-y-4 flex-grow flex flex-col justify-center">
                   <h3 className="font-dm-sans text-2xl lg:text-[32px] font-bold tracking-tight text-[#0e1011] leading-tight">
@@ -771,7 +747,7 @@ export default function ProductDetails({ params }: PageProps) {
               </div>
 
               {/* Right Column: Image */}
-              <div className="w-full lg:w-[calc(60%-6px)] h-[350px] md:h-[450px] lg:h-[500px] rounded-l-xl rounded-r-none overflow-hidden border-y border-l border-black/5 relative">
+              <div className="w-full lg:w-[calc(60%-6px)] h-[350px] md:h-[450px] lg:h-[690px] rounded-xl overflow-hidden border border-black/5 relative">
                 <img
                   src="/images/tTnxI9bEGHuPLga5HlUAYCJjneY_bc98a1.webp"
                   alt="Quality That Lasts a Lifetime"
@@ -783,13 +759,15 @@ export default function ProductDetails({ params }: PageProps) {
         </section>
 
         {/* Related products grid with animated cards */}
-        <section className="space-y-8 border-t border-border-accent pt-16">
-          <h2 className="font-dm-sans text-2xl font-bold text-fg-primary tracking-tight">You Might Also Like</h2>
+        <section className="space-y-8  pt-16">
+          <div className="w-full bg-[#f6f6f6] rounded-xl py-4 flex items-center justify-center transition-theme">
+            <h2 className="font-dm-sans text-base text-[#0e1011] tracking-wide">You Might Like</h2>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {relatedProducts.map((p) => (
               <div
                 key={p.slug}
-                className="w-full bg-bg-secondary/40 rounded-xl overflow-hidden group h-[500px] relative border border-border-accent/40"
+                className="w-full bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40"
               >
                 {/* Product Background Image */}
                 <img
@@ -832,7 +810,7 @@ export default function ProductDetails({ params }: PageProps) {
                   <span className="text-sm font-bold text-fg-primary">${p.price}</span>
                   <Link
                     href={`/shop/${p.slug}`}
-                    className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                    className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
                   >
                     View
                   </Link>

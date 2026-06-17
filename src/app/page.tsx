@@ -101,16 +101,17 @@ export default function Home() {
                 {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
                 <div className="absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-theme">
                   <div className="flex flex-row md:flex-col justify-between items-end md:items-start gap-4 md:gap-2">
-                    <h2 className="font-dm-sans text-lg md:text-[32px] font-bold leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
+                    <h2 className="font-dm-sans text-lg md:text-[32px] leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
+                    <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
                     <Link
                       href={`/shop/${slide.slug}`}
-                      className="relative pb-0.5 text-xs md:text-sm font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mb-1 md:mb-0"
+                      className="relative pb-0.5 text-xs md:text-sm uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mb-1 md:mb-0"
                     >
                       View <span className="hidden md:inline">Product</span>
                       <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
                     </Link>
                   </div>
-                  <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
+
                 </div>
               </div>
             ))}
@@ -187,7 +188,7 @@ export default function Home() {
 
       {/* 4. Section Products Header Card */}
       <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
-        <h2 className="font-dm-sans text-base font-bold text-fg-primary tracking-tight">Our Favorites</h2>
+        <h2 className="font-dm-sans text-base text-fg-primary tracking-tight">Our Favorites</h2>
       </div>
 
       {/* 5. Section Products Carousel */}
@@ -295,7 +296,7 @@ export default function Home() {
                   <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
                     <span className="text-sm font-bold text-fg-primary">${product.price}</span>
                     <span
-                      className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                      className="px-4 py-2 rounded-lg text-sm tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
                     >
                       View
                     </span>
@@ -365,7 +366,7 @@ export default function Home() {
         <>
           {/* 6. Section Collections Header Card */}
           <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
-            <h2 className="font-dm-sans text-base font-bold text-fg-primary tracking-tight">Collections</h2>
+            <h2 className="font-dm-sans text-base text-fg-primary tracking-tight">Collections</h2>
           </div>
 
           {/* 7. Section Collections (Asymmetric layout) */}
@@ -465,7 +466,7 @@ export default function Home() {
 
       {/* 8. Section About Header Card */}
       <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl py-6 flex items-center justify-center transition-theme">
-        <h2 className="font-dm-sans text-base font-bold text-fg-primary tracking-tight">About Us</h2>
+        <h2 className="font-dm-sans text-base text-fg-primary tracking-tight">About Us</h2>
       </div>
 
       {/* 9. Section About Us (Split Card Layout) */}

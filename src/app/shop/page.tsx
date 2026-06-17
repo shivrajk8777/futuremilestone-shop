@@ -210,7 +210,7 @@ function ShopContent() {
                       )}
                     </div>
                     <span
-                      className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity"
+                      className="px-4 py-2 rounded-lg text-xs tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
                     >
                       View
                     </span>
