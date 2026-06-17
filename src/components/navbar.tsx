@@ -281,7 +281,7 @@ export default function Navbar() {
           }`}
       >
         {/* Top 12px Solid Background Strip */}
-        <div className="absolute top-0 left-0 right-0 h-3 bg-bg-primary border-b border-border-accent/40 transition-theme z-20 pointer-events-auto" />
+        <div className="absolute top-0 left-0 right-0 h-3 bg-bg-primary border-border-accent/40 transition-theme z-20 pointer-events-auto z-[999]" />
 
         {/* Left Block: Brand, Navigation Links, and Theme Switcher */}
         <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-8 md:py-1.5 items-center gap-3 md:gap-8 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
