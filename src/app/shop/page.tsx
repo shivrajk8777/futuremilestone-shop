@@ -14,15 +14,15 @@ const saleBadges: Record<string, string> = {
 
 function ShopSkeletonGrid() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 animate-fade-in">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-fade-in">
       {Array.from({ length: 8 }).map((_, idx) => (
         <div
           key={idx}
           className="w-full rounded-xl overflow-hidden aspect-[8/11] relative border border-border-accent/40 animate-wave"
         >
           {/* Top Left Title Tab Skeleton */}
-          <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-32 h-10 select-none z-10">
-            <div className="h-4 bg-border-accent/30 rounded w-20 mt-1" />
+          <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-20 md:w-32 h-10 select-none z-10">
+            <div className="h-4 bg-border-accent/30 rounded w-12 md:w-20 mt-1" />
           </div>
         </div>
       ))}
@@ -154,7 +154,7 @@ function ShopContent() {
           <ShopSkeletonGrid />
         ) : filteredProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {filteredProducts.map((product) => (
                 <Link
                   href={`/shop/${product.slug}`}
@@ -194,7 +194,8 @@ function ShopContent() {
                       </svg>
                     </div>
                     <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-tight flex items-center transition-all duration-300">
-                      <span>{product.name}</span>
+                      <span className="md:hidden">{product.name.split(' ')[0]}</span>
+                      <span className="hidden md:inline">{product.name}</span>
                       <span className="opacity-0 max-w-0 inline-block overflow-hidden translate-x-[-4px] group-hover:opacity-100 group-hover:max-w-[20px] group-hover:translate-x-0 group-hover:ml-1.5 transition-all duration-300 ease-out">
                         ↗
                       </span>

@@ -198,10 +198,10 @@ export default function Home() {
             {Array.from({ length: 4 }).map((_, idx) => (
               <div
                 key={idx}
-                className="w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 rounded-xl overflow-hidden aspect-[8/11] relative border border-border-accent/40 animate-wave"
+                className="w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 rounded-xl overflow-hidden aspect-[8/11] relative border border-border-accent/40 animate-wave"
               >
                 {/* Floating Top-Left Title Tab Skeleton */}
-                <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-36 h-12 select-none z-10">
+                <div className="absolute top-0 left-0 bg-bg-primary pr-6 pb-3 pt-3 pl-4 rounded-br-2xl w-24 md:w-36 h-12 select-none z-10">
                   {/* Curved Edge SVG - Right */}
                   <div className="absolute top-0 -right-[18px] w-[18px] h-[18px] pointer-events-none rotate-90">
                     <svg viewBox="0 0 18 18" className="w-[18px] h-[18px]" style={{ fill: 'var(--background-primary)' }}>
@@ -222,10 +222,10 @@ export default function Home() {
         ) : favorites.length > 0 ? (
           <>
             {/* Scroll Buttons - Overlay Floating on Carousel */}
-            <div className="absolute top-1/2 -translate-y-1/2 left-4 z-20 hidden md:block">
+            <div className="absolute top-1/2 -translate-y-1/2 left-3 md:left-4 z-20">
               <button
                 onClick={() => scrollCarousel('left')}
-                className="p-3 rounded-full border border-border-accent hover:border-fg-primary transition-colors bg-bg-primary/90 text-fg-primary shadow-md"
+                className="p-2 md:p-3 rounded-lg md:rounded-full border border-transparent md:border-border-accent hover:bg-black/45 md:hover:bg-bg-primary/100 md:hover:border-fg-primary transition-colors bg-black/30 md:bg-bg-primary/90 text-white md:text-fg-primary shadow-md flex items-center justify-center"
                 aria-label="Previous Products"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -233,10 +233,10 @@ export default function Home() {
                 </svg>
               </button>
             </div>
-            <div className="absolute top-1/2 -translate-y-1/2 right-4 z-20 hidden md:block">
+            <div className="absolute top-1/2 -translate-y-1/2 right-3 md:right-4 z-20">
               <button
                 onClick={() => scrollCarousel('right')}
-                className="p-3 rounded-full border border-border-accent hover:border-fg-primary transition-colors bg-bg-primary/90 text-fg-primary shadow-md"
+                className="p-2 md:p-3 rounded-lg md:rounded-full border border-transparent md:border-border-accent hover:bg-black/45 md:hover:bg-bg-primary/100 md:hover:border-fg-primary transition-colors bg-black/30 md:bg-bg-primary/90 text-white md:text-fg-primary shadow-md flex items-center justify-center"
                 aria-label="Next Products"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -254,7 +254,7 @@ export default function Home() {
                 <Link
                   href={`/shop/${product.slug}`}
                   key={product.slug}
-                  className="block w-[calc(100%-24px)] sm:w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 snap-start bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40"
+                  className="block w-[calc(50%-6px)] lg:w-[calc(25%-9px)] flex-shrink-0 snap-start bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40"
                 >
                   {/* Product Background Image */}
                   <img
@@ -285,7 +285,8 @@ export default function Home() {
                       </svg>
                     </div>
                     <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-tight flex items-center transition-all duration-300">
-                      <span>{product.name}</span>
+                      <span className="md:hidden">{product.name.split(' ')[0]}</span>
+                      <span className="hidden md:inline">{product.name}</span>
                       <span className="opacity-0 max-w-0 inline-block overflow-hidden translate-x-[-4px] group-hover:opacity-100 group-hover:max-w-[20px] group-hover:translate-x-0 group-hover:ml-1.5 transition-all duration-300 ease-out">
                         ↗
                       </span>
