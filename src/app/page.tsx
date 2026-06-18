@@ -18,8 +18,12 @@ const saleBadges: Record<string, string> = {
 export default function Home() {
   const { settings, loading: settingsLoading } = useSettings();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { state: { collections, loading, error, fetched } } = useCollections();
   const { state: productState } = useProducts();
@@ -88,8 +92,8 @@ export default function Home() {
       {!settingsLoading && settings.carouselVisible && activeSlides.length > 0 && (
         <section className="relative h-[350px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
           {/* Slides */}
-          <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-            {activeSlides.map((slide: any) => (
+          <div className="absolute inset-0 flex transition-transform duration-[1100ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+            {activeSlides.map((slide: any, idx: number) => (
               <div key={slide.slug} className="relative w-full h-full flex-shrink-0">
                 <img
                   src={slide.bgImage}
@@ -99,7 +103,11 @@ export default function Home() {
                 <div className="absolute inset-0 bg-black/10" />
 
                 {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
-                <div className="absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-theme">
+                <div className={`absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)] transition-theme ${
+                  idx === currentSlide && mounted
+                    ? 'translate-x-0 opacity-100'
+                    : 'translate-x-[20px] md:translate-x-[40px] opacity-0 pointer-events-none'
+                }`}>
                   <div className="flex flex-row md:flex-col justify-between items-end md:items-start gap-4 md:gap-2">
                     <h2 className="font-dm-sans text-lg md:text-[32px] leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
                     <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
