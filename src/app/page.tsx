@@ -94,7 +94,7 @@ export default function Home() {
                 <img
                   src={slide.bgImage}
                   alt={slide.name}
-                  className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
+                  className="absolute inset-0 w-full h-full object-fill brightness-[0.8] dark:brightness-[0.7]"
                 />
                 <div className="absolute inset-0 bg-black/10" />
 
