@@ -166,7 +166,7 @@ function ShopContent() {
                     <img
                       src={product.images[0]}
                       alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
+                      className="absolute inset-0 w-full h-full object-fill transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
                     />
                   ) : (
                     <div className="absolute inset-0 w-full h-full bg-bg-secondary flex items-center justify-center text-fg-secondary text-xs">No image</div>

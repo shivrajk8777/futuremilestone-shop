@@ -260,7 +260,7 @@ export default function Home() {
                   <img
                     src={product.images[0]}
                     alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
+                    className="absolute inset-0 w-full h-full object-fill transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
                   />
 
                   {/* Top-Right Sale Badge */}
