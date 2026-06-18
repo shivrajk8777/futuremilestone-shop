@@ -86,7 +86,7 @@ export default function Home() {
 
       {/* 2. Section Hero (Slideshow) */}
       {!settingsLoading && settings.carouselVisible && activeSlides.length > 0 && (
-        <section className="relative h-[450px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
+        <section className="relative h-[350px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
           {/* Slides */}
           <div className="absolute inset-0 flex transition-transform duration-1000 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {activeSlides.map((slide: any) => (
