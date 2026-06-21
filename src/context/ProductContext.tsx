@@ -43,30 +43,35 @@ const initialState: ProductState = {
     wood: [],
     dark: [],
     modern: [],
+    favorites: [],
   },
   pages: {
     all: 1,
     wood: 1,
     dark: 1,
     modern: 1,
+    favorites: 1,
   },
   hasMore: {
     all: true,
     wood: true,
     dark: true,
     modern: true,
+    favorites: true,
   },
   loading: {
     all: false,
     wood: false,
     dark: false,
     modern: false,
+    favorites: false,
   },
   error: {
     all: null,
     wood: null,
     dark: null,
     modern: null,
+    favorites: null,
   },
   initialFetched: false,
 };
@@ -153,7 +158,11 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   // Helper function to fetch a single page of products
   const fetchProductsList = async (category: string, page: number) => {
-    const catParam = category === 'all' ? '' : `&category=${category}`;
+    const catParam = category === 'all'
+      ? ''
+      : category === 'favorites'
+        ? '&favorites=true'
+        : `&category=${category}`;
     const response = await fetch(`/api/products?page=${page}&limit=8${catParam}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch products: ${response.statusText}`);
@@ -166,7 +175,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   };
 
   const fetchInitialProducts = async () => {
-    const categories = ['all', 'wood', 'dark', 'modern'];
+    const categories = ['all', 'wood', 'dark', 'modern', 'favorites'];
     
     // Trigger parallel fetching in the background
     await Promise.all(

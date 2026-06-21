@@ -1,3 +1,10 @@
+export interface ProductDetailSection {
+  id: string;
+  imageUrl: string;
+  heading: string;
+  content: string;
+}
+
 export interface Product {
   slug: string;
   name: string;
@@ -11,6 +18,7 @@ export interface Product {
   images: string[];
   originalPrice?: number;
   discountBadge?: string;
+  details?: ProductDetailSection[];
 }
 
 export const products: Product[] = [

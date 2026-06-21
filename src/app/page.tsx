@@ -40,10 +40,10 @@ export default function Home() {
     setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   };
 
-  // Section Products: latest 8 products dynamically
-  const dynamicProducts = productState.productsByCategory['all'] || [];
-  const favorites = dynamicProducts.slice(0, 8);
-  const isProductsLoading = productState.loading['all'] || !productState.initialFetched;
+  // Section Products: custom favorite products if configured, otherwise latest 8 products as fallback
+  const favoritesList = productState.productsByCategory['favorites'] || [];
+  const favorites = favoritesList.length > 0 ? favoritesList : (productState.productsByCategory['all'] || []).slice(0, 8);
+  const isProductsLoading = productState.loading['all'] || productState.loading['favorites'] || !productState.initialFetched;
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (favoritesCarouselRef.current) {

@@ -52,6 +52,7 @@ export async function GET(
         : (product.imageUrl ? [product.imageUrl] : []),
       materialsList: Array.isArray(product.materials) ? product.materials : [],
       dimensionsList: discounted.dimensionsList,
+      details: Array.isArray(product.details) ? product.details : [],
     };
 
     return NextResponse.json({ success: true, product: formatted });

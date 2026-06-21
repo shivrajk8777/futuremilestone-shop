@@ -107,7 +107,7 @@ function ShopContent() {
 
       {/* ── Category Filter Bar ── */}
       {collectionState.fetched && !collectionState.loading && collectionsList.length > 0 && (
-        <div className="flex items-stretch gap-3">
+        <div className="flex items-stretch gap-3 overflow-x-auto scrollbar-none flex-nowrap pb-1">
 
           {/* Left: All / back arrow */}
           <button
@@ -116,9 +116,15 @@ function ShopContent() {
             className={`flex items-center justify-center px-5 py-4 rounded-xl border border-border-accent bg-bg-secondary hover:bg-fg-primary/5 transition-colors flex-shrink-0 ${selectedCategory === 'all' ? 'text-fg-primary' : 'text-fg-secondary'
               }`}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            {selectedCategory === 'all' ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v11a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            )}
           </button>
 
           {/* Category buttons — each a separate card */}
@@ -128,7 +134,7 @@ function ShopContent() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.slug)}
-                className={`flex-1 flex items-center justify-between px-6 py-4 rounded-xl border transition-colors ${isActive
+                className={`flex-1 flex-shrink-0 min-w-[180px] flex items-center justify-between px-6 py-4 rounded-xl border transition-colors whitespace-nowrap ${isActive
                   ? 'bg-bg-secondary border-border-accent text-fg-primary'
                   : 'bg-bg-secondary border-border-accent text-fg-secondary hover:bg-fg-primary/5'
                   }`}

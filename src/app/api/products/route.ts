@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || undefined;
+    const favorites = searchParams.get('favorites') === 'true';
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '8', 10);
 
@@ -13,7 +14,9 @@ export async function GET(request: NextRequest) {
     
     // Build query filter
     const filter: Record<string, any> = {};
-    if (category && category !== 'all') {
+    if (favorites) {
+      filter.favorite = true;
+    } else if (category && category !== 'all') {
       filter.collectionSlug = category;
     }
 
@@ -22,7 +25,7 @@ export async function GET(request: NextRequest) {
     const products = await db
       .collection('products')
       .find(filter)
-      .sort({ updatedAt: -1, _id: -1 })
+      .sort(favorites ? { favoriteOrder: 1, updatedAt: -1, _id: -1 } : (category && category !== 'all' ? { order: 1, updatedAt: -1, _id: -1 } : { updatedAt: -1, _id: -1 }))
       .skip(skip)
       .limit(limit)
       .toArray();

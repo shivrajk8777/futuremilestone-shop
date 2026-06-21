@@ -4,7 +4,7 @@ import { getDatabase } from '@/lib/mongodb';
 export async function GET() {
   try {
     const db = await getDatabase();
-    const collections = await db
+        const collections = await db
       .collection('collections')
       .find(
         {},
@@ -14,20 +14,33 @@ export async function GET() {
             slug: 1,
             imageUrl: 1,
             description: 1,
+            order: 1,
             updatedAt: 1,
           },
         }
       )
-      .sort({ updatedAt: -1, _id: -1 })
       .toArray();
 
-    const formatted = collections.map((item) => ({
-      id: item._id.toString(),
-      name: item.name ?? '',
-      slug: item.slug ?? '',
-      imageUrl: item.imageUrl ?? '',
-      description: item.description ?? '',
-    }));
+    const formatted = collections
+      .map((item) => ({
+        id: item._id.toString(),
+        name: item.name ?? '',
+        slug: item.slug ?? '',
+        imageUrl: item.imageUrl ?? '',
+        description: item.description ?? '',
+        order: typeof item.order === 'number' ? item.order : null,
+        updatedAt: item.updatedAt ?? item._id.getTimestamp(),
+      }))
+      .sort((a, b) => {
+        const orderA = a.order !== null ? a.order : Infinity;
+        const orderB = b.order !== null ? b.order : Infinity;
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+        const timeA = new Date(a.updatedAt).getTime();
+        const timeB = new Date(b.updatedAt).getTime();
+        return timeB - timeA;
+      });
 
     return NextResponse.json({ success: true, collections: formatted });
   } catch (error: any) {
