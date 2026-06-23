@@ -19,6 +19,8 @@ export default function Home() {
   const { settings, loading: settingsLoading } = useSettings();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
+  const [fadeLoader, setFadeLoader] = useState(false);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +47,21 @@ export default function Home() {
   const favorites = favoritesList.length > 0 ? favoritesList : (productState.productsByCategory['all'] || []).slice(0, 8);
   const isProductsLoading = productState.loading['all'] || productState.loading['favorites'] || !productState.initialFetched;
 
+  const isDataReady = !settingsLoading && !isProductsLoading;
+
+  useEffect(() => {
+    if (isDataReady && mounted) {
+      const timer = setTimeout(() => {
+        setFadeLoader(true);
+        const removeTimer = setTimeout(() => {
+          setShowLoader(false);
+        }, 700); // fade out transition duration
+        return () => clearTimeout(removeTimer);
+      }, 1000); // 1 second minimum duration to appreciate animation
+      return () => clearTimeout(timer);
+    }
+  }, [isDataReady, mounted]);
+
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (favoritesCarouselRef.current) {
       const scrollAmount = favoritesCarouselRef.current.clientWidth;
@@ -61,6 +78,37 @@ export default function Home() {
 
   return (
     <div className={`flex flex-col gap-3 pb-3 ${showMarquee ? '' : 'pt-3'}`}>
+      {showLoader && (
+        <div
+          className={`fixed inset-0 z-[9999] bg-bg-primary flex flex-col items-center justify-center transition-all duration-700 ease-in-out transition-theme ${
+            fadeLoader ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
+          <div className="flex flex-col items-center gap-4">
+            {/* Pulsing Brand Logo */}
+            <div className="relative w-16 h-16">
+              <img
+                src="/images/menu-icon-dark.svg"
+                alt="fm Logo"
+                className="absolute inset-0 w-full h-full object-contain dark:opacity-0 transition-opacity duration-300"
+              />
+              <img
+                src="/images/menu-icon-light.svg"
+                alt="fm Logo"
+                className="absolute inset-0 w-full h-full object-contain opacity-0 dark:opacity-100 transition-opacity duration-300"
+              />
+            </div>
+            {/* Brand Title */}
+            <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-wider uppercase">
+              future milestone
+            </span>
+            {/* Modern Slim Progress Bar */}
+            <div className="w-16 h-[2.5px] bg-fg-primary/15 rounded-full overflow-hidden relative mt-1">
+              <div className="absolute inset-y-0 left-0 bg-fg-primary w-1/2 rounded-full animate-loading-bar" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 1. Top Announcement Marquee */}
       {showMarquee && (

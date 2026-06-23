@@ -97,6 +97,8 @@
   
   --animate-marquee: marquee 25s linear infinite;
   --animate-wave: wave 1.6s infinite linear;
+  --animate-logo-scale: logo-scale 2s ease-in-out infinite;
+  --animate-loading-bar: loading-bar 1.5s infinite ease-in-out;
 
   @keyframes marquee {
     from {
@@ -113,6 +115,29 @@
     }
     100% {
       background-position: 200% 0;
+    }
+  }
+
+  @keyframes logo-scale {
+    0%, 100% {
+      transform: scale(0.95);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+
+  @keyframes loading-bar {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(100%);
     }
   }
 }
