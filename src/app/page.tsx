@@ -94,7 +94,7 @@ export default function Home() {
           {/* Slides */}
           <div className="absolute inset-0 flex transition-transform duration-[1100ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {activeSlides.map((slide: any, idx: number) => (
-              <div key={slide.slug} className="relative w-full h-full flex-shrink-0">
+              <div key={idx} className="relative w-full h-full flex-shrink-0">
                 <img
                   src={slide.bgImage}
                   alt={slide.name}
@@ -103,16 +103,18 @@ export default function Home() {
                 <div className="absolute inset-0 bg-black/10" />
 
                 {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
-                <div className={`absolute bottom-6 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-5 md:p-10 flex flex-col md:gap-8 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)] transition-theme ${idx === currentSlide && mounted
+                <div className={`absolute bottom-3 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-3 md:p-10 flex flex-col gap-1.5 md:gap-8 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)] transition-theme ${idx === currentSlide && mounted
                   ? 'translate-x-0 opacity-100'
                   : 'translate-x-[20px] md:translate-x-[40px] opacity-0 pointer-events-none'
                   }`}>
-                  <div className="flex flex-row md:flex-col justify-between items-end md:items-start gap-4 md:gap-2">
-                    <h2 className="font-dm-sans text-lg md:text-[32px] leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight flex-1">{slide.name}</h2>
-                    <p className="hidden md:block text-xs md:text-base text-fg-secondary leading-[1.6]">{slide.tagline}</p>
+                  <div className="flex flex-col justify-between items-start gap-1 md:gap-2">
+                    <h2 className="font-dm-sans text-sm md:text-[32px] leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight">{slide.name}</h2>
+                    {slide.tagline && (
+                      <p className="text-[10px] md:text-base text-fg-secondary leading-[1.4] md:leading-[1.6]">{slide.tagline}</p>
+                    )}
                     <Link
-                      href={`/shop/${slide.slug}`}
-                      className="relative pb-0.5 text-xs md:text-sm uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mb-1 md:mb-0"
+                      href={slide.slug ? `/shop/${slide.slug}` : '/shop'}
+                      className="relative pb-0.5 text-[10px] md:text-sm uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mt-0.5 md:mt-0"
                     >
                       View <span className="hidden md:inline">Product</span>
                       <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
