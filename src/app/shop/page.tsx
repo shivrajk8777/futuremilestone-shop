@@ -37,11 +37,12 @@ function ShopContent() {
   const { state: collectionState } = useCollections();
   const collectionsList = collectionState.collections;
 
-  const { state: productState, fetchMoreProducts } = useProducts();
+  const { state: productState, fetchMoreProducts, fetchCategoryProducts } = useProducts();
   const productsList = productState.productsByCategory[selectedCategory] || [];
   const isPage1Loading =
     !productState.initialFetched ||
-    (productState.loading[selectedCategory] && productsList.length === 0);
+    (productState.loading[selectedCategory] && productsList.length === 0) ||
+    (productState.productsByCategory[selectedCategory] === undefined && selectedCategory !== 'all');
   const isMoreLoading = productState.loading[selectedCategory] && productsList.length > 0;
   const hasMore = productState.hasMore[selectedCategory];
 
@@ -55,6 +56,13 @@ function ShopContent() {
       setSelectedCategory('all');
     }
   }, [searchParams]);
+
+  // Fetch products for the selected category if not already loaded
+  useEffect(() => {
+    if (selectedCategory && productState.initialFetched) {
+      fetchCategoryProducts(selectedCategory);
+    }
+  }, [selectedCategory, productState.initialFetched]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

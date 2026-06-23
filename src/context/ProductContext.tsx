@@ -38,41 +38,11 @@ type ProductAction =
   | { type: 'SET_INITIAL_FETCHED' };
 
 const initialState: ProductState = {
-  productsByCategory: {
-    all: [],
-    wood: [],
-    dark: [],
-    modern: [],
-    favorites: [],
-  },
-  pages: {
-    all: 1,
-    wood: 1,
-    dark: 1,
-    modern: 1,
-    favorites: 1,
-  },
-  hasMore: {
-    all: true,
-    wood: true,
-    dark: true,
-    modern: true,
-    favorites: true,
-  },
-  loading: {
-    all: false,
-    wood: false,
-    dark: false,
-    modern: false,
-    favorites: false,
-  },
-  error: {
-    all: null,
-    wood: null,
-    dark: null,
-    modern: null,
-    favorites: null,
-  },
+  productsByCategory: {},
+  pages: {},
+  hasMore: {},
+  loading: {},
+  error: {},
   initialFetched: false,
 };
 
@@ -148,6 +118,7 @@ const ProductContext = createContext<
   | {
       state: ProductState;
       fetchMoreProducts: (category: string) => Promise<void>;
+      fetchCategoryProducts: (category: string) => Promise<void>;
       refetchInitial: () => Promise<void>;
     }
   | undefined
@@ -175,9 +146,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   };
 
   const fetchInitialProducts = async () => {
-    const categories = ['all', 'wood', 'dark', 'modern', 'favorites'];
+    // Only pre-fetch 'all' and 'favorites' on startup — other categories load on demand
+    const categories = ['all', 'favorites'];
     
-    // Trigger parallel fetching in the background
     await Promise.all(
       categories.map(async (category) => {
         dispatch({ type: 'FETCH_INIT_START', category });
@@ -191,6 +162,25 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       })
     );
     dispatch({ type: 'SET_INITIAL_FETCHED' });
+  };
+
+  // Fetch a specific category's first page if not already loaded or loading
+  const fetchCategoryProducts = async (category: string) => {
+    // Skip if already loaded or currently loading
+    if (
+      state.loading[category] ||
+      (state.productsByCategory[category] !== undefined && state.productsByCategory[category].length > 0)
+    ) {
+      return;
+    }
+    dispatch({ type: 'FETCH_INIT_START', category });
+    try {
+      const productsList = await fetchProductsList(category, 1);
+      dispatch({ type: 'FETCH_INIT_SUCCESS', category, products: productsList });
+    } catch (error: any) {
+      console.error(`Error loading products for category ${category}:`, error);
+      dispatch({ type: 'FETCH_INIT_FAILURE', category, error: error.message || 'Unknown error' });
+    }
   };
 
   const fetchMoreProducts = async (category: string) => {
@@ -221,6 +211,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       value={{
         state,
         fetchMoreProducts,
+        fetchCategoryProducts,
         refetchInitial: fetchInitialProducts,
       }}
     >
