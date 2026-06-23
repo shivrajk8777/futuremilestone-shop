@@ -869,7 +869,7 @@ export default function ProductDetails({ params }: PageProps) {
                 <img
                   src={p.images[0]}
                   alt={p.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-md"
+                  className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
                 />
 
                 {/* Top-Right Sale Badge */}
