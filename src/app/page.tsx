@@ -80,31 +80,26 @@ export default function Home() {
     <div className={`flex flex-col gap-3 pb-3 ${showMarquee ? '' : 'pt-3'}`}>
       {showLoader && (
         <div
-          className={`fixed inset-0 z-[9999] bg-bg-primary flex flex-col items-center justify-center transition-all duration-700 ease-in-out transition-theme ${
+          className={`fixed inset-0 z-[9999] bg-[#0e1011] flex flex-col items-center justify-center transition-all duration-700 ease-in-out ${
             fadeLoader ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
         >
           <div className="flex flex-col items-center gap-4">
-            {/* Pulsing Brand Logo */}
+            {/* Brand Logo */}
             <div className="relative w-16 h-16">
-              <img
-                src="/images/menu-icon-dark.svg"
-                alt="fm Logo"
-                className="absolute inset-0 w-full h-full object-contain dark:opacity-0 transition-opacity duration-300"
-              />
               <img
                 src="/images/menu-icon-light.svg"
                 alt="fm Logo"
-                className="absolute inset-0 w-full h-full object-contain opacity-0 dark:opacity-100 transition-opacity duration-300"
+                className="w-full h-full object-contain"
               />
             </div>
             {/* Brand Title */}
-            <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-wider uppercase">
+            <span className="font-dm-sans font-bold text-white text-sm tracking-wider uppercase">
               future milestone
             </span>
             {/* Modern Slim Progress Bar */}
-            <div className="w-16 h-[2.5px] bg-fg-primary/15 rounded-full overflow-hidden relative mt-1">
-              <div className="absolute inset-y-0 left-0 bg-fg-primary w-1/2 rounded-full animate-loading-bar" />
+            <div className="w-16 h-[2.5px] bg-white/20 rounded-full overflow-hidden relative mt-1">
+              <div className="absolute inset-y-0 left-0 bg-white w-1/2 rounded-full animate-loading-bar" />
             </div>
           </div>
         </div>
