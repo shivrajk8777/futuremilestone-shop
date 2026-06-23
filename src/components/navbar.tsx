@@ -284,7 +284,7 @@ export default function Navbar() {
         <div className="absolute top-0 left-0 right-0 h-3 bg-bg-primary border-border-accent/40 transition-theme z-20 pointer-events-auto z-[999]" />
 
         {/* Left Block: Brand, Navigation Links, and Theme Switcher */}
-        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-8 md:py-1.5 items-center gap-3 md:gap-8 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-5 md:py-1.5 items-center gap-3 md:gap-7 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Left Block */}
           {/* Bottom-Left Edge Curve */}
@@ -477,7 +477,7 @@ export default function Navbar() {
         </div>
 
         {/* Right Block: Search and Cart Buttons */}
-        <div className={`pointer-events-auto bg-bg-primary rounded-bl-2xl border-l border-b border-border-accent/40 pl-4 pr-3 py-2.5 md:pl-2 md:pr-6 md:py-1.5 items-center gap-1.5 md:gap-0 shadow-sm transition-theme relative z-30 ml-auto ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`pointer-events-auto bg-bg-primary rounded-bl-2xl border-l border-b border-border-accent/40 pl-2 pr-2 py-2.5 md:pl-2 md:pr-6 md:py-1.5 items-center gap-1.1 md:gap-0 shadow-sm transition-theme relative z-30 ml-auto ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Right Block */}
           {/* Bottom-Right Edge Curve */}
@@ -603,7 +603,6 @@ export default function Navbar() {
             className="md:hidden p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer"
             aria-label="Toggle Menu"
           >
-            <span className="text-xs font-bold uppercase tracking-wider">{isMobileMenuOpen ? 'Close' : 'Menu'}</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMobileMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
