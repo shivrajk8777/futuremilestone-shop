@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { products, Product, ProductDetailSection } from '@/data/products';
 import { useUser } from '@/context/UserContext';
+import { useToast } from '@/context/ToastContext';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -94,6 +95,7 @@ function ProductDetailSkeleton() {
 export default function ProductDetails({ params }: PageProps) {
   const { slug } = use(params);
   const { user } = useUser();
+  const { warning } = useToast();
 
   // Find static product fallback
   const staticProduct = products.find((p) => p.slug === slug);
@@ -286,7 +288,7 @@ export default function ProductDetails({ params }: PageProps) {
 
   const handleAddToCart = async () => {
     if (!selectedDimension) {
-      alert("Please select a dimension first.");
+      warning('Dimension Required', 'Please select a dimension before adding to cart.');
       return;
     }
     // Build cart entry

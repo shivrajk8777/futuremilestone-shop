@@ -9,6 +9,7 @@ import { CollectionProvider } from '@/context/CollectionContext';
 import { ProductProvider } from '@/context/ProductContext';
 import { UserProvider } from '@/context/UserContext';
 import { SettingsProvider } from '@/context/SettingsContext';
+import { ToastProvider } from '@/context/ToastContext';
 
 export const metadata: Metadata = {
   title: 'Future Milestone - Scandinavian Furniture',
@@ -32,6 +33,7 @@ export default function RootLayout({
           <CollectionProvider>
             <ProductProvider>
               <UserProvider>
+                <ToastProvider>
                 <div className="flex-grow flex flex-col bg-bg-primary rounded-2xl relative overflow-hidden transition-theme">
                   <Navbar />
                   <MainWrapper>
@@ -40,6 +42,7 @@ export default function RootLayout({
                   <SocialBar />
                   <Footer />
                 </div>
+              </ToastProvider>
               </UserProvider>
             </ProductProvider>
           </CollectionProvider>
