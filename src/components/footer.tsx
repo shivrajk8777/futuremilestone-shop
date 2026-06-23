@@ -1,11 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { useCurrency, COUNTRY_LIST } from '@/context/CurrencyContext';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const { country, setCountry } = useCurrency();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const filteredCountries = COUNTRY_LIST.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.currency.toLowerCase().includes(search.toLowerCase()) ||
+    c.code.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+        setSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Focus search on open
+  useEffect(() => {
+    if (dropdownOpen && searchRef.current) {
+      setTimeout(() => searchRef.current?.focus(), 50);
+    }
+  }, [dropdownOpen]);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,8 +223,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Right Card: Newsletter Signup & Floating price badge */}
-        <div className="w-full md:w-[400px] bg-fg-primary text-bg-primary rounded-2xl p-8 md:p-10 flex flex-col justify-between gap-8 relative overflow-hidden transition-theme">
+        {/* Right Card: Newsletter Signup & Country Selector */}
+        <div className="w-full md:w-[400px] bg-fg-primary text-bg-primary rounded-2xl p-8 md:p-10 flex flex-col justify-between gap-8 relative transition-theme">
 
           {/* Newsletter heading */}
           <div className="space-y-4 mt-2">
@@ -228,6 +259,95 @@ export default function Footer() {
             )}
           </form>
 
+          {/* Country / Currency Selector */}
+          <div className="z-10" ref={dropdownRef}>
+            <p className="text-[10px] uppercase tracking-widest text-bg-primary/40 font-bold mb-2 select-none">
+              Region &amp; Currency
+            </p>
+
+            {/* Trigger Button */}
+            <button
+              id="country-selector-btn"
+              onClick={() => { setDropdownOpen((p) => !p); setSearch(''); }}
+              className="w-full flex items-center justify-between gap-3 bg-bg-primary/10 hover:bg-bg-primary/20 border border-bg-primary/20 rounded-xl px-4 py-3 text-sm font-medium text-bg-primary transition-colors cursor-pointer focus:outline-none group"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-xl leading-none flex-shrink-0">{country.flag}</span>
+                <span className="truncate">{country.name}</span>
+                <span className="text-bg-primary/50 text-xs font-bold flex-shrink-0">{country.currency}</span>
+              </div>
+              <svg
+                className={`w-4 h-4 flex-shrink-0 text-bg-primary/50 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Dropdown */}
+            {dropdownOpen && (
+              <div className="absolute bottom-full mb-2 left-0 right-0 mx-4 md:mx-0 md:left-8 md:right-8 bg-bg-primary rounded-2xl border border-border-accent shadow-2xl overflow-hidden z-50 flex flex-col"
+                style={{ maxHeight: '320px' }}
+              >
+                {/* Search */}
+                <div className="p-3 border-b border-border-accent flex-shrink-0">
+                  <div className="flex items-center gap-2 bg-bg-secondary rounded-xl px-3 py-2 border border-border-accent/60">
+                    <svg className="w-3.5 h-3.5 text-fg-secondary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                      ref={searchRef}
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search country or currency…"
+                      className="flex-1 bg-transparent text-fg-primary text-xs placeholder-fg-secondary/50 focus:outline-none"
+                    />
+                    {search && (
+                      <button onClick={() => setSearch('')} className="text-fg-secondary hover:text-fg-primary transition-colors cursor-pointer">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Country List */}
+                <div className="overflow-y-auto flex-1">
+                  {filteredCountries.length === 0 ? (
+                    <div className="py-8 text-center text-fg-secondary text-xs">No results found</div>
+                  ) : (
+                    filteredCountries.map((c) => {
+                      const isSelected = c.code === country.code;
+                      return (
+                        <button
+                          key={c.code}
+                          onClick={() => {
+                            setCountry(c.code);
+                            setDropdownOpen(false);
+                            setSearch('');
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors cursor-pointer text-left ${
+                            isSelected
+                              ? 'bg-fg-primary/8 text-fg-primary font-semibold'
+                              : 'text-fg-secondary hover:bg-fg-primary/5 hover:text-fg-primary'
+                          }`}
+                        >
+                          <span className="text-lg leading-none w-6 flex-shrink-0 text-center">{c.flag}</span>
+                          <span className="flex-1 min-w-0 truncate">{c.name}</span>
+                          <span className="text-[10px] font-bold text-fg-secondary/60 flex-shrink-0">{c.symbol} {c.currency}</span>
+                          {isSelected && (
+                            <svg className="w-3.5 h-3.5 text-fg-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
         </div>
 

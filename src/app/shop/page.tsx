@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCollections } from '@/context/CollectionContext';
 import { useProducts } from '@/context/ProductContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const saleBadges: Record<string, string> = {
   sage: '50% OFF',
@@ -38,6 +39,7 @@ function ShopContent() {
   const collectionsList = collectionState.collections;
 
   const { state: productState, fetchMoreProducts, fetchCategoryProducts } = useProducts();
+  const { formatPrice } = useCurrency();
   const productsList = productState.productsByCategory[selectedCategory] || [];
   const isPage1Loading =
     !productState.initialFetched ||
@@ -219,9 +221,9 @@ function ShopContent() {
                   {/* Animated Pop-up Bottom Price Bar */}
                   <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
                     <div className="flex flex-col items-start">
-                      <span className="text-sm font-bold text-fg-primary">${product.price}</span>
+                      <span className="text-sm font-bold text-fg-primary">{formatPrice(product.price)}</span>
                       {product.originalPrice && product.originalPrice > product.price && (
-                        <span className="text-[10px] text-fg-secondary line-through">${product.originalPrice}</span>
+                        <span className="text-[10px] text-fg-secondary line-through">{formatPrice(product.originalPrice)}</span>
                       )}
                     </div>
                     <span

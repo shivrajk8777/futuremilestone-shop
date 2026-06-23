@@ -10,6 +10,7 @@ import { ProductProvider } from '@/context/ProductContext';
 import { UserProvider } from '@/context/UserContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { ToastProvider } from '@/context/ToastContext';
+import { CurrencyProvider } from '@/context/CurrencyContext';
 
 export const metadata: Metadata = {
   title: 'Future Milestone - Scandinavian Furniture',
@@ -33,6 +34,7 @@ export default function RootLayout({
           <CollectionProvider>
             <ProductProvider>
               <UserProvider>
+                <CurrencyProvider>
                 <ToastProvider>
                 <div className="flex-grow flex flex-col bg-bg-primary rounded-2xl relative overflow-hidden transition-theme">
                   <Navbar />
@@ -43,6 +45,7 @@ export default function RootLayout({
                   <Footer />
                 </div>
               </ToastProvider>
+                </CurrencyProvider>
               </UserProvider>
             </ProductProvider>
           </CollectionProvider>

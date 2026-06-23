@@ -6,6 +6,7 @@ import { products } from '@/data/products';
 import { useCollections } from '@/context/CollectionContext';
 import { useProducts } from '@/context/ProductContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 
 
@@ -17,6 +18,7 @@ const saleBadges: Record<string, string> = {
 
 export default function Home() {
   const { settings, loading: settingsLoading } = useSettings();
+  const { formatPrice } = useCurrency();
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -413,7 +415,7 @@ export default function Home() {
 
                   {/* Animated Pop-up Bottom Price Bar */}
                   <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
-                    <span className="text-sm font-bold text-fg-primary">${product.price}</span>
+                    <span className="text-sm font-bold text-fg-primary">{formatPrice(product.price)}</span>
                     <span
                       className="px-4 py-2 rounded-lg text-sm tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
                     >

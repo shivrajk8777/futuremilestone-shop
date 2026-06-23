@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { products, Product, ProductDetailSection } from '@/data/products';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/context/ToastContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -96,6 +97,7 @@ export default function ProductDetails({ params }: PageProps) {
   const { slug } = use(params);
   const { user } = useUser();
   const { warning } = useToast();
+  const { formatPrice } = useCurrency();
 
   // Find static product fallback
   const staticProduct = products.find((p) => p.slug === slug);
@@ -435,11 +437,11 @@ export default function ProductDetails({ params }: PageProps) {
               )}
               <div className="flex items-baseline gap-3 animate-fade-in">
                 <span className="font-dm-sans text-3xl font-bold text-fg-primary">
-                  ${currentPrice}
+                  {formatPrice(currentPrice)}
                 </span>
                 {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
                   <span className="font-dm-sans text-lg text-fg-secondary/40 line-through">
-                    ${currentOriginalPrice || (currentPrice * 2)}
+                    {formatPrice(currentOriginalPrice || (currentPrice * 2))}
                   </span>
                 )}
               </div>
