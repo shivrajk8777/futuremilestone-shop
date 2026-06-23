@@ -95,7 +95,7 @@
   --font-dm-sans: "DM Sans", "Inter", sans-serif;
   --font-inter: "Inter", sans-serif;
   
-  --animate-marquee: marquee 25s linear infinite;
+  --animate-marquee: marquee 11s linear infinite;
   --animate-wave: wave 1.6s infinite linear;
   --animate-logo-scale: logo-scale 2s ease-in-out infinite;
   --animate-loading-bar: loading-bar 1.5s infinite ease-in-out;

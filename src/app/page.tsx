@@ -17,7 +17,8 @@ const saleBadges: Record<string, string> = {
 
 export default function Home() {
   const { settings, loading: settingsLoading } = useSettings();
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(1);
+  const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const [fadeLoader, setFadeLoader] = useState(false);
@@ -32,14 +33,22 @@ export default function Home() {
 
   const activeSlides = settings.slides && settings.slides.length > 0 ? settings.slides : [];
 
+  const displaySlides = activeSlides.length > 0
+    ? [activeSlides[activeSlides.length - 1], ...activeSlides, activeSlides[0]]
+    : [];
+
   const nextSlide = () => {
     if (activeSlides.length === 0) return;
-    setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
+    if (currentSlide > activeSlides.length) return;
+    setIsTransitionEnabled(true);
+    setCurrentSlide((prev) => prev + 1);
   };
 
   const prevSlide = () => {
     if (activeSlides.length === 0) return;
-    setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
+    if (currentSlide < 1) return;
+    setIsTransitionEnabled(true);
+    setCurrentSlide((prev) => prev - 1);
   };
 
   // Section Products: custom favorite products if configured, otherwise latest 8 products as fallback
@@ -61,6 +70,40 @@ export default function Home() {
       return () => clearTimeout(timer);
     }
   }, [isDataReady, mounted]);
+
+  // Re-enable transitions after layout reset
+  useEffect(() => {
+    if (!isTransitionEnabled) {
+      const timer = setTimeout(() => {
+        setIsTransitionEnabled(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isTransitionEnabled]);
+
+  // Autoplay slideshow every 5s
+  useEffect(() => {
+    if (activeSlides.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsTransitionEnabled(true);
+      setCurrentSlide((prev) => prev + 1);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [currentSlide, activeSlides.length]);
+
+  const handleTransitionEnd = () => {
+    if (activeSlides.length === 0) return;
+
+    if (currentSlide === activeSlides.length + 1) {
+      setIsTransitionEnabled(false);
+      setCurrentSlide(1);
+    } else if (currentSlide === 0) {
+      setIsTransitionEnabled(false);
+      setCurrentSlide(activeSlides.length);
+    }
+  };
 
   const scrollCarousel = (direction: 'left' | 'right') => {
     if (favoritesCarouselRef.current) {
@@ -135,38 +178,55 @@ export default function Home() {
       {!settingsLoading && settings.carouselVisible && activeSlides.length > 0 && (
         <section className="relative h-[290px] md:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
           {/* Slides */}
-          <div className="absolute inset-0 flex transition-transform duration-[1100ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-            {activeSlides.map((slide: any, idx: number) => (
-              <div key={idx} className="relative w-full h-full flex-shrink-0">
-                <img
-                  src={slide.bgImage}
-                  alt={slide.name}
-                  className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
-                />
-                <div className="absolute inset-0 bg-black/10" />
+          <div
+            className="absolute inset-0 flex"
+            style={{
+              transform: `translateX(-${currentSlide * 100}%)`,
+              transition: isTransitionEnabled ? 'transform 1100ms cubic-bezier(0.25, 1.1, 0.5, 1)' : 'none',
+            }}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {displaySlides.map((slide: any, idx: number) => {
+              const actualSlideIdx = idx === 0
+                ? activeSlides.length - 1
+                : idx === activeSlides.length + 1
+                  ? 0
+                  : idx - 1;
+              const currentActualIdx = (currentSlide - 1 + activeSlides.length) % activeSlides.length;
+              const isActive = actualSlideIdx === currentActualIdx;
 
-                {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
-                <div className={`absolute bottom-3 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-3 md:p-10 flex flex-col gap-1.5 md:gap-8 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25,1.1,0.5,1)] transition-theme ${idx === currentSlide && mounted
-                  ? 'translate-x-0 opacity-100'
-                  : 'translate-x-[20px] md:translate-x-[40px] opacity-0 pointer-events-none'
-                  }`}>
-                  <div className="flex flex-col justify-between items-start gap-1 md:gap-2">
-                    <h2 className="font-dm-sans text-sm md:text-[32px] leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight">{slide.name}</h2>
-                    {slide.tagline && (
-                      <p className="text-[10px] md:text-base text-fg-secondary leading-[1.4] md:leading-[1.6]">{slide.tagline}</p>
-                    )}
-                    <Link
-                      href={slide.slug ? `/shop/${slide.slug}` : '/shop'}
-                      className="relative pb-0.5 text-[10px] md:text-sm uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mt-0.5 md:mt-0"
-                    >
-                      View <span className="hidden md:inline">Product</span>
-                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
-                    </Link>
+              return (
+                <div key={idx} className="relative w-full h-full flex-shrink-0">
+                  <img
+                    src={slide.bgImage}
+                    alt={slide.name}
+                    className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
+                  />
+                  <div className="absolute inset-0 bg-black/10" />
+
+                  {/* Product Content Card (Bottom-Center on mobile, Bottom-Left on md) */}
+                  <div className={`absolute bottom-3 left-4 right-4 md:right-auto md:bottom-12 md:left-12 md:max-w-[400px] bg-bg-primary rounded-xl p-3 md:p-10 flex flex-col gap-1.5 md:gap-8 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25, 1.1, 0.5, 1)] transition-theme ${isActive && mounted
+                    ? 'translate-x-0 opacity-100'
+                    : 'translate-x-[20px] md:translate-x-[40px] opacity-0 pointer-events-none'
+                    }`}>
+                    <div className="flex flex-col justify-between items-start gap-1 md:gap-2">
+                      <h2 className="font-dm-sans text-sm md:text-[32px] leading-[1.3] md:leading-[1.2] text-fg-primary tracking-tight">{slide.name}</h2>
+                      {slide.tagline && (
+                        <p className="text-[10px] md:text-base text-fg-secondary leading-[1.4] md:leading-[1.6]">{slide.tagline}</p>
+                      )}
+                      <Link
+                        href={slide.slug ? `/shop/${slide.slug}` : '/shop'}
+                        className="relative pb-0.5 text-[10px] md:text-sm uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mt-0.5 md:mt-0"
+                      >
+                        View <span className="hidden md:inline">Product</span>
+                        <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
+                      </Link>
+                    </div>
+
                   </div>
-
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Slide navigation controls */}
@@ -191,17 +251,23 @@ export default function Home() {
 
           {/* Dot Indicators — bottom center */}
           <div className="absolute bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-            {activeSlides.map((_: any, idx: number) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`rounded-full transition-all duration-300 focus:outline-none ${idx === currentSlide
-                  ? 'w-2.5 h-2.5 bg-white'
-                  : 'w-2 h-2 bg-white/40 hover:bg-white/70'
-                  }`}
-              />
-            ))}
+            {activeSlides.map((_: any, idx: number) => {
+              const activeDotIdx = (currentSlide - 1 + activeSlides.length) % activeSlides.length;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setIsTransitionEnabled(true);
+                    setCurrentSlide(idx + 1);
+                  }}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`rounded-full transition-all duration-300 focus:outline-none ${idx === activeDotIdx
+                    ? 'w-2.5 h-2.5 bg-white'
+                    : 'w-2.5 h-2 bg-white/40 hover:bg-white/70'
+                    }`}
+                />
+              );
+            })}
           </div>
         </section>
       )}
