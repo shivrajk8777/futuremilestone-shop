@@ -380,14 +380,14 @@ export default function ProductDetails({ params }: PageProps) {
       <div className="w-full flex flex-col lg:flex-row gap-3 select-text transition-theme relative lg:h-screen -mt-24">
 
         {/* Left Column: Image gallery card */}
-        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[500px] md:h-[600px] lg:h-full flex-shrink-0 transition-theme">
+        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[380px] sm:h-[480px] md:h-[600px] lg:h-full flex-shrink-0 transition-theme">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full bg-bg-secondary/40 shadow-sm flex flex-col">
             <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto scrollbar-none h-full snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
               {activeProduct.images.map((img, idx) => (
                 <div
                   key={idx}
                   id={`image-${idx}`}
-                  className="w-full lg:w-full aspect-square lg:aspect-[3/4] flex-shrink-0 snap-center relative"
+                  className="w-full h-full lg:w-full lg:h-auto lg:aspect-[3/4] flex-shrink-0 snap-center relative"
                 >
                   <img src={img} alt={`${activeProduct.name} view ${idx + 1}`} className="object-cover w-full h-full" />
                 </div>
@@ -515,8 +515,8 @@ export default function ProductDetails({ params }: PageProps) {
                   8 in stock
                 </span>
               </div>
-              <div className="flex gap-3 items-center">
-                <div className="flex gap-1.5 items-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full">
+                <div className="flex gap-1.5 items-center w-full sm:w-auto">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="font-dm-sans w-11 h-11 flex items-center justify-center bg-fg-primary/5 hover:bg-fg-primary/10 rounded-sm text-lg text-fg-primary/60 hover:text-fg-primary focus:outline-none cursor-pointer transition-colors"
@@ -537,7 +537,7 @@ export default function ProductDetails({ params }: PageProps) {
 
                 <button
                   onClick={handleAddToCart}
-                  className="font-dm-sans flex-1 h-11 bg-fg-primary text-bg-primary rounded-sm font-bold uppercase tracking-wider text-xs hover:opacity-90 transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer relative overflow-hidden"
+                  className="font-dm-sans w-full sm:flex-1 h-11 bg-fg-primary text-bg-primary rounded-sm font-bold uppercase tracking-wider text-xs hover:opacity-90 transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer relative overflow-hidden"
                 >
                   <span>Add To Cart</span>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -622,7 +622,7 @@ export default function ProductDetails({ params }: PageProps) {
             </button>
             {isDescOpen && (
               <div className="mt-3 text-sm text-fg-secondary leading-relaxed pl-2 py-1">
-                Elevate your lifestyle experience with the {activeProduct.name}. A perfect blend of timeless design and modern craftsmanship. Designed to add warmth, comfort, and premium aesthetic value to your interior layouts.
+                {activeProduct.description || `Elevate your lifestyle experience with the ${activeProduct.name}. A perfect blend of timeless design and modern craftsmanship. Designed to add warmth, comfort, and premium aesthetic value to your interior layouts.`}
               </div>
             )}
           </div>
