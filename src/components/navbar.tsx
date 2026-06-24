@@ -530,6 +530,31 @@ export default function Navbar() {
             </span>
           </button>
 
+          {/* User Icon - Mobile only (shown next to hamburger) */}
+          <div className="md:hidden">
+            {user ? (
+              <Link
+                href="/account"
+                className="p-1 text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer"
+                aria-label="My Account"
+              >
+                <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                </svg>
+              </Link>
+            ) : (
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="p-1 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none cursor-pointer"
+                aria-label="Sign In"
+              >
+                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+            )}
+          </div>
+
           {/* User Button / Dropdown */}
           <div className="relative hidden md:block" id="user-dropdown-container">
             {user ? (
@@ -675,6 +700,54 @@ export default function Navbar() {
                 </svg>
               </Link>
             ))}
+
+            {/* User Section */}
+            <div className="mt-2 border-t border-border-accent/40 pt-4 flex flex-col gap-2">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-3 px-2 py-1">
+                    <div className="w-9 h-9 rounded-full bg-fg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-fg-primary" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-fg-primary">{user.name}</p>
+                      <p className="text-xs text-fg-secondary">{user.email}</p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/account"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between w-full p-4 bg-black/5 dark:bg-white/5 rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                  >
+                    <span className="text-sm font-medium text-fg-primary ml-1">Account Details</span>
+                    <svg className="w-4 h-4 text-fg-primary mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                    className="flex items-center justify-between w-full p-4 bg-red-500/10 rounded-xl hover:bg-red-500/20 transition-colors text-left cursor-pointer focus:outline-none"
+                  >
+                    <span className="text-sm font-medium text-red-500 ml-1">Log Out</span>
+                    <svg className="w-4 h-4 text-red-500 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => { setAuthModalOpen(true); setIsMobileMenuOpen(false); }}
+                  className="flex items-center justify-center gap-2 w-full p-4 bg-fg-primary text-bg-primary rounded-xl hover:opacity-90 transition-opacity cursor-pointer focus:outline-none"
+                >
+                  <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="text-sm font-semibold">Sign In</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
