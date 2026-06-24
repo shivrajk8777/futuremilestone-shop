@@ -184,7 +184,6 @@ export default function Home() {
             style={{
               transform: `translateX(-${currentSlide * 100}%)`,
               transition: isTransitionEnabled ? 'transform 1300ms cubic-bezier(0.65, 1.18, 0.64, 1)' : 'none',
-
             }}
             onTransitionEnd={handleTransitionEnd}
           >
