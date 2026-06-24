@@ -125,9 +125,8 @@ export default function Home() {
     <div className={`flex flex-col gap-3 pb-3 ${showMarquee ? '' : 'pt-3'}`}>
       {showLoader && (
         <div
-          className={`fixed inset-0 z-[9999] bg-[#0e1011] flex flex-col items-center justify-center transition-all duration-700 ease-in-out ${
-            fadeLoader ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+          className={`fixed inset-0 z-[9999] bg-[#0e1011] flex flex-col items-center justify-center transition-all duration-700 ease-in-out ${fadeLoader ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
         >
           <div className="flex flex-col items-center gap-4">
             {/* Brand Logo */}
@@ -184,7 +183,8 @@ export default function Home() {
             className="absolute inset-0 flex"
             style={{
               transform: `translateX(-${currentSlide * 100}%)`,
-              transition: isTransitionEnabled ? 'transform 1100ms cubic-bezier(0.25, 1.1, 0.5, 1)' : 'none',
+              transition: isTransitionEnabled ? 'transform 1300ms cubic-bezier(0.65, 1.18, 0.64, 1)' : 'none',
+
             }}
             onTransitionEnd={handleTransitionEnd}
           >
