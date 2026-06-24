@@ -905,22 +905,27 @@ export default function ProductDetails({ params }: PageProps) {
           <div className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl py-4 flex items-center justify-center transition-theme">
             <h2 className="font-dm-sans text-base text-fg-primary tracking-wide">You Might Like</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {relatedProducts.map((p) => (
-              <div
+              <Link
+                href={`/shop/${p.slug}`}
                 key={p.slug}
-                className="w-full bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40"
+                className="block w-full bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40 animate-fade-in"
               >
                 {/* Product Background Image */}
-                <img
-                  src={p.images[0]}
-                  alt={p.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
-                />
+                {p.images && p.images[0] ? (
+                  <img
+                    src={p.images[0]}
+                    alt={p.name}
+                    className="absolute inset-0 w-full h-full object-fill transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 w-full h-full bg-bg-secondary flex items-center justify-center text-fg-secondary text-xs">No image</div>
+                )}
 
                 {/* Top-Right Sale Badge */}
                 {(p.discountBadge || saleBadges[p.slug]) && (
-                  <div className="absolute top-3 right-3 bg-white text-black text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase">
+                  <div className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase shadow-md">
                     {p.discountBadge || saleBadges[p.slug]}
                   </div>
                 )}
@@ -940,7 +945,8 @@ export default function ProductDetails({ params }: PageProps) {
                     </svg>
                   </div>
                   <span className="font-dm-sans font-bold text-fg-primary text-sm tracking-tight flex items-center transition-all duration-300">
-                    <span>{p.name}</span>
+                    <span className="md:hidden">{p.name.split(' ')[0]}</span>
+                    <span className="hidden md:inline">{p.name}</span>
                     <span className="opacity-0 max-w-0 inline-block overflow-hidden translate-x-[-4px] group-hover:opacity-100 group-hover:max-w-[20px] group-hover:translate-x-0 group-hover:ml-1.5 transition-all duration-300 ease-out">
                       ↗
                     </span>
@@ -949,15 +955,19 @@ export default function ProductDetails({ params }: PageProps) {
 
                 {/* Animated Pop-up Bottom Price Bar */}
                 <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
-                  <span className="text-sm font-bold text-fg-primary">${p.price}</span>
-                  <Link
-                    href={`/shop/${p.slug}`}
-                    className="bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-bold text-fg-primary">{formatPrice(p.price)}</span>
+                    {p.originalPrice && p.originalPrice > p.price && (
+                      <span className="text-[10px] text-fg-secondary line-through">{formatPrice(p.originalPrice)}</span>
+                    )}
+                  </div>
+                  <span
+                    className="px-4 py-2 rounded-lg text-xs tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
                   >
                     View
-                  </Link>
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

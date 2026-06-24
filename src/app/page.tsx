@@ -83,16 +83,41 @@ export default function Home() {
     }
   }, [isTransitionEnabled]);
 
-  // Autoplay slideshow every 5s
+  // Autoplay slideshow every 5s, pausing when tab is inactive to prevent white screen / index out of bounds
   useEffect(() => {
     if (activeSlides.length <= 1) return;
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setCurrentSlide((prev) => {
+          if (prev > activeSlides.length + 1 || prev < 0) {
+            setIsTransitionEnabled(false);
+            return 1;
+          }
+          return prev;
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     const interval = setInterval(() => {
-      setIsTransitionEnabled(true);
-      setCurrentSlide((prev) => prev + 1);
+      if (document.hidden) return; // Pause autoplay when tab is inactive
+
+      setCurrentSlide((prev) => {
+        if (prev > activeSlides.length) {
+          setIsTransitionEnabled(false);
+          return 1;
+        }
+        setIsTransitionEnabled(true);
+        return prev + 1;
+      });
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [currentSlide, activeSlides.length]);
 
   const handleTransitionEnd = () => {
