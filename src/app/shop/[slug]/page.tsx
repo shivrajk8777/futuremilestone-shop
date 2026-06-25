@@ -209,6 +209,7 @@ export default function ProductDetails({ params }: PageProps) {
     shippingReturns: dbProduct?.shippingReturns || staticProduct?.shippingReturns || 'Free shipping on orders over $500. Standard delivery takes 3-7 business days. Easy returns within 30 days of delivery.',
     images: (dbProduct?.images?.length ? dbProduct.images : (staticProduct?.images || ['/images/placeholder.png'])) as string[],
     details: (dbProduct?.details || []) as ProductDetailSection[],
+    dimensionsInfo: dbProduct?.dimensionsInfo || (staticProduct as any)?.dimensionsInfo || null,
   };
 
   // Default dimensions fallback for static products
@@ -675,19 +676,27 @@ export default function ProductDetails({ params }: PageProps) {
                   <tbody>
                     <tr className="border-b border-border-accent/40">
                       <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide w-1/3">Material</td>
-                      <td className="py-2.5">{selectedMaterial === 'Oak' ? (activeProduct.category === 'wood' ? 'Solid Oak Frame' : 'Premium Oak') : 'Solid Teak Frame'}</td>
+                      <td className="py-2.5">
+                        {activeProduct.dimensionsInfo?.material || (selectedMaterial === 'Oak' ? (activeProduct.category === 'wood' ? 'Solid Oak Frame' : 'Premium Oak') : 'Solid Teak Frame')}
+                      </td>
                     </tr>
                     <tr className="border-b border-border-accent/40">
                       <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide">Finish</td>
-                      <td className="py-2.5">Natural Matte protective finish</td>
+                      <td className="py-2.5">
+                        {activeProduct.dimensionsInfo?.finish || 'Natural Matte protective finish'}
+                      </td>
                     </tr>
                     <tr className="border-b border-border-accent/40">
                       <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide">Dimensions</td>
-                      <td className="py-2.5">{activeProduct.dimensions}</td>
+                      <td className="py-2.5">
+                        {activeProduct.dimensionsInfo?.dimensions || activeProduct.dimensions}
+                      </td>
                     </tr>
                     <tr className="border-b border-border-accent/40">
                       <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide">Weight</td>
-                      <td className="py-2.5">6.5 - 8.0 kg</td>
+                      <td className="py-2.5">
+                        {activeProduct.dimensionsInfo?.weight || '6.5 - 8.0 kg'}
+                      </td>
                     </tr>
                   </tbody>
                 </table>

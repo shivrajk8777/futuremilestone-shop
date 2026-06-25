@@ -53,6 +53,12 @@ export async function GET(
       materialsList: Array.isArray(product.materials) ? product.materials : [],
       dimensionsList: discounted.dimensionsList,
       details: Array.isArray(product.details) ? product.details : [],
+      dimensionsInfo: product.dimensionsInfo ?? {
+        material: '',
+        finish: '',
+        dimensions: '',
+        weight: '',
+      },
     };
 
     return NextResponse.json({ success: true, product: formatted });
