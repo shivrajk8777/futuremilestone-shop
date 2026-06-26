@@ -112,7 +112,6 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Accordion states - multiple can be open at once
   const [isDescOpen, setIsDescOpen] = useState(true);
-  const [isDimensionsOpen, setIsDimensionsOpen] = useState(false);
   const [isShippingOpen, setIsShippingOpen] = useState(false);
 
   // Active thumbnail observation index
@@ -368,7 +367,6 @@ export default function ProductDetails({ params }: PageProps) {
   const rightColumnRef = useRef<HTMLDivElement>(null);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
-  const dimensionsRef = useRef<HTMLDivElement>(null);
   const shippingRef = useRef<HTMLDivElement>(null);
 
   // relatedProducts is loaded dynamically from database and managed in state.
@@ -648,61 +646,7 @@ export default function ProductDetails({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Dimensions Accordion Card */}
-          <div className="w-full bg-bg-secondary text-fg-primary rounded-xl border border-border-accent/40 flex-shrink-0 overflow-hidden transition-theme">
-            <button
-              onClick={() => setIsDimensionsOpen(!isDimensionsOpen)}
-              className="font-dm-sans w-full flex items-center justify-between px-5 md:px-6 py-5 md:py-6 text-base font-medium text-fg-primary focus:outline-none cursor-pointer"
-            >
-              <span>Dimensions</span>
-              <svg
-                className={`w-4 h-4 text-fg-secondary flex-shrink-0 transition-transform duration-300 ease-in-out ${isDimensionsOpen ? 'rotate-180' : 'rotate-0'}`}
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div
-              ref={dimensionsRef}
-              style={{
-                maxHeight: isDimensionsOpen ? (dimensionsRef.current?.scrollHeight ?? 500) + 'px' : '0px',
-                opacity: isDimensionsOpen ? 1 : 0,
-                transition: 'max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease',
-              }}
-              className="overflow-hidden"
-            >
-              <div className="px-5 md:px-6 pb-5 md:pb-6">
-                <table className="w-full text-xs text-left text-fg-secondary border-collapse">
-                  <tbody>
-                    <tr className="border-b border-border-accent/40">
-                      <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide w-1/3">Material</td>
-                      <td className="py-2.5">
-                        {activeProduct.dimensionsInfo?.material || (selectedMaterial === 'Oak' ? (activeProduct.category === 'wood' ? 'Solid Oak Frame' : 'Premium Oak') : 'Solid Teak Frame')}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-border-accent/40">
-                      <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide">Finish</td>
-                      <td className="py-2.5">
-                        {activeProduct.dimensionsInfo?.finish || 'Natural Matte protective finish'}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-border-accent/40">
-                      <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide">Dimensions</td>
-                      <td className="py-2.5">
-                        {activeProduct.dimensionsInfo?.dimensions || activeProduct.dimensions}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-border-accent/40">
-                      <td className="font-dm-sans py-2.5 font-semibold text-fg-primary uppercase tracking-wide">Weight</td>
-                      <td className="py-2.5">
-                        {activeProduct.dimensionsInfo?.weight || '6.5 - 8.0 kg'}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+
 
           {/* Shipping Accordion Card */}
           <div className="w-full bg-bg-secondary text-fg-primary rounded-xl border border-border-accent/40 flex-shrink-0 overflow-hidden transition-theme">
