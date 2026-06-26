@@ -256,6 +256,7 @@ export default function ProductDetails({ params }: PageProps) {
   // Handle intersection observer to highlight active thumbnail as user scrolls gallery
   useEffect(() => {
     const scrollContainer = galleryScrollRef.current;
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
     const observers = activeProduct.images.map((_, idx) => {
       const observer = new IntersectionObserver(
         ([entry]) => {
@@ -264,7 +265,7 @@ export default function ProductDetails({ params }: PageProps) {
           }
         },
         {
-          root: scrollContainer,
+          root: isDesktop ? null : scrollContainer,
           threshold: 0.5,
         }
       );
@@ -383,17 +384,17 @@ export default function ProductDetails({ params }: PageProps) {
     <div className="w-full bg-bg-primary transition-theme pb-16">
 
       {/* ── Main Split Hero Section ── */}
-      <div className="w-full flex flex-col lg:flex-row gap-3 select-text transition-theme relative lg:h-screen -mt-24">
+      <div className="w-full flex flex-col lg:flex-row items-start gap-3 select-text transition-theme relative lg:min-h-screen lg:-mt-24">
 
-        {/* Left Column: Image gallery card */}
-        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[380px] sm:h-[480px] md:h-[600px] lg:h-full flex-shrink-0 transition-theme">
-          <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full bg-bg-secondary/40 shadow-sm flex flex-col">
-            <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-y-auto scrollbar-none h-full snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
+        {/* Left Column: Image gallery */}
+        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex-shrink-0 transition-theme h-[380px] sm:h-[480px] md:h-[600px] lg:h-auto">
+          <div className="h-full lg:h-auto rounded-xl lg:rounded-none overflow-hidden lg:overflow-visible relative border border-border-accent/40 lg:border-none w-full bg-bg-secondary/40 lg:bg-transparent shadow-sm lg:shadow-none flex flex-col gap-3">
+            <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-visible scrollbar-none h-full lg:h-auto snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
               {activeProduct.images.map((img, idx) => (
                 <div
                   key={idx}
                   id={`image-${idx}`}
-                  className="w-full h-full lg:w-full lg:h-auto lg:aspect-[3/4] flex-shrink-0 snap-center relative"
+                  className="w-full h-full lg:h-auto lg:aspect-[3/4] flex-shrink-0 snap-center relative rounded-none lg:rounded-xl overflow-hidden lg:border lg:border-border-accent/40 lg:bg-bg-secondary/40 lg:shadow-sm"
                 >
                   <img src={img} alt={`${activeProduct.name} view ${idx + 1}`} className="object-cover w-full h-full" />
                 </div>
@@ -401,7 +402,7 @@ export default function ProductDetails({ params }: PageProps) {
             </div>
 
             {/* Floating Sticky Thumbnails panel */}
-            <div className="absolute bottom-6 left-0 right-0 hidden lg:flex justify-center z-20 pointer-events-none">
+            <div className="absolute lg:sticky bottom-6 lg:bottom-8 left-0 right-0 flex justify-center z-20 pointer-events-none">
               <div className="bg-bg-primary/95 backdrop-blur-md p-2.5 rounded-2xl border border-border-accent/80 shadow-lg flex gap-2 pointer-events-auto transition-theme">
                 {activeProduct.images.map((img, idx) => {
                   const isActive = activeImgIdx === idx;
@@ -421,8 +422,8 @@ export default function ProductDetails({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Right Column: Sticky / Scrollable Details Panel */}
-        <div ref={rightColumnRef} className="w-full lg:w-[calc(41%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-full lg:overflow-y-auto scrollbar-none">
+        {/* Right Column: Sticky Details Panel */}
+        <div ref={rightColumnRef} className="w-full lg:w-[calc(41%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:sticky lg:top-1 lg:self-start">
 
           {/* Main Details Card */}
           <div className="w-full bg-bg-secondary text-fg-primary rounded-xl p-8 md:p-12 lg:pt-20 lg:pb-12 lg:px-12 border border-border-accent/40 space-y-6 flex-shrink-0 shadow-sm flex flex-col transition-theme">

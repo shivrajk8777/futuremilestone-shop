@@ -35,16 +35,16 @@ export default function RootLayout({
             <ProductProvider>
               <UserProvider>
                 <CurrencyProvider>
-                <ToastProvider>
-                <div className="flex-grow flex flex-col bg-bg-primary rounded-2xl relative overflow-hidden transition-theme">
-                  <Navbar />
-                  <MainWrapper>
-                    {children}
-                  </MainWrapper>
-                  <SocialBar />
-                  <Footer />
-                </div>
-              </ToastProvider>
+                  <ToastProvider>
+                    <div className="flex-grow flex flex-col bg-bg-primary rounded-2xl relative transition-theme">
+                      <Navbar />
+                      <MainWrapper>
+                        {children}
+                      </MainWrapper>
+                      <SocialBar />
+                      <Footer />
+                    </div>
+                  </ToastProvider>
                 </CurrencyProvider>
               </UserProvider>
             </ProductProvider>
