@@ -9,7 +9,7 @@ export async function GET(
   try {
     const { slug } = await params;
     const db = await getDatabase();
-    
+
     const product = await db.collection('products').findOne({ slug });
 
     if (!product) {

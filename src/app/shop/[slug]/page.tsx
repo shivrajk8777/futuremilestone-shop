@@ -642,7 +642,7 @@ export default function ProductDetails({ params }: PageProps) {
               }}
               className="overflow-hidden"
             >
-              <div className="px-5 md:px-6 pb-5 md:pb-6 text-sm text-fg-secondary leading-relaxed">
+              <div className="px-5 md:px-6 pb-5 md:pb-6 text-sm text-fg-secondary leading-relaxed whitespace-pre-line">
                 {activeProduct.description || `Elevate your lifestyle experience with the ${activeProduct.name}. A perfect blend of timeless design and modern craftsmanship. Designed to add warmth, comfort, and premium aesthetic value to your interior layouts.`}
               </div>
             </div>
