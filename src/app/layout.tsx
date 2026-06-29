@@ -5,6 +5,7 @@ import Footer from '@/components/footer';
 import MainWrapper from '@/components/main-wrapper';
 import SocialBar from '@/components/social-bar';
 import DynamicBody from '@/components/dynamic-body';
+import ChatWidget from '@/components/chat-widget';
 import { CollectionProvider } from '@/context/CollectionContext';
 import { ProductProvider } from '@/context/ProductContext';
 import { UserProvider } from '@/context/UserContext';
@@ -43,6 +44,7 @@ export default function RootLayout({
                       </MainWrapper>
                       <SocialBar />
                       <Footer />
+                      <ChatWidget />
                     </div>
                   </ToastProvider>
                 </CurrencyProvider>
