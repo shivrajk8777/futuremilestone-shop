@@ -23,7 +23,7 @@ export default function ChatWidget() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -42,7 +42,7 @@ export default function ChatWidget() {
         const data = await res.json();
         if (data.success) {
           setMessages(data.messages);
-          
+
           // Calculate unread messages (sender is admin and readByUser is false)
           // Note: The API GET endpoint marks them as read automatically when fetched,
           // but if we are polling while the chat is closed, we want to know the unread count.
@@ -65,7 +65,7 @@ export default function ChatWidget() {
           const result = await response.json();
           if (result.success) {
             setMessages(result.messages);
-            
+
             if (!isOpen) {
               const unread = result.messages.filter(
                 (m: Message) => m.sender === 'admin' && !m.readByUser
@@ -229,11 +229,10 @@ export default function ChatWidget() {
                     >
                       <div className="max-w-[75%] space-y-1">
                         <div
-                          className={`px-4 py-3 rounded-2xl text-sm ${
-                            isAdmin
+                          className={`px-4 py-3 rounded-2xl text-sm ${isAdmin
                               ? 'bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-tl-none'
                               : 'bg-fg-primary text-bg-primary rounded-tr-none'
-                          }`}
+                            }`}
                         >
                           <p className="m-0 leading-relaxed break-words whitespace-pre-wrap">{msg.message}</p>
                         </div>
