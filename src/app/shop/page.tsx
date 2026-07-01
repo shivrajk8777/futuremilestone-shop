@@ -182,7 +182,7 @@ function ShopContent() {
                     <img
                       src={product.images[0]}
                       alt={product.name}
-                      className="absolute inset-0 w-full h-full object-fill transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
+                      className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
                     />
                   ) : (
                     <div className="absolute inset-0 w-full h-full bg-bg-secondary flex items-center justify-center text-fg-secondary text-xs">No image</div>
@@ -219,7 +219,7 @@ function ShopContent() {
                   </div>
 
                   {/* Animated Pop-up Bottom Price Bar */}
-                  <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
+                  <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 hidden md:flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0">
                     <div className="flex flex-col items-start">
                       <span className="text-sm font-bold text-fg-primary">{formatPrice(product.price)}</span>
                       {product.originalPrice && product.originalPrice > product.price && (

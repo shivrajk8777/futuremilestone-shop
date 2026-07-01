@@ -384,25 +384,42 @@ export default function ProductDetails({ params }: PageProps) {
     <div className="w-full bg-bg-primary transition-theme pb-16">
 
       {/* ── Main Split Hero Section ── */}
-      <div className="w-full flex flex-col lg:flex-row items-start gap-3 select-text transition-theme relative lg:min-h-screen lg:-mt-24">
+      <div className="w-full flex flex-col lg:flex-row items-start gap-3 lg:gap-3 select-text transition-theme relative lg:min-h-screen -mt-24">
 
         {/* Left Column: Image gallery */}
-        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex-shrink-0 transition-theme h-[380px] sm:h-[480px] md:h-[600px] lg:h-auto">
-          <div className="h-full lg:h-auto rounded-xl lg:rounded-none overflow-hidden lg:overflow-visible relative border border-border-accent/40 lg:border-none w-full bg-bg-secondary/40 lg:bg-transparent shadow-sm lg:shadow-none flex flex-col gap-3">
+        <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-0 lg:pr-0 flex-shrink-0 transition-theme h-auto">
+          <div className="h-full lg:h-auto rounded-2xl lg:rounded-none overflow-hidden lg:overflow-visible relative lg:border-none w-full lg:bg-transparent lg:shadow-none flex flex-col gap-3">
             <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-visible scrollbar-none h-full lg:h-auto snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
               {activeProduct.images.map((img, idx) => (
                 <div
                   key={idx}
                   id={`image-${idx}`}
-                  className="w-full h-full lg:h-auto lg:aspect-[3/4] flex-shrink-0 snap-center relative rounded-none lg:rounded-xl overflow-hidden lg:border lg:border-border-accent/40 lg:bg-bg-secondary/40 lg:shadow-sm"
+                  className="w-full aspect-square lg:aspect-auto lg:h-screen flex-shrink-0 snap-center relative rounded-2xl overflow-hidden lg:bg-bg-secondary/40"
                 >
                   <img src={img} alt={`${activeProduct.name} view ${idx + 1}`} className="object-cover w-full h-full" />
                 </div>
               ))}
             </div>
 
-            {/* Floating Sticky Thumbnails panel */}
-            <div className="absolute lg:sticky bottom-6 lg:bottom-8 left-0 right-0 flex justify-center z-20 pointer-events-none">
+            {/* Mobile Dots Indicators (Mobile only) */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none lg:hidden">
+              {activeProduct.images.map((_, idx) => {
+                const isActive = activeImgIdx === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => scrollToImage(idx)}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer pointer-events-auto ${
+                      isActive ? 'w-5 bg-fg-primary' : 'w-1.5 bg-fg-primary/30'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Floating Sticky Thumbnails panel (Desktop only) */}
+            <div className="hidden lg:flex absolute lg:sticky bottom-6 lg:bottom-8 left-0 right-0 justify-center z-20 pointer-events-none">
               <div className="bg-bg-primary/95 backdrop-blur-md p-2.5 rounded-2xl border border-border-accent/80 shadow-lg flex gap-2 pointer-events-auto transition-theme">
                 {activeProduct.images.map((img, idx) => {
                   const isActive = activeImgIdx === idx;
@@ -423,28 +440,28 @@ export default function ProductDetails({ params }: PageProps) {
         </section>
 
         {/* Right Column: Sticky Details Panel */}
-        <div ref={rightColumnRef} className="w-full lg:w-[calc(41%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:sticky lg:top-1 lg:self-start">
+        <div ref={rightColumnRef} className="w-full lg:w-[calc(42%-6px)] py-3 px-3 lg:py-3 lg:pr-6 lg:pl-0 flex flex-col gap-3 transition-theme lg:sticky lg:top-1 lg:self-start">
 
           {/* Main Details Card */}
-          <div className="w-full bg-bg-secondary text-fg-primary rounded-xl p-8 md:p-12 lg:pt-20 lg:pb-12 lg:px-12 border border-border-accent/40 space-y-6 flex-shrink-0 shadow-sm flex flex-col transition-theme">
+          <div className="w-full bg-bg-secondary text-fg-primary rounded-2xl lg:rounded-xl p-8 md:p-12 lg:pt-20 lg:pb-12 lg:px-12 border border-transparent lg:border-border-accent/40 space-y-6 flex-shrink-0 shadow-none lg:shadow-sm flex flex-col transition-theme">
 
             {/* Sale tag and pricing */}
-            <div className="space-y-3">
-              {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
-                <div className="bg-[#ef4444] text-white text-[10px] font-bold px-2.5 py-1 rounded-lg w-fit uppercase tracking-wider">
-                  {activeProduct.discountBadge || saleBadges[activeProduct.slug]}
-                </div>
-              )}
+            <div className="flex items-center justify-between w-full">
               <div className="flex items-baseline gap-3 animate-fade-in">
                 <span className="font-dm-sans text-3xl font-bold text-fg-primary">
                   {formatPrice(currentPrice)}
                 </span>
                 {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
                   <span className="font-dm-sans text-lg text-fg-secondary/40 line-through">
-                    {formatPrice(currentOriginalPrice || (currentPrice * 2))}
+                    {formatPrice(currentOriginalPrice > currentPrice ? currentOriginalPrice : (currentPrice * 2))}
                   </span>
                 )}
               </div>
+              {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
+                <div className="bg-fg-primary text-bg-primary text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider select-none">
+                  {activeProduct.discountBadge || saleBadges[activeProduct.slug]}
+                </div>
+              )}
             </div>
 
             {/* Title & Tagline */}
@@ -871,7 +888,7 @@ export default function ProductDetails({ params }: PageProps) {
                   <img
                     src={p.images[0]}
                     alt={p.name}
-                    className="absolute inset-0 w-full h-full object-fill transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
+                    className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
                   />
                 ) : (
                   <div className="absolute inset-0 w-full h-full bg-bg-secondary flex items-center justify-center text-fg-secondary text-xs">No image</div>
@@ -908,7 +925,7 @@ export default function ProductDetails({ params }: PageProps) {
                 </div>
 
                 {/* Animated Pop-up Bottom Price Bar */}
-                <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-md:opacity-100 max-md:translate-y-0">
+                <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 hidden md:flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0">
                   <div className="flex flex-col items-start">
                     <span className="text-sm font-bold text-fg-primary">{formatPrice(p.price)}</span>
                     {p.originalPrice && p.originalPrice > p.price && (
