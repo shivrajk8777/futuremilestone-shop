@@ -168,7 +168,7 @@ export default function Home() {
             </span>
             {/* Modern Slim Progress Bar */}
             <div className="w-16 h-[2.5px] bg-white/20 rounded-full overflow-hidden relative mt-1">
-              <div className="absolute inset-y-0 left-0 bg-white w-1/2 rounded-full animate-loading-bar" />
+              <div className="absolute inset-y-0 left-0 bg-neutral-300 w-full origin-left animate-loader-fill" />
             </div>
           </div>
         </div>
@@ -517,23 +517,41 @@ export default function Home() {
           {/* 7. Section Collections (Asymmetric layout) */}
           <section className="w-full flex flex-col md:flex-row gap-3">
             {/* Left Column - Wood collection (Large Card) */}
-            <div className="w-full md:w-1/2 h-[450px] md:h-[600px] rounded-xl overflow-hidden relative border border-border-accent/40 group">
-              {collections[0].imageUrl && (
-                <img
-                  src={collections[0].imageUrl}
-                  alt={collections[0].name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
-                />
-              )}
-              <div className="absolute inset-0 bg-black/5" />
+            <div className="w-full md:w-1/2 flex flex-col gap-3 md:h-[600px]">
+              {/* Image Container */}
+              <div className="w-full h-[250px] md:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
+                {collections[0].imageUrl && (
+                  <img
+                    src={collections[0].imageUrl}
+                    alt={collections[0].name}
+                    className="absolute md:absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
+                  />
+                )}
+                <div className="absolute inset-0 bg-black/5" />
 
-              {/* Floating Bottom-Left Card */}
-              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 w-[260px] bg-bg-primary rounded-xl p-8 flex flex-col gap-6 shadow-xl transition-theme">
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-dm-sans text-xl font-bold text-fg-primary">{collections[0].name}</h3>
-                  <p className="text-xs text-fg-secondary leading-[1.6]">{collections[0].description}</p>
+                {/* Floating Bottom-Left Card (Desktop only) */}
+                <div className="hidden md:flex absolute bottom-8 left-8 w-[260px] bg-bg-primary rounded-xl p-8 flex-col gap-6 shadow-xl transition-theme">
+                  <div className="flex flex-col gap-2">
+                    <h3 className="font-dm-sans text-xl font-bold text-fg-primary">{collections[0].name}</h3>
+                    <p className="text-xs text-fg-secondary leading-[1.6]">{collections[0].description}</p>
+                  </div>
+                  <div>
+                    <Link
+                      href={`/shop?category=${collections[0].slug}`}
+                      className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
+                    >
+                      View Collection
+                      <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/link:bg-fg-secondary" />
+                    </Link>
+                  </div>
                 </div>
-                <div>
+              </div>
+
+              {/* Stacked Card Content (Mobile only - Light Gray bg-bg-secondary background) */}
+              <div className="w-full md:hidden bg-bg-secondary text-fg-primary rounded-xl p-8 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
+                <h3 className="font-dm-sans text-xl font-bold text-fg-primary">{collections[0].name}</h3>
+                <p className="text-xs text-fg-secondary leading-[1.6]">{collections[0].description}</p>
+                <div className="mt-4">
                   <Link
                     href={`/shop?category=${collections[0].slug}`}
                     className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
