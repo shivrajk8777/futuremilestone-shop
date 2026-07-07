@@ -1,10 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
 
-export async function GET() {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id } = await params;
     const cookieStore = await cookies();
     const userId = cookieStore.get('session_user')?.value;
 
@@ -15,24 +19,32 @@ export async function GET() {
       );
     }
 
-    let objId;
+    let userObjId;
+    let orderObjId;
     try {
-      objId = new ObjectId(userId);
+      userObjId = new ObjectId(userId);
+      orderObjId = new ObjectId(id);
     } catch (err) {
       return NextResponse.json(
-        { success: false, error: 'Invalid user session' },
+        { success: false, error: 'Invalid ID format' },
         { status: 400 }
       );
     }
 
     const db = await getDatabase();
-    const orders = await db
-      .collection('orders')
-      .find({ userId: objId })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const order = await db.collection('orders').findOne({
+      _id: orderObjId,
+      userId: userObjId,
+    });
 
-    const formattedOrders = orders.map((order) => ({
+    if (!order) {
+      return NextResponse.json(
+        { success: false, error: 'Order not found' },
+        { status: 404 }
+      );
+    }
+
+    const formattedOrder = {
       id: order._id.toString(),
       orderNumber: order.orderNumber,
       items: order.items || [],
@@ -41,18 +53,21 @@ export async function GET() {
       createdAt: order.createdAt,
       trackingId: order.trackingId || null,
       deliveryPartnerName: order.deliveryPartnerName || null,
+      deliveryPartnerId: order.deliveryPartnerId || null,
+      deliveryPartnerCode: order.deliveryPartnerCode || null,
       adminMessage: order.adminMessage || null,
       statusTimeline: order.statusTimeline || [],
-    }));
+      shippingAddress: order.shippingAddress || null,
+    };
 
     return NextResponse.json({
       success: true,
-      orders: formattedOrders,
+      order: formattedOrder,
     });
   } catch (error: any) {
-    console.error('Fetch orders error:', error);
+    console.error('Fetch order error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to fetch orders' },
+      { success: false, error: error.message || 'Failed to fetch order' },
       { status: 500 }
     );
   }

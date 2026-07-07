@@ -19,6 +19,14 @@ interface Order {
   total: number;
   status: string;
   createdAt: string;
+  trackingId?: string | null;
+  deliveryPartnerName?: string | null;
+  adminMessage?: string | null;
+  statusTimeline?: Array<{
+    status: string;
+    timestamp: string;
+    comment: string;
+  }>;
 }
 
 export default function AccountPage() {
@@ -36,6 +44,7 @@ export default function AccountPage() {
   // Orders state
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   // Address manager state
   const [showAddAddress, setShowAddAddress] = useState(false);
@@ -389,56 +398,89 @@ export default function AccountPage() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {orders.map((order) => (
-                        <div key={order.id} className="border border-border-accent/40 rounded-xl bg-bg-primary overflow-hidden shadow-sm flex flex-col">
-                          
-                          {/* Order Header */}
-                          <div className="px-5 py-4 bg-bg-secondary/70 border-b border-border-accent/40 flex flex-wrap justify-between items-center gap-3 text-xs">
-                            <div className="flex items-center gap-3">
-                              <span className="font-bold text-fg-primary">{order.orderNumber}</span>
-                              <span className="text-fg-secondary/80 font-normal">
-                                {new Date(order.createdAt).toLocaleDateString(undefined, {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="font-bold text-fg-primary">${order.total}</span>
-                              <span className="px-2 py-0.5 rounded-full text-[9px] uppercase font-bold bg-green-500/10 text-green-500">
-                                {order.status}
-                              </span>
-                            </div>
-                          </div>
+                      {orders.map((order) => {
+                        const formatTimelineDate = (dateStr?: string) => {
+                          if (!dateStr) return '';
+                          return new Date(dateStr).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          });
+                        };
 
-                          {/* Order Items */}
-                          <div className="p-5 divide-y divide-border-accent/30 space-y-4">
-                            {order.items.map((item, index) => (
-                              <div key={index} className={`flex gap-4 ${index > 0 ? 'pt-4' : ''}`}>
-                                <div className="w-14 h-14 bg-bg-secondary rounded-lg overflow-hidden flex-shrink-0 relative border border-border-accent/30">
-                                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="flex-1 flex justify-between items-start text-xs">
-                                  <div>
-                                    <h4 className="font-semibold text-fg-primary">{item.name}</h4>
-                                    <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
-                                      <span>{item.material}</span>
-                                      <span>•</span>
-                                      <span>{item.dimension}</span>
+                        return (
+                          <div key={order.id} className="border border-border-accent/40 rounded-xl bg-bg-primary overflow-hidden shadow-sm flex flex-col">
+                            
+                            {/* Order Header */}
+                            <div className="px-5 py-4 bg-bg-secondary/70 border-b border-border-accent/40 flex flex-wrap justify-between items-center gap-3 text-xs">
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-fg-primary">{order.orderNumber}</span>
+                                <span className="text-fg-secondary/80 font-normal">
+                                  {new Date(order.createdAt).toLocaleDateString(undefined, {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-fg-primary">${order.total}</span>
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold ${
+                                  order.status === 'Cancelled' || order.status === 'Canceled'
+                                    ? 'bg-red-500/10 text-red-500'
+                                    : 'bg-green-500/10 text-green-500'
+                                }`}>
+                                  {order.status}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Order Items */}
+                            <div className="p-5 divide-y divide-border-accent/30 space-y-4">
+                              {order.items.map((item, index) => (
+                                <Link 
+                                  key={index} 
+                                  href={`/shop/${item.slug}`}
+                                  className={`flex gap-4 group/item hover:opacity-90 transition-opacity ${index > 0 ? 'pt-4' : ''}`}
+                                >
+                                  <div className="w-14 h-14 bg-bg-secondary rounded-lg overflow-hidden flex-shrink-0 relative border border-border-accent/30">
+                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300" />
+                                  </div>
+                                  <div className="flex-1 flex justify-between items-start text-xs">
+                                    <div>
+                                      <h4 className="font-semibold text-fg-primary group-hover/item:underline decoration-fg-primary transition-all">{item.name}</h4>
+                                      <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
+                                        <span>{item.material}</span>
+                                        <span>•</span>
+                                        <span>{item.dimension}</span>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <p className="font-semibold text-fg-primary">${item.price}</p>
+                                      <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
                                     </div>
                                   </div>
-                                  <div className="text-right">
-                                    <p className="font-semibold text-fg-primary">${item.price}</p>
-                                    <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                                </Link>
+                              ))}
+                            </div>
+
+                            {/* Order Footer Actions */}
+                            <div className="px-5 py-3 bg-bg-secondary/40 border-t border-border-accent/30 flex justify-between items-center text-xs">
+                              <span className="text-[10px] text-fg-secondary/60 font-medium">
+                                {order.items.reduce((sum, item) => sum + item.quantity, 0)} {order.items.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'item' : 'items'}
+                              </span>
+                              <Link
+                                href={`/orders/${order.id}`}
+                                className="px-4 py-1.5 border border-border-accent text-fg-primary rounded-lg font-semibold hover:bg-bg-secondary transition-colors cursor-pointer text-[11px]"
+                              >
+                                Track Order
+                              </Link>
+                            </div>
+
                           </div>
-                          
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

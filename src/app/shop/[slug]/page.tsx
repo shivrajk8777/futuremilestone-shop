@@ -232,8 +232,12 @@ export default function ProductDetails({ params }: PageProps) {
 
   // Initialize selectedDimension if needed
   useEffect(() => {
-    if (selectedDimension && !dimensionsList.some((d: DimensionItem) => d.id === selectedDimension.id)) {
-      setSelectedDimension(null);
+    if (!selectedDimension || !dimensionsList.some((d: DimensionItem) => d.id === selectedDimension.id)) {
+      if (dimensionsList.length > 0) {
+        setSelectedDimension(dimensionsList[0]);
+      } else {
+        setSelectedDimension(null);
+      }
     }
   }, [dimensionsList, selectedDimension]);
 
@@ -241,10 +245,22 @@ export default function ProductDetails({ params }: PageProps) {
   const currentPrice = selectedDimension ? selectedDimension.price : activeProduct.price;
   const currentOriginalPrice = selectedDimension ? (selectedDimension.originalPrice ?? selectedDimension.price) : activeProduct.originalPrice;
 
+  // Compute active stock based on selected material
+  const activeMaterialObj = dbProduct?.materialsList?.find(
+    (m: any) => m.name === selectedMaterial
+  );
+  const currentStock = activeMaterialObj !== undefined && activeMaterialObj !== null && 'stock' in activeMaterialObj
+    ? Number(activeMaterialObj.stock)
+    : 8;
+
   // Update quantity/variant state if the product changes
   useEffect(() => {
     setQuantity(1);
-    setSelectedDimension(null);
+    if (dimensionsList.length > 0) {
+      setSelectedDimension(dimensionsList[0]);
+    } else {
+      setSelectedDimension(null);
+    }
     if (materialsList.length > 0) {
       setSelectedMaterial(materialsList[0]);
     } else {
@@ -252,6 +268,13 @@ export default function ProductDetails({ params }: PageProps) {
     }
     setActiveImgIdx(0);
   }, [activeProduct.slug, dbProduct]);
+
+  // Ensure quantity is within dynamic stock bounds
+  useEffect(() => {
+    if (quantity > currentStock && currentStock > 0) {
+      setQuantity(currentStock);
+    }
+  }, [selectedMaterial, currentStock, quantity]);
 
   // Handle intersection observer to highlight active thumbnail as user scrolls gallery
   useEffect(() => {
@@ -290,6 +313,7 @@ export default function ProductDetails({ params }: PageProps) {
   };
 
   const handleAddToCart = async () => {
+    if (currentStock === 0) return;
     if (!selectedDimension) {
       warning('Dimension Required', 'Please select a dimension before adding to cart.');
       return;
@@ -485,7 +509,7 @@ export default function ProductDetails({ params }: PageProps) {
                       key={mat}
                       onClick={() => setSelectedMaterial(mat)}
                       className={`font-dm-sans px-5 py-2.5 rounded-sm border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
-                        ? 'bg-border-accent/80 border-border-accent text-fg-primary shadow-md'
+                        ? 'bg-fg-primary border-fg-primary text-bg-primary shadow-md'
                         : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
                         }`}
                     >
@@ -498,35 +522,27 @@ export default function ProductDetails({ params }: PageProps) {
 
             {/* Dimension Selector */}
             <div className="space-y-3 pt-4 border-t border-border-accent/60 animate-fade-in relative">
-              <label htmlFor="dimension-select" className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary block">
+              <span className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary">
                 Dimension
-              </label>
-              <div className="relative">
-                <select
-                  id="dimension-select"
-                  value={selectedDimension?.id || ''}
-                  onChange={(e) => {
-                    const selected = dimensionsList.find((d) => d.id === e.target.value);
-                    if (selected) setSelectedDimension(selected);
-                  }}
-                  className="font-dm-sans w-full bg-bg-primary border border-border-accent text-fg-primary text-xs font-semibold rounded-sm py-3 px-4 pr-10 appearance-none cursor-pointer focus:outline-none focus:border-border-accent/80 transition-all shadow-sm transition-theme"
-                >
-                  <option value="" disabled>Select Dimension</option>
-                  {dimensionsList.map((dim) => {
-                    const firstPrice = dimensionsList[0]?.price || 0;
-                    const priceDiff = dim.price - firstPrice;
-                    return (
-                      <option key={dim.id} value={dim.id} className="bg-bg-primary text-fg-primary">
-                        {dim.label} {priceDiff > 0 ? `(+$${priceDiff})` : ''}
-                      </option>
-                    );
-                  })}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-fg-secondary/60">
-                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                  </svg>
-                </div>
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {dimensionsList.map((dim) => {
+                  const isActive = selectedDimension?.id === dim.id;
+                  const firstPrice = dimensionsList[0]?.price || 0;
+                  const priceDiff = dim.price - firstPrice;
+                  return (
+                    <button
+                      key={dim.id}
+                      onClick={() => setSelectedDimension(dim)}
+                      className={`font-dm-sans px-5 py-2.5 rounded-sm border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
+                        ? 'bg-fg-primary border-fg-primary text-bg-primary shadow-md'
+                        : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
+                        }`}
+                    >
+                      {dim.label} {priceDiff > 0 ? `(+$${priceDiff})` : ''}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -534,26 +550,39 @@ export default function ProductDetails({ params }: PageProps) {
             <div className="space-y-3 pt-4 border-t border-border-accent/60">
               <div className="flex items-center justify-between">
                 <span className="font-dm-sans text-xs uppercase font-bold tracking-wider text-fg-secondary">Quantity</span>
-                <span className="text-xs text-green-600 font-semibold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse" />
-                  8 in stock
-                </span>
+                {currentStock === 0 ? (
+                  <span className="text-xs text-red-600 font-semibold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+                    Out of stock
+                  </span>
+                ) : currentStock <= 3 ? (
+                  <span className="text-xs text-amber-500 font-semibold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Only {currentStock} left in stock
+                  </span>
+                ) : (
+                  <span className="text-xs text-green-600 font-semibold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse" />
+                    {currentStock} in stock
+                  </span>
+                )}
               </div>
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full">
                 <div className="flex gap-1.5 items-center w-full sm:w-auto">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="font-dm-sans w-11 h-11 flex items-center justify-center bg-fg-primary/5 hover:bg-fg-primary/10 rounded-sm text-lg text-fg-primary/60 hover:text-fg-primary focus:outline-none cursor-pointer transition-colors"
-                    disabled={quantity <= 1}
+                    disabled={quantity <= 1 || currentStock === 0}
                   >
                     &minus;
                   </button>
                   <div className="font-dm-sans w-14 h-11 flex items-center justify-center bg-bg-primary border border-border-accent rounded-sm text-sm font-semibold text-fg-primary select-none shadow-sm">
-                    {quantity}
+                    {currentStock === 0 ? 0 : quantity}
                   </div>
                   <button
                     onClick={() => setQuantity((q) => q + 1)}
                     className="font-dm-sans w-11 h-11 flex items-center justify-center bg-fg-primary/5 hover:bg-fg-primary/10 rounded-sm text-lg text-fg-primary/60 hover:text-fg-primary focus:outline-none cursor-pointer transition-colors"
+                    disabled={quantity >= currentStock || currentStock === 0}
                   >
                     +
                   </button>
@@ -561,12 +590,19 @@ export default function ProductDetails({ params }: PageProps) {
 
                 <button
                   onClick={handleAddToCart}
-                  className="font-dm-sans w-full sm:flex-1 h-11 bg-fg-primary text-bg-primary rounded-sm font-bold uppercase tracking-wider text-xs hover:opacity-90 transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer relative overflow-hidden"
+                  disabled={currentStock === 0}
+                  className={`font-dm-sans w-full sm:flex-1 h-11 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 shadow-md relative overflow-hidden ${
+                    currentStock === 0
+                      ? 'bg-fg-primary/20 text-fg-primary/40 cursor-not-allowed'
+                      : 'bg-fg-primary text-bg-primary hover:opacity-90 cursor-pointer'
+                  }`}
                 >
-                  <span>Add To Cart</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
+                  <span>{currentStock === 0 ? 'Out Of Stock' : 'Add To Cart'}</span>
+                  {currentStock > 0 && (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>

@@ -11,11 +11,180 @@ interface CartItem {
   quantity: number;
 }
 
+function CheckoutImage({ cart }: { cart: CartItem[] }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (cart.length <= 1) {
+      setCurrentIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % cart.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [cart]);
+
+  if (cart.length === 0) {
+    return (
+      <>
+        <img
+          src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
+          alt="Checkout"
+          className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
+        />
+        <div className="absolute inset-0 bg-black/10" />
+      </>
+    );
+  }
+
+  return (
+    <>
+      {/* Dynamic cross-fading images */}
+      {cart.map((item, idx) => {
+        const imageUrl = item.product.images?.[0] || "/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp";
+        return (
+          <img
+            key={idx}
+            src={imageUrl}
+            alt={item.product.name}
+            className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${
+              currentIndex === idx
+                ? 'opacity-100 scale-100 pointer-events-auto'
+                : 'opacity-0 scale-[0.99] pointer-events-none'
+            }`}
+          />
+        );
+      })}
+      <div className="absolute inset-0 bg-black/10 pointer-events-none z-10" />
+
+      {/* Slideshow controls / indicators */}
+      {cart.length > 1 && (
+        <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-20">
+          <span className="text-[10px] font-bold text-white uppercase tracking-widest bg-black/40 backdrop-blur-md rounded-full px-3 py-1 shadow-sm select-none">
+            {currentIndex + 1} / {cart.length}
+          </span>
+          <div className="flex gap-1.5 bg-black/40 backdrop-blur-md rounded-full p-1.5 shadow-sm">
+            {cart.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setCurrentIndex(idx)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  currentIndex === idx ? 'bg-white scale-110' : 'bg-white/40 hover:bg-white/60'
+                }`}
+                title={`View slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function CheckoutSkeleton() {
+  return (
+    <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
+      {/* Left Column: Stable sticky image skeleton */}
+      <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
+        <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave relative overflow-hidden">
+          {/* Floating order summary badge on image skeleton */}
+          <div className="absolute bottom-5 left-5 right-5">
+            <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme animate-pulse">
+              <div className="space-y-2">
+                <div className="h-3 w-16 bg-fg-primary/10 rounded-md" />
+                <div className="h-6 w-24 bg-fg-primary/10 rounded-md" />
+              </div>
+              <div className="text-right flex flex-col items-end space-y-2">
+                <div className="h-3 w-12 bg-fg-primary/10 rounded-md" />
+                <div className="h-4 w-20 bg-fg-primary/10 rounded-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Right Column: Scrollable forms + order summary skeleton */}
+      <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
+        
+        {/* Header card skeleton */}
+        <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-3 animate-pulse">
+          <div className="h-8 w-1/3 bg-fg-primary/10 rounded-md" />
+          <div className="h-4 w-3/4 bg-fg-primary/10 rounded-md" />
+        </div>
+
+        {/* Order Summary skeleton */}
+        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme animate-pulse">
+          <div className="w-full border-b border-border-accent/40 py-4 flex justify-center">
+            <div className="h-4 w-28 bg-fg-primary/10 rounded-md" />
+          </div>
+          <div className="p-6 flex flex-col gap-4">
+            <div className="flex gap-4">
+              <div className="w-16 h-16 bg-fg-primary/5 rounded-lg border border-border-accent/30 flex-shrink-0 animate-pulse" />
+              <div className="flex-1 flex flex-col justify-between py-1">
+                <div className="flex justify-between">
+                  <div className="h-4 w-1/3 bg-fg-primary/10 rounded-md" />
+                  <div className="h-4 w-10 bg-fg-primary/10 rounded-md" />
+                </div>
+                <div className="h-3 w-1/4 bg-fg-primary/10 rounded-md" />
+                <div className="h-3 w-16 bg-fg-primary/10 rounded-md" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Shipping Details skeleton */}
+        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme animate-pulse">
+          <div className="w-full border-b border-border-accent/40 py-4 flex justify-center">
+            <div className="h-4 w-32 bg-fg-primary/10 rounded-md" />
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="space-y-2">
+              <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
+              <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
+              <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Details skeleton */}
+        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme animate-pulse">
+          <div className="w-full border-b border-border-accent/40 py-4 flex justify-center">
+            <div className="h-4 w-32 bg-fg-primary/10 rounded-md" />
+          </div>
+          <div className="p-6 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2 col-span-2">
+                <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
+                <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3.5 w-16 bg-fg-primary/10 rounded-md" />
+                <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3.5 w-16 bg-fg-primary/10 rounded-md" />
+                <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 export default function CheckoutPage() {
   const { user, loading, setAuthModalOpen } = useUser();
   const router = useRouter();
 
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartLoading, setCartLoading] = useState(true);
   const [addressOption, setAddressOption] = useState<'primary' | 'saved' | 'new'>('primary');
   const [selectedSavedId, setSelectedSavedId] = useState<string>('');
 
@@ -59,6 +228,9 @@ export default function CheckoutPage() {
           if (savedCart) {
             try { setCart(JSON.parse(savedCart)); } catch (e) { console.error(e); }
           }
+        })
+        .finally(() => {
+          setCartLoading(false);
         });
     } else {
       const savedCart = localStorage.getItem('cart');
@@ -69,6 +241,7 @@ export default function CheckoutPage() {
           console.error(e);
         }
       }
+      setCartLoading(false);
     }
   }, [user, loading]);
 
@@ -121,23 +294,8 @@ export default function CheckoutPage() {
 
   // ── Loading / Guard states ─────────────────────────────────────────────────
 
-  if (loading) {
-    return (
-      <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary transition-theme relative lg:h-screen">
-        {/* Left image placeholder */}
-        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] lg:h-[calc(100vh-24px)] flex-shrink-0">
-          <div className="h-full rounded-xl w-full bg-bg-secondary/40 animate-pulse border border-border-accent/10" />
-        </section>
-        {/* Right content placeholder */}
-        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 items-center justify-center">
-          <svg className="animate-spin h-7 w-7 text-fg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-          </svg>
-          <p className="text-xs text-fg-secondary font-medium">Preparing checkout...</p>
-        </div>
-      </div>
-    );
+  if (loading || cartLoading) {
+    return <CheckoutSkeleton />;
   }
 
   if (!user) {
@@ -146,12 +304,7 @@ export default function CheckoutPage() {
         {/* Left image */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] md:h-[400px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-            <img
-              src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
-              alt="Checkout"
-              className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
-            />
-            <div className="absolute inset-0 bg-black/10" />
+            <CheckoutImage cart={cart} />
           </div>
         </section>
         {/* Right: sign-in prompt */}
@@ -194,12 +347,7 @@ export default function CheckoutPage() {
         {/* Left image */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] md:h-[400px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-            <img
-              src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
-              alt="Checkout"
-              className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
-            />
-            <div className="absolute inset-0 bg-black/10" />
+            <CheckoutImage cart={cart} />
           </div>
         </section>
         {/* Right: empty cart prompt */}
@@ -292,7 +440,7 @@ export default function CheckoutPage() {
         setCart([]);
         window.dispatchEvent(new Event('cart-updated'));
         window.dispatchEvent(new Event('orders-updated'));
-        router.push(`/checkout/success?orderNumber=${encodeURIComponent(data.order.orderNumber)}&total=${total}&name=${encodeURIComponent(shippingDetails.name)}&address=${encodeURIComponent(shippingDetails.addressLine)}`);
+        router.push(`/checkout/success?orderId=${data.order.id}&orderNumber=${encodeURIComponent(data.order.orderNumber)}&total=${total}&name=${encodeURIComponent(shippingDetails.name)}&address=${encodeURIComponent(shippingDetails.addressLine)}`);
       } else {
         setCheckoutError(data.error || 'Failed to place order. Please try again.');
       }
@@ -310,12 +458,7 @@ export default function CheckoutPage() {
       {/* Left Column: Stable sticky image — same as FAQ */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-          <img
-            src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
-            alt="Checkout"
-            className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
-          />
-          <div className="absolute inset-0 bg-black/10" />
+          <CheckoutImage cart={cart} />
 
           {/* Floating order summary badge on image */}
           <div className="absolute bottom-5 left-5 right-5">
