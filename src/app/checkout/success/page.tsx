@@ -120,10 +120,6 @@ function SuccessDetails() {
       .finally(() => setLoading(false));
   }, [orderId]);
 
-  if (loading) {
-    return <CheckoutSuccessSkeleton />;
-  }
-
   // Slideshow logic for left column
   const items = order?.items || [];
   useEffect(() => {
@@ -136,6 +132,10 @@ function SuccessDetails() {
     }, 3000);
     return () => clearInterval(interval);
   }, [items]);
+
+  if (loading) {
+    return <CheckoutSuccessSkeleton />;
+  }
 
   // Calculate mock delivery date (5 days from today)
   const deliveryDate = new Date();

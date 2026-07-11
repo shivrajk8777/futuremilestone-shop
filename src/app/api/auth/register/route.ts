@@ -5,11 +5,11 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password, otp } = await request.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !otp) {
       return NextResponse.json(
-        { success: false, error: 'Name, email, and password are required' },
+        { success: false, error: 'Name, email, password, and verification code are required' },
         { status: 400 }
       );
     }
@@ -22,9 +22,25 @@ export async function POST(request: NextRequest) {
     }
 
     const db = await getDatabase();
-    const usersCollection = db.collection('users');
-
     const emailNormalized = email.toLowerCase().trim();
+
+    // Verify OTP
+    const otpsCollection = db.collection('otps');
+    const otpDoc = await otpsCollection.findOne({
+      email: emailNormalized,
+      otp: otp.trim(),
+      type: 'signup',
+      expiresAt: { $gt: new Date() }
+    });
+
+    if (!otpDoc) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired verification code' },
+        { status: 400 }
+      );
+    }
+
+    const usersCollection = db.collection('users');
     const existingUser = await usersCollection.findOne({ email: emailNormalized });
 
     if (existingUser) {
@@ -41,6 +57,9 @@ export async function POST(request: NextRequest) {
       passwordHash,
       createdAt: new Date(),
     });
+
+    // Delete the used OTP code
+    await otpsCollection.deleteOne({ _id: otpDoc._id });
 
     const userId = result.insertedId.toString();
 

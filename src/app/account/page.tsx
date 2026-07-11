@@ -29,6 +29,15 @@ interface Order {
   }>;
 }
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 
+  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 
+  'Lakshadweep', 'Puducherry'
+];
+
 export default function AccountPage() {
   const { user, loading, updateProfile, addAddress, deleteAddress, setAuthModalOpen } = useUser();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
@@ -36,7 +45,15 @@ export default function AccountPage() {
   // Profile state
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
+  const [profileCountry, setProfileCountry] = useState('India');
+  const [profileFullName, setProfileFullName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileFlat, setProfileFlat] = useState('');
+  const [profileArea, setProfileArea] = useState('');
+  const [profileLandmark, setProfileLandmark] = useState('');
+  const [profilePincode, setProfilePincode] = useState('');
+  const [profileCity, setProfileCity] = useState('');
+  const [profileState, setProfileState] = useState('');
   const [profileMessage, setProfileMessage] = useState('');
   const [profileError, setProfileError] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
@@ -49,9 +66,15 @@ export default function AccountPage() {
   // Address manager state
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newLabel, setNewLabel] = useState('');
-  const [newName, setNewName] = useState('');
-  const [newAddressLine, setNewAddressLine] = useState('');
+  const [newFullName, setNewFullName] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [newCountry, setNewCountry] = useState('India');
+  const [newFlat, setNewFlat] = useState('');
+  const [newArea, setNewArea] = useState('');
+  const [newLandmark, setNewLandmark] = useState('');
+  const [newPincode, setNewPincode] = useState('');
+  const [newCity, setNewCity] = useState('');
+  const [newState, setNewState] = useState('');
   const [addressMessage, setAddressMessage] = useState('');
   const [addressError, setAddressError] = useState('');
   const [savingAddress, setSavingAddress] = useState(false);
@@ -64,7 +87,24 @@ export default function AccountPage() {
     if (user) {
       setName(user.name || '');
       setPhone(user.phone || '');
-      setAddress(user.address || '');
+      
+      const addr = user.address;
+      if (addr && typeof addr === 'object') {
+        setProfileCountry(addr.country || 'India');
+        setProfileFullName(addr.fullName || '');
+        setProfilePhone(addr.phone || '');
+        setProfileFlat(addr.flat || '');
+        setProfileArea(addr.area || '');
+        setProfileLandmark(addr.landmark || '');
+        setProfilePincode(addr.pincode || '');
+        setProfileCity(addr.city || '');
+        setProfileState(addr.state || '');
+      } else if (typeof addr === 'string' && addr) {
+        setProfileArea(addr);
+        setProfileFullName(user.name || '');
+        setProfilePhone(user.phone || '');
+        setProfileCountry('India');
+      }
     }
   }, [user]);
 
@@ -150,7 +190,23 @@ export default function AccountPage() {
     setProfileError('');
     setSavingProfile(true);
 
-    const res = await updateProfile({ name, phone, address });
+    const structuredAddress = {
+      fullName: profileFullName,
+      phone: profilePhone,
+      flat: profileFlat,
+      area: profileArea,
+      landmark: profileLandmark,
+      pincode: profilePincode,
+      city: profileCity,
+      state: profileState,
+      country: profileCountry,
+    };
+
+    const res = await updateProfile({
+      name,
+      phone,
+      address: structuredAddress,
+    });
     setSavingProfile(false);
 
     if (res.success) {
@@ -169,18 +225,30 @@ export default function AccountPage() {
 
     const res = await addAddress({
       label: newLabel,
-      name: newName,
-      addressLine: newAddressLine,
+      fullName: newFullName,
       phone: newPhone,
+      flat: newFlat,
+      area: newArea,
+      landmark: newLandmark,
+      pincode: newPincode,
+      city: newCity,
+      state: newState,
+      country: newCountry,
     });
     setSavingAddress(false);
 
     if (res.success) {
       setAddressMessage('New address saved successfully!');
       setNewLabel('');
-      setNewName('');
-      setNewAddressLine('');
+      setNewFullName('');
       setNewPhone('');
+      setNewFlat('');
+      setNewArea('');
+      setNewLandmark('');
+      setNewPincode('');
+      setNewCity('');
+      setNewState('');
+      setNewCountry('India');
       setShowAddAddress(false);
       setTimeout(() => setAddressMessage(''), 4000);
     } else {
@@ -348,16 +416,141 @@ export default function AccountPage() {
                       />
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label htmlFor="address" className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Default Address</label>
-                      <textarea
-                        id="address"
-                        rows={4}
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        placeholder="Street name, suite, city, postal code, country"
-                        className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors resize-none font-medium"
-                      />
+                    <div className="space-y-4 border-t border-border-accent/20 pt-4">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-fg-primary">Address Information</h3>
+                      
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
+                        <select
+                          value={profileCountry}
+                          onChange={(e) => {
+                            setProfileCountry(e.target.value);
+                            setProfileState('');
+                          }}
+                          className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                        >
+                          <option value="India">India</option>
+                          <option value="United States">United States</option>
+                          <option value="United Kingdom">United Kingdom</option>
+                          <option value="Germany">Germany</option>
+                          <option value="France">France</option>
+                          <option value="Canada">Canada</option>
+                          <option value="Australia">Australia</option>
+                          <option value="United Arab Emirates">United Arab Emirates</option>
+                          <option value="Saudi Arabia">Saudi Arabia</option>
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Full Name (First and Last name)</label>
+                          <input
+                            type="text"
+                            required
+                            value={profileFullName}
+                            onChange={(e) => setProfileFullName(e.target.value)}
+                            placeholder="Recipient full name"
+                            className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
+                          <input
+                            type="text"
+                            required
+                            value={profilePhone}
+                            onChange={(e) => setProfilePhone(e.target.value)}
+                            placeholder="Mobile number"
+                            className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Building, Company, Apartment</label>
+                        <input
+                          type="text"
+                          required
+                          value={profileFlat}
+                          onChange={(e) => setProfileFlat(e.target.value)}
+                          placeholder="Flat/House/Building/Apartment"
+                          className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector, Village</label>
+                        <input
+                          type="text"
+                          required
+                          value={profileArea}
+                          onChange={(e) => setProfileArea(e.target.value)}
+                          placeholder="Area, Street, Village, etc."
+                          className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Landmark (Optional)</label>
+                        <input
+                          type="text"
+                          value={profileLandmark}
+                          onChange={(e) => setProfileLandmark(e.target.value)}
+                          placeholder="E.g. near apollo hospital"
+                          className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
+                          <input
+                            type="text"
+                            required
+                            value={profilePincode}
+                            onChange={(e) => setProfilePincode(e.target.value)}
+                            placeholder="Pincode/Postal code"
+                            className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
+                          <input
+                            type="text"
+                            required
+                            value={profileCity}
+                            onChange={(e) => setProfileCity(e.target.value)}
+                            placeholder="Town or City"
+                            className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">State</label>
+                        {profileCountry === 'India' ? (
+                          <select
+                            value={profileState}
+                            onChange={(e) => setProfileState(e.target.value)}
+                            required
+                            className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                          >
+                            <option value="">Select State</option>
+                            {INDIAN_STATES.map(s => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type="text"
+                            required
+                            value={profileState}
+                            onChange={(e) => setProfileState(e.target.value)}
+                            placeholder="State/Province/Region"
+                            className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                          />
+                        )}
+                      </div>
                     </div>
 
                     <button
@@ -548,44 +741,139 @@ export default function AccountPage() {
                               />
                             </div>
                             <div className="space-y-1">
-                              <label htmlFor="addr-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Recipient Name</label>
-                              <input
-                                id="addr-name"
-                                type="text"
-                                required
-                                value={newName}
-                                onChange={(e) => setNewName(e.target.value)}
-                                placeholder="John Doe"
-                                className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                              />
+                              <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
+                              <select
+                                value={newCountry}
+                                onChange={(e) => {
+                                  setNewCountry(e.target.value);
+                                  setNewState('');
+                                }}
+                                className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                              >
+                                <option value="India">India</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Germany">Germany</option>
+                                <option value="France">France</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Australia">Australia</option>
+                                <option value="United Arab Emirates">United Arab Emirates</option>
+                                <option value="Saudi Arabia">Saudi Arabia</option>
+                              </select>
                             </div>
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1 sm:col-span-2">
-                              <label htmlFor="addr-line" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Address Details</label>
+                            <div className="space-y-1">
+                              <label htmlFor="addr-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Full Name (First and Last name)</label>
                               <input
-                                id="addr-line"
+                                id="addr-name"
                                 type="text"
                                 required
-                                value={newAddressLine}
-                                onChange={(e) => setNewAddressLine(e.target.value)}
-                                placeholder="Street name, suite, city, state, country"
+                                value={newFullName}
+                                onChange={(e) => setNewFullName(e.target.value)}
+                                placeholder="nihal"
+                                className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label htmlFor="addr-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
+                              <input
+                                id="addr-phone"
+                                type="text"
+                                required
+                                value={newPhone}
+                                onChange={(e) => setNewPhone(e.target.value)}
+                                placeholder="7372976525"
                                 className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
                               />
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label htmlFor="addr-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Contact Phone</label>
+                            <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Building, Company, Apartment</label>
                             <input
-                              id="addr-phone"
                               type="text"
-                              value={newPhone}
-                              onChange={(e) => setNewPhone(e.target.value)}
-                              placeholder="+420 123 456 789"
+                              required
+                              value={newFlat}
+                              onChange={(e) => setNewFlat(e.target.value)}
+                              placeholder="Flat/House/Building/Apartment"
                               className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
                             />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector, Village</label>
+                            <input
+                              type="text"
+                              required
+                              value={newArea}
+                              onChange={(e) => setNewArea(e.target.value)}
+                              placeholder="Area, Street, Sector, etc."
+                              className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Landmark (Optional)</label>
+                            <input
+                              type="text"
+                              value={newLandmark}
+                              onChange={(e) => setNewLandmark(e.target.value)}
+                              placeholder="E.g. near apollo hospital"
+                              className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
+                              <input
+                                type="text"
+                                required
+                                value={newPincode}
+                                onChange={(e) => setNewPincode(e.target.value)}
+                                placeholder="6-digit Pincode"
+                                className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
+                              <input
+                                type="text"
+                                required
+                                value={newCity}
+                                onChange={(e) => setNewCity(e.target.value)}
+                                placeholder="Town/City"
+                                className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">State</label>
+                            {newCountry === 'India' ? (
+                              <select
+                                value={newState}
+                                onChange={(e) => setNewState(e.target.value)}
+                                required
+                                className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                              >
+                                <option value="">Select State</option>
+                                {INDIAN_STATES.map(s => (
+                                  <option key={s} value={s}>{s}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type="text"
+                                required
+                                value={newState}
+                                onChange={(e) => setNewState(e.target.value)}
+                                placeholder="State/Province/Region"
+                                className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                              />
+                            )}
                           </div>
 
                           <button
@@ -623,8 +911,21 @@ export default function AccountPage() {
                               </button>
                             </div>
                             <div className="space-y-1 text-xs">
-                              <p className="font-bold text-fg-primary">{addr.name}</p>
-                              <p className="text-fg-secondary leading-relaxed font-normal">{addr.addressLine}</p>
+                              <p className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</p>
+                              <p className="text-fg-secondary leading-relaxed font-normal">
+                                {addr.addressLine ? (
+                                  addr.addressLine
+                                ) : (
+                                  <>
+                                    {addr.flat}, {addr.area}
+                                    {addr.landmark && `, ${addr.landmark}`}
+                                    <br />
+                                    {addr.city}, {addr.state} - {addr.pincode}
+                                    <br />
+                                    {addr.country}
+                                  </>
+                                )}
+                              </p>
                               {addr.phone && <p className="text-fg-secondary/80 font-normal text-[11px] mt-1">📞 {addr.phone}</p>}
                             </div>
                           </div>

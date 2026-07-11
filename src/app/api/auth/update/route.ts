@@ -24,6 +24,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let savedAddressValue = address;
+    if (address && typeof address === 'object') {
+      savedAddressValue = {
+        fullName: address.fullName ? String(address.fullName).trim() : '',
+        phone: address.phone ? String(address.phone).trim() : '',
+        flat: address.flat ? String(address.flat).trim() : '',
+        area: address.area ? String(address.area).trim() : '',
+        landmark: address.landmark ? String(address.landmark).trim() : '',
+        pincode: address.pincode ? String(address.pincode).trim() : '',
+        city: address.city ? String(address.city).trim() : '',
+        state: address.state ? String(address.state).trim() : '',
+        country: address.country ? String(address.country).trim() : '',
+      };
+    }
+
     const db = await getDatabase();
     const usersCollection = db.collection('users');
 
@@ -43,7 +58,7 @@ export async function POST(request: NextRequest) {
         $set: {
           name,
           phone: phone || '',
-          address: address || '',
+          address: savedAddressValue || null,
           updatedAt: new Date(),
         },
       }

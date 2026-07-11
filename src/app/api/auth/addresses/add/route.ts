@@ -15,11 +15,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { label, name, addressLine, phone } = await request.json();
+    const {
+      label,
+      fullName,
+      phone,
+      flat,
+      area,
+      landmark,
+      pincode,
+      city,
+      state,
+      country
+    } = await request.json();
 
-    if (!label || !name || !addressLine) {
+    if (!label || !fullName || !phone || !flat || !area || !pincode || !city || !state || !country) {
       return NextResponse.json(
-        { success: false, error: 'Label, name, and address details are required' },
+        { success: false, error: 'All fields except landmark are required' },
         { status: 400 }
       );
     }
@@ -41,9 +52,15 @@ export async function POST(request: NextRequest) {
     const newAddress = {
       id: addressId,
       label: label.trim(),
-      name: name.trim(),
-      addressLine: addressLine.trim(),
-      phone: phone ? phone.trim() : '',
+      fullName: fullName.trim(),
+      phone: phone.trim(),
+      flat: flat.trim(),
+      area: area.trim(),
+      landmark: landmark ? landmark.trim() : '',
+      pincode: pincode.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      country: country.trim(),
       createdAt: new Date(),
     };
 

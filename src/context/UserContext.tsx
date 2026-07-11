@@ -2,12 +2,23 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export interface SavedAddress {
+export interface UserAddress {
+  fullName: string;
+  phone: string;
+  flat: string;
+  area: string;
+  landmark?: string;
+  pincode: string;
+  city: string;
+  state: string;
+  country: string;
+}
+
+export interface SavedAddress extends UserAddress {
   id: string;
   label: string;
-  name: string;
-  addressLine: string;
-  phone?: string;
+  name?: string;
+  addressLine?: string;
   createdAt: string;
 }
 
@@ -16,7 +27,7 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
-  address?: string;
+  address?: UserAddress | string;
   savedAddresses?: SavedAddress[];
 }
 
@@ -26,10 +37,21 @@ interface UserContextType {
   isAuthModalOpen: boolean;
   setAuthModalOpen: (open: boolean) => void;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, email: string, password: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  updateProfile: (data: { name: string; phone?: string; address?: string }) => Promise<{ success: boolean; error?: string }>;
-  addAddress: (data: { label: string; name: string; addressLine: string; phone?: string }) => Promise<{ success: boolean; error?: string }>;
+  updateProfile: (data: { name: string; phone?: string; address?: UserAddress | string }) => Promise<{ success: boolean; error?: string }>;
+  addAddress: (data: {
+    label: string;
+    fullName: string;
+    phone: string;
+    flat: string;
+    area: string;
+    landmark?: string;
+    pincode: string;
+    city: string;
+    state: string;
+    country: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   deleteAddress: (addressId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -92,12 +114,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (name: string, email: string, password: string) => {
+  const signup = async (name: string, email: string, password: string, otp: string) => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, otp }),
       });
       const data = await res.json();
       if (data.success && data.user) {
@@ -121,7 +143,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateProfile = async (data: { name: string; phone?: string; address?: string }) => {
+  const updateProfile = async (data: { name: string; phone?: string; address?: UserAddress | string }) => {
     try {
       const res = await fetch('/api/auth/update', {
         method: 'POST',
@@ -139,7 +161,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addAddress = async (data: { label: string; name: string; addressLine: string; phone?: string }) => {
+  const addAddress = async (data: {
+    label: string;
+    fullName: string;
+    phone: string;
+    flat: string;
+    area: string;
+    landmark?: string;
+    pincode: string;
+    city: string;
+    state: string;
+    country: string;
+  }) => {
     try {
       const res = await fetch('/api/auth/addresses/add', {
         method: 'POST',

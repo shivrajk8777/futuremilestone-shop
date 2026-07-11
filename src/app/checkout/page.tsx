@@ -179,6 +179,15 @@ function CheckoutSkeleton() {
   );
 }
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 
+  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 
+  'Lakshadweep', 'Puducherry'
+];
+
 export default function CheckoutPage() {
   const { user, loading, setAuthModalOpen } = useUser();
   const router = useRouter();
@@ -189,9 +198,15 @@ export default function CheckoutPage() {
   const [selectedSavedId, setSelectedSavedId] = useState<string>('');
 
   // Custom shipping address state
-  const [customName, setCustomName] = useState('');
-  const [customAddress, setCustomAddress] = useState('');
+  const [customCountry, setCustomCountry] = useState('India');
+  const [customFullName, setCustomFullName] = useState('');
   const [customPhone, setCustomPhone] = useState('');
+  const [customFlat, setCustomFlat] = useState('');
+  const [customArea, setCustomArea] = useState('');
+  const [customLandmark, setCustomLandmark] = useState('');
+  const [customPincode, setCustomPincode] = useState('');
+  const [customCity, setCustomCity] = useState('');
+  const [customState, setCustomState] = useState('');
 
   // Payment states
   const [cardName, setCardName] = useState('');
@@ -204,6 +219,9 @@ export default function CheckoutPage() {
 
   // Scroll priority ref — same as FAQ page
   const rightColumnRef = useRef<HTMLDivElement>(null);
+
+  const hasSavedAddresses = !!(user?.address || (user?.savedAddresses && user.savedAddresses.length > 0));
+  const showCustomForm = addressOption === 'new' || !hasSavedAddresses;
 
   // Load cart: from DB when logged in, otherwise from localStorage
   useEffect(() => {
@@ -383,23 +401,86 @@ export default function CheckoutPage() {
   const total = subtotal + shipping + tax;
 
   const getShippingDetails = () => {
+    if (addressOption === 'new' || !hasSavedAddresses) {
+      return {
+        fullName: customFullName,
+        phone: customPhone,
+        flat: customFlat,
+        area: customArea,
+        landmark: customLandmark,
+        pincode: customPincode,
+        city: customCity,
+        state: customState,
+        country: customCountry,
+        saveAddress: true,
+      };
+    }
     if (addressOption === 'primary') {
-      return { name: user.name, addressLine: user.address || '', phone: user.phone || '', label: 'Default Address' };
+      const addr = user.address;
+      if (addr && typeof addr === 'object') {
+        return {
+          fullName: addr.fullName || user.name,
+          phone: addr.phone || user.phone || '',
+          flat: addr.flat || '',
+          area: addr.area || '',
+          landmark: addr.landmark || '',
+          pincode: addr.pincode || '',
+          city: addr.city || '',
+          state: addr.state || '',
+          country: addr.country || 'India',
+        };
+      }
+      return {
+        fullName: user.name,
+        phone: user.phone || '',
+        flat: '',
+        area: typeof addr === 'string' ? addr : '',
+        landmark: '',
+        pincode: '',
+        city: '',
+        state: '',
+        country: 'India',
+      };
     } else if (addressOption === 'saved') {
       const selected = user.savedAddresses?.find(a => a.id === selectedSavedId);
-      return { name: selected?.name || user.name, addressLine: selected?.addressLine || '', phone: selected?.phone || '', label: selected?.label || 'Saved Address' };
-    } else {
-      return { name: customName, addressLine: customAddress, phone: customPhone, label: 'Custom Address' };
+      if (selected) {
+        if (selected.addressLine) {
+          return {
+            fullName: selected.fullName || selected.name || user.name,
+            phone: selected.phone || '',
+            flat: '',
+            area: selected.addressLine,
+            landmark: '',
+            pincode: '',
+            city: '',
+            state: '',
+            country: 'India',
+          };
+        }
+        return {
+          fullName: selected.fullName || selected.name || user.name,
+          phone: selected.phone || '',
+          flat: selected.flat || '',
+          area: selected.area || '',
+          landmark: selected.landmark || '',
+          pincode: selected.pincode || '',
+          city: selected.city || '',
+          state: selected.state || '',
+          country: selected.country || 'India',
+        };
+      }
+      return null;
     }
+    return null;
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setCheckoutError('');
 
-    const shippingDetails = getShippingDetails();
-    if (!shippingDetails.name || !shippingDetails.addressLine) {
-      setCheckoutError('Please enter valid shipping details.');
+    const shippingDetails = getShippingDetails() as any;
+    if (!shippingDetails || !shippingDetails.fullName || !shippingDetails.flat || !shippingDetails.area) {
+      setCheckoutError('Please enter valid shipping details (Full Name, Flat/House no., and Area are required).');
       return;
     }
     if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
@@ -440,7 +521,11 @@ export default function CheckoutPage() {
         setCart([]);
         window.dispatchEvent(new Event('cart-updated'));
         window.dispatchEvent(new Event('orders-updated'));
-        router.push(`/checkout/success?orderId=${data.order.id}&orderNumber=${encodeURIComponent(data.order.orderNumber)}&total=${total}&name=${encodeURIComponent(shippingDetails.name)}&address=${encodeURIComponent(shippingDetails.addressLine)}`);
+        window.dispatchEvent(new Event('auth-changed'));
+        
+        const dispName = shippingDetails.fullName || user.name;
+        const dispAddr = shippingDetails.addressLine || `${shippingDetails.flat}, ${shippingDetails.area}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.pincode}, ${shippingDetails.country}`;
+        router.push(`/checkout/success?orderId=${data.order.id}&orderNumber=${encodeURIComponent(data.order.orderNumber)}&total=${total}&name=${encodeURIComponent(dispName)}&address=${encodeURIComponent(dispAddr)}`);
       } else {
         setCheckoutError(data.error || 'Failed to place order. Please try again.');
       }
@@ -587,7 +672,13 @@ export default function CheckoutPage() {
                   />
                   <div className="text-xs">
                     <span className="font-bold text-fg-primary block">Default Account Address</span>
-                    <p className="text-fg-secondary mt-1">{user.address}</p>
+                    <p className="text-fg-secondary mt-1">
+                      {typeof user.address === 'object' ? (
+                        `${user.address.flat}, ${user.address.area}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}, ${user.address.country}`
+                      ) : (
+                        user.address
+                      )}
+                    </p>
                     {user.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {user.phone}</p>}
                   </div>
                 </label>
@@ -610,10 +701,16 @@ export default function CheckoutPage() {
                       />
                       <div className="text-xs">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-fg-primary">{addr.name}</span>
+                          <span className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</span>
                           <span className="px-1.5 py-0.5 bg-fg-primary/5 text-fg-primary text-[8px] font-bold uppercase tracking-wider rounded border border-border-accent/20">{addr.label}</span>
                         </div>
-                        <p className="text-fg-secondary mt-1">{addr.addressLine}</p>
+                        <p className="text-fg-secondary mt-1">
+                          {addr.addressLine ? (
+                            addr.addressLine
+                          ) : (
+                            `${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state} - ${addr.pincode}, ${addr.country}`
+                          )}
+                        </p>
                         {addr.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {addr.phone}</p>}
                       </div>
                     </label>
@@ -622,57 +719,157 @@ export default function CheckoutPage() {
               )}
 
               {/* Option 3: Custom address */}
-              <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                addressOption === 'new' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-              }`}>
-                <input
-                  type="radio"
-                  name="shipping_addr"
-                  checked={addressOption === 'new'}
-                  onChange={() => setAddressOption('new')}
-                  className="mt-1 accent-fg-primary flex-shrink-0"
-                />
-                <div className="text-xs">
-                  <span className="font-bold text-fg-primary">Deliver to a different address</span>
-                </div>
-              </label>
+              {hasSavedAddresses && (
+                <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
+                  addressOption === 'new' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                }`}>
+                  <input
+                    type="radio"
+                    name="shipping_addr"
+                    checked={addressOption === 'new'}
+                    onChange={() => setAddressOption('new')}
+                    className="mt-1 accent-fg-primary flex-shrink-0"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-fg-primary">Deliver to a different address</span>
+                  </div>
+                </label>
+              )}
 
-              {addressOption === 'new' && (
+              {showCustomForm && (
                 <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-3.5 animate-fade-in shadow-sm">
                   <div className="space-y-1">
-                    <label htmlFor="ship-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Recipient Name</label>
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
+                    <select
+                      value={customCountry}
+                      onChange={(e) => {
+                        setCustomCountry(e.target.value);
+                        setCustomState('');
+                      }}
+                      className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                    >
+                      <option value="India">India</option>
+                      <option value="United States">United States</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Germany">Germany</option>
+                      <option value="France">France</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Australia">Australia</option>
+                      <option value="United Arab Emirates">United Arab Emirates</option>
+                      <option value="Saudi Arabia">Saudi Arabia</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label htmlFor="ship-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Full Name (First and Last name)</label>
+                      <input
+                        id="ship-name"
+                        type="text"
+                        required={showCustomForm}
+                        value={customFullName}
+                        onChange={(e) => setCustomFullName(e.target.value)}
+                        placeholder="Jane Smith"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="ship-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
+                      <input
+                        id="ship-phone"
+                        type="text"
+                        required={showCustomForm}
+                        value={customPhone}
+                        onChange={(e) => setCustomPhone(e.target.value)}
+                        placeholder="Mobile number"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="ship-flat" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Building, Company, Apartment</label>
                     <input
-                      id="ship-name"
+                      id="ship-flat"
                       type="text"
-                      required={addressOption === 'new'}
-                      value={customName}
-                      onChange={(e) => setCustomName(e.target.value)}
-                      placeholder="Jane Smith"
+                      required={showCustomForm}
+                      value={customFlat}
+                      onChange={(e) => setCustomFlat(e.target.value)}
+                      placeholder="Flat, House no., Apartment etc."
                       className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="ship-address" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Address</label>
+                    <label htmlFor="ship-area" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector, Village</label>
                     <input
-                      id="ship-address"
+                      id="ship-area"
                       type="text"
-                      required={addressOption === 'new'}
-                      value={customAddress}
-                      onChange={(e) => setCustomAddress(e.target.value)}
-                      placeholder="Street name, suite, city, state, country"
+                      required={showCustomForm}
+                      value={customArea}
+                      onChange={(e) => setCustomArea(e.target.value)}
+                      placeholder="Area, Street, village etc."
                       className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="ship-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Phone Number</label>
+                    <label htmlFor="ship-landmark" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Landmark (Optional)</label>
                     <input
-                      id="ship-phone"
+                      id="ship-landmark"
                       type="text"
-                      value={customPhone}
-                      onChange={(e) => setCustomPhone(e.target.value)}
-                      placeholder="+420 123 456 789"
+                      value={customLandmark}
+                      onChange={(e) => setCustomLandmark(e.target.value)}
+                      placeholder="E.g. near apollo hospital"
                       className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label htmlFor="ship-pincode" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
+                      <input
+                        id="ship-pincode"
+                        type="text"
+                        required={showCustomForm}
+                        value={customPincode}
+                        onChange={(e) => setCustomPincode(e.target.value)}
+                        placeholder="6-digit Pincode"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="ship-city" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
+                      <input
+                        id="ship-city"
+                        type="text"
+                        required={showCustomForm}
+                        value={customCity}
+                        onChange={(e) => setCustomCity(e.target.value)}
+                        placeholder="Town/City"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">State</label>
+                    {customCountry === 'India' ? (
+                      <select
+                        value={customState}
+                        onChange={(e) => setCustomState(e.target.value)}
+                        required={showCustomForm}
+                        className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                      >
+                        <option value="">Select State</option>
+                        {INDIAN_STATES.map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        required={showCustomForm}
+                        value={customState}
+                        onChange={(e) => setCustomState(e.target.value)}
+                        placeholder="State/Province/Region"
+                        className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    )}
                   </div>
                 </div>
               )}

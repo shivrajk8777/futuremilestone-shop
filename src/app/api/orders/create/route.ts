@@ -37,6 +37,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Save address to user's saved locations if requested
+    if (shippingAddress && typeof shippingAddress === 'object' && shippingAddress.saveAddress) {
+      const addressId = `addr_${Math.random().toString(36).slice(2, 10)}`;
+      const savedAddr = {
+        id: addressId,
+        label: `Shipping - ${shippingAddress.city || 'Location'}`,
+        fullName: shippingAddress.fullName || '',
+        phone: shippingAddress.phone || '',
+        flat: shippingAddress.flat || '',
+        area: shippingAddress.area || '',
+        landmark: shippingAddress.landmark || '',
+        pincode: shippingAddress.pincode || '',
+        city: shippingAddress.city || '',
+        state: shippingAddress.state || '',
+        country: shippingAddress.country || '',
+        createdAt: new Date(),
+      };
+
+      await db.collection('users').updateOne(
+        { _id: objId },
+        {
+          // @ts-ignore
+          $push: { savedAddresses: savedAddr }
+        }
+      );
+    }
+
+    let cleanShippingAddress = null;
+    if (shippingAddress) {
+      if (typeof shippingAddress === 'object') {
+        cleanShippingAddress = {
+          fullName: shippingAddress.fullName || '',
+          phone: shippingAddress.phone || '',
+          flat: shippingAddress.flat || '',
+          area: shippingAddress.area || '',
+          landmark: shippingAddress.landmark || '',
+          pincode: shippingAddress.pincode || '',
+          city: shippingAddress.city || '',
+          state: shippingAddress.state || '',
+          country: shippingAddress.country || '',
+        };
+      } else {
+        cleanShippingAddress = shippingAddress;
+      }
+    }
+
     // Generate random 5-character alphanumeric order number
     const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
     const orderNumber = `#FJ-${rand}`;
@@ -47,7 +93,7 @@ export async function POST(request: NextRequest) {
       items,
       total: Number(total) || 0,
       status: 'Processing',
-      shippingAddress: shippingAddress || null,
+      shippingAddress: cleanShippingAddress,
       createdAt: new Date(),
       trackingId: null,
       deliveryPartnerName: null,
