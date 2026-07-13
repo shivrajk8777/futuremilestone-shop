@@ -89,7 +89,7 @@ export default function Footer() {
             <div className="space-y-5">
 
               <p className="text-xs text-bg-primary/50 font-medium">
-                © Made by{' '}
+                © FM{' '}
                 <a
                   href="#"
                   target="_blank"
@@ -132,14 +132,7 @@ export default function Footer() {
                     </span>
                   </Link>
                 </li>
-                <li className='mb-4'>
-                  <Link href="/404" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
-                      <span>404</span>
-                      <span>404</span>
-                    </span>
-                  </Link>
-                </li>
+
               </ul>
             </div>
 
@@ -158,8 +151,8 @@ export default function Footer() {
                 <li className='mb-4'>
                   <Link href="/contact" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
                     <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
-                      <span>Contact</span>
-                      <span>Contact</span>
+                      <span>Contact </span>
+                      <span>Contact </span>
                     </span>
                   </Link>
                 </li>
@@ -186,35 +179,13 @@ export default function Footer() {
                     </span>
                   </Link>
                 </li>
-                <li className='mb-4'>
-                  <Link href="/shop/sona" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
-                      <span>Shop Product</span>
-                      <span>Shop Product</span>
-                    </span>
-                  </Link>
-                </li>
-                <li className='mb-4'>
-                  <Link href="/shop?category=wood" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
-                      <span>Shop Category</span>
-                      <span>Shop Category</span>
-                    </span>
-                  </Link>
-                </li>
+
+
                 <li className='mb-4'>
                   <Link href="/blog" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
                     <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
                       <span>Blog</span>
                       <span>Blog</span>
-                    </span>
-                  </Link>
-                </li>
-                <li className='mb-4'>
-                  <Link href="/blog/5-ways-scandinavian-design-can-transform-your-space" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
-                      <span>Blog Post</span>
-                      <span>Blog Post</span>
                     </span>
                   </Link>
                 </li>
@@ -326,11 +297,10 @@ export default function Footer() {
                             setDropdownOpen(false);
                             setSearch('');
                           }}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors cursor-pointer text-left ${
-                            isSelected
-                              ? 'bg-fg-primary/8 text-fg-primary font-semibold'
-                              : 'text-fg-secondary hover:bg-fg-primary/5 hover:text-fg-primary'
-                          }`}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors cursor-pointer text-left ${isSelected
+                            ? 'bg-fg-primary/8 text-fg-primary font-semibold'
+                            : 'text-fg-secondary hover:bg-fg-primary/5 hover:text-fg-primary'
+                            }`}
                         >
                           <span className="text-lg leading-none w-6 flex-shrink-0 text-center">{c.flag}</span>
                           <span className="flex-1 min-w-0 truncate">{c.name}</span>

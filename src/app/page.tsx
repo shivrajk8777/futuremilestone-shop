@@ -242,7 +242,7 @@ export default function Home() {
                       )}
                       <Link
                         href={slide.slug ? `/shop/${slide.slug}` : '/shop'}
-                        className="relative pb-0.5 text-[10px] md:text-sm uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mt-0.5 md:mt-0"
+                        className="relative pb-0.5 text-[10px] md:text-sm tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/btn flex-shrink-0 mt-0.5 md:mt-0"
                       >
                         View <span className="hidden md:inline">Product</span>
                         <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/btn:bg-fg-secondary" />
@@ -305,7 +305,7 @@ export default function Home() {
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
           </svg>
-          <span className="text-xs font-bold tracking-wider uppercase">Free Shipping over 500€</span>
+          <span className="text-xs font-bold tracking-wider uppercase">Free Shipping over 500$</span>
         </div>
         {/* Benefit 2 */}
         <div className="flex items-center gap-3">
@@ -538,7 +538,7 @@ export default function Home() {
                   <div>
                     <Link
                       href={`/shop?category=${collections[0].slug}`}
-                      className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
+                      className="relative pb-0.5 text-xs font-bold  tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
                     >
                       View Collection
                       <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/link:bg-fg-secondary" />
@@ -554,7 +554,7 @@ export default function Home() {
                 <div className="mt-4">
                   <Link
                     href={`/shop?category=${collections[0].slug}`}
-                    className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
+                    className="relative pb-0.5 text-xs font-bold tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
                   >
                     View Collection
                     <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/link:bg-fg-secondary" />
@@ -579,13 +579,13 @@ export default function Home() {
                   )}
                 </div>
                 {/* Card Content (Right - Solid Dark Inverse background) */}
-                <div className="w-full sm:w-1/3 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
+                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 transition-theme">
                   <h3 className="font-dm-sans text-xl font-bold text-bg-primary">{collections[1].name}</h3>
                   <p className="text-xs text-bg-secondary/80 leading-[1.6]">{collections[1].description}</p>
                   <div className="mt-4">
                     <Link
                       href={`/shop?category=${collections[1].slug}`}
-                      className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
+                      className="relative pb-0.5 text-xs font-bold  tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
                     >
                       View Collection
                       <span className="absolute bottom-0 left-0 w-full h-[1px] bg-bg-primary transition-colors group-hover/link:bg-bg-secondary" />
@@ -597,13 +597,13 @@ export default function Home() {
               {/* Row 2 - Modern Collection (Card left, Image right) */}
               <div className="flex flex-col sm:flex-row gap-3 h-auto sm:h-[294px] w-full">
                 {/* Card Content (Left - Solid Dark Inverse background) */}
-                <div className="w-full sm:w-1/3 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 order-last sm:order-first transition-theme">
+                <div className="w-full sm:w-1/2 h-auto sm:h-full bg-fg-primary text-bg-primary rounded-xl p-8 sm:p-10 flex flex-col justify-center gap-2 relative border border-border-accent/40 order-last sm:order-first transition-theme">
                   <h3 className="font-dm-sans text-xl font-bold text-bg-primary">{collections[2].name}</h3>
                   <p className="text-xs text-bg-secondary/80 leading-[1.6]">{collections[2].description}</p>
                   <div className="mt-4">
                     <Link
                       href={`/shop?category=${collections[2].slug}`}
-                      className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
+                      className="relative pb-0.5 text-xs font-bold tracking-wider text-bg-primary hover:text-bg-secondary transition-colors inline-block group/link"
                     >
                       View Collection
                       <span className="absolute bottom-0 left-0 w-full h-[1px] bg-bg-primary transition-colors group-hover/link:bg-bg-secondary" />
@@ -646,7 +646,7 @@ export default function Home() {
             <div>
               <Link
                 href="/about"
-                className="relative pb-0.5 text-xs font-bold uppercase tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
+                className="relative pb-0.5 text-xs font-bold tracking-wider text-fg-primary hover:text-fg-secondary transition-colors inline-block group/link"
               >
                 More About Us
                 <span className="absolute bottom-0 left-0 w-full h-[1px] bg-fg-primary transition-colors group-hover/link:bg-fg-secondary" />

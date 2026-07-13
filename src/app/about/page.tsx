@@ -86,7 +86,7 @@ export default function About() {
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
           <img
             src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
-            alt="We are Future Milestone Furniture"
+            alt="Future Milestone Furniture"
             className="absolute inset-0 w-full h-full object-cover brightness-[0.95] transition-transform duration-700 group-hover:scale-101"
           />
           <div className="absolute inset-0 bg-black/5" />
@@ -95,7 +95,7 @@ export default function About() {
           <div className="absolute bottom-0 right-0 bg-bg-primary pr-5 pb-3.5 pt-3.5 pl-6 rounded-tl-2xl select-none z-10 transition-theme border-t border-l border-border-accent/10">
 
             <span className="font-dm-sans font-bold text-fg-primary text-xs tracking-wider">
-              We are Future Milestone Furniture
+              Future Milestone Furniture
             </span>
           </div>
         </div>
