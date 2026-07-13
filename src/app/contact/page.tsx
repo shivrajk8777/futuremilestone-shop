@@ -56,14 +56,15 @@ export default function Contact() {
 
   const showrooms = [
     {
-      city: 'Prague',
-      address: 'Vinohradská 121,\n130 00 Praha 3,\nCzech Republic',
-      mapUrl: 'https://maps.google.com/'
+      city: 'Jaipur Office',
+      address: 'A-50, Kanaram Nagar,\nSikar Road,\nJaipur - 302039',
+      mapUrl: 'https://maps.google.com/?q=A-50,+Kanaram+Nagar,+Sikar+Road,+Jaipur+-+302039'
     },
     {
-      city: 'Hamburg',
-      address: 'Gänsemarkt 2,\n20354 Hamburg,\nGermany',
-      mapUrl: 'https://maps.google.com/'
+      city: 'Get In Touch',
+      isContactDetails: true,
+      phone: '+91-7073803090',
+      email: 'support@futuremilestone.shop'
     }
   ];
 
@@ -157,24 +158,58 @@ export default function Contact() {
               key={showroom.city}
               className="bg-bg-secondary border border-border-accent/40 p-8 rounded-xl transition-theme flex flex-col justify-between gap-6 min-h-[220px]"
             >
-              <div className="space-y-4">
-                <h2 className="font-dm-sans text-xl md:text-2xl font-medium text-fg-primary tracking-tight">
-                  {showroom.city}
-                </h2>
-                <p className="text-sm text-fg-secondary leading-relaxed font-normal whitespace-pre-line">
-                  {showroom.address}
-                </p>
-              </div>
-              <div>
-                <a
-                  href={showroom.mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-opacity shadow-sm"
-                >
-                  Get Direction ↗
-                </a>
-              </div>
+              {showroom.isContactDetails ? (
+                <>
+                  <div className="space-y-4">
+                    <h2 className="font-dm-sans text-xl md:text-2xl font-medium text-fg-primary tracking-tight">
+                      {showroom.city}
+                    </h2>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs text-fg-secondary font-medium">Call Us</span>
+                        <a href={`tel:${showroom.phone}`} className="text-fg-primary hover:underline font-semibold transition-all">
+                          {showroom.phone}
+                        </a>
+                      </div>
+                      <div className="flex flex-col gap-0.5 pt-1">
+                        <span className="text-xs text-fg-secondary font-medium">Email Us</span>
+                        <a href={`mailto:${showroom.email}`} className="text-fg-primary hover:underline font-semibold transition-all break-all">
+                          {showroom.email}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <a
+                      href={`mailto:${showroom.email}`}
+                      className="inline-flex items-center bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-opacity shadow-sm"
+                    >
+                      Email Now ↗
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    <h2 className="font-dm-sans text-xl md:text-2xl font-medium text-fg-primary tracking-tight">
+                      {showroom.city}
+                    </h2>
+                    <p className="text-sm text-fg-secondary leading-relaxed font-normal whitespace-pre-line">
+                      {showroom.address}
+                    </p>
+                  </div>
+                  <div>
+                    <a
+                      href={showroom.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-opacity shadow-sm"
+                    >
+                      Get Direction ↗
+                    </a>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>

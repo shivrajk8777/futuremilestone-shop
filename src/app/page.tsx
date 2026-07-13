@@ -163,7 +163,7 @@ export default function Home() {
               />
             </div>
             {/* Brand Title */}
-            <span className="font-dm-sans font-bold text-white text-sm tracking-wider uppercase">
+            <span className="font-dm-sans font-bold text-white text-sm tracking-wider">
               future milestone
             </span>
             {/* Modern Slim Progress Bar */}

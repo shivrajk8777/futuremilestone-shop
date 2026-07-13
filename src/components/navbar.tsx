@@ -284,7 +284,7 @@ export default function Navbar() {
         <div className="absolute top-0 left-0 right-0 h-3 bg-bg-primary border-border-accent/40 transition-theme z-20 pointer-events-auto z-[999]" />
 
         {/* Left Block: Brand, Navigation Links, and Theme Switcher */}
-        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-5 md:py-1.5 items-center gap-3 md:gap-7 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`pointer-events-auto bg-bg-primary rounded-br-2xl border-r border-b border-border-accent/40 pl-3 pr-4 py-2.5 md:pl-6 md:pr-5 md:py-1.5 items-center gap-1 md:gap-7 shadow-sm transition-theme relative z-30 ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}>
 
           {/* Inset Rounded Corners - Left Block */}
           {/* Bottom-Left Edge Curve */}
@@ -303,13 +303,13 @@ export default function Navbar() {
           </div>
 
           {/* Logo link */}
-          <Link href="/" className="flex items-center gap-1.5 md:gap-2 text-fg-primary font-dm-sans text-[15px] md:text-[17px] font-bold tracking-tight select-none group/logo">
+          <Link href="/" className="flex items-center gap-1 md:gap-2 text-fg-primary font-dm-sans text-[11px] md:text-[17px] font-bold tracking-tight select-none group/logo">
             {/* Custom Logo Icon */}
-            <img src={theme === 'dark' ? '/images/menu-icon-light.svg' : '/images/menu-icon-dark.svg'} alt="Logo" className="w-[16px] h-[16px] md:w-[18px] md:h-[18px] object-contain transition-theme" />
-            {/* Logo text: top-to-bottom slide — "Future Milestone" visible by default, "Home" slides in from top on hover */}
-            <span className="overflow-hidden h-[16px] md:h-[18px] flex flex-col">
+            <img src={theme === 'dark' ? '/images/menu-icon-light.svg' : '/images/menu-icon-dark.svg'} alt="Logo" className="w-[12px] h-[12px] md:w-[18px] md:h-[18px] object-contain transition-theme" />
+            {/* Logo text: hidden on mobile, slide animation on md+ */}
+            <span className="hidden md:flex overflow-hidden h-[18px] flex-col">
               <span
-                className="flex flex-col transition-transform duration-300 -translate-y-[16px] md:-translate-y-[18px] group-hover/logo:translate-y-0 leading-[16px] md:leading-[18px]"
+                className="flex flex-col transition-transform duration-300 -translate-y-[18px] group-hover/logo:translate-y-0 leading-[18px]"
               >
                 <span>Home</span>
                 <span>future milestone</span>
@@ -501,7 +501,7 @@ export default function Navbar() {
             className={`p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none cursor-pointer ${isMobileMenuOpen ? 'hidden md:block' : ''}`}
             aria-label="Search"
           >
-            <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -517,7 +517,7 @@ export default function Navbar() {
             className={`p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none relative items-center cursor-pointer ${isMobileMenuOpen ? 'hidden md:flex' : 'flex'}`}
             aria-label="Cart"
           >
-            <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -525,7 +525,7 @@ export default function Navbar() {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <span className="text-xs font-semibold text-fg-primary ml-1.5">
+            <span className="text-[10px] md:text-xs font-semibold text-fg-primary ml-1">
               ({cartCount})
             </span>
           </button>
@@ -538,7 +538,7 @@ export default function Navbar() {
                 className="p-1 text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer"
                 aria-label="My Account"
               >
-                <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
                 </svg>
               </Link>
@@ -548,7 +548,7 @@ export default function Navbar() {
                 className="p-1 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none cursor-pointer"
                 aria-label="Sign In"
               >
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5 md:w-4.5 md:h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </button>
@@ -628,7 +628,7 @@ export default function Navbar() {
             className="md:hidden p-1 md:p-1.5 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer"
             aria-label="Toggle Menu"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMobileMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
