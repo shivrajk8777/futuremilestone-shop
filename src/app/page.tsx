@@ -305,7 +305,7 @@ export default function Home() {
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
           </svg>
-          <span className="text-xs font-bold tracking-wider uppercase">Free Shipping over 500$</span>
+          <span className="text-xs font-bold tracking-wider uppercase">Free Shipping</span>
         </div>
         {/* Benefit 2 */}
         <div className="flex items-center gap-3">
@@ -317,16 +317,16 @@ export default function Home() {
         {/* Benefit 3 */}
         <div className="flex items-center gap-3">
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
           </svg>
-          <span className="text-xs font-bold tracking-wider uppercase">Free Returns</span>
+          <span className="text-xs font-bold tracking-wider uppercase">Handmade</span>
         </div>
         {/* Benefit 4 */}
         <div className="flex items-center gap-3">
           <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <span className="text-xs font-bold tracking-wider uppercase">5-Year Warranty</span>
+          <span className="text-xs font-bold tracking-wider uppercase">Quality craftsmanship</span>
         </div>
       </section>
 
