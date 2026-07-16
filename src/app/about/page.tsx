@@ -2,35 +2,53 @@
 
 import Link from 'next/link';
 import LogoMarquee from '@/components/logo-marquee';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
+
+const DEFAULT_TEAM = [
+  {
+    name: 'Erik Jansen',
+    role: 'Head of Design',
+    image: '/images/HuqNTe7ZlAoHRwcSqCGZZ9PGYQQ_df2789.webp',
+    socials: { twitter: '#', instagram: '#', behance: '#' }
+  },
+  {
+    name: 'Ingrid Dahl',
+    role: 'Brand Director',
+    image: '/images/h1y6JnX5fmEv7JAvfZNIqpWM_3a8d82.webp',
+    socials: { twitter: '#', instagram: '#', behance: '#' }
+  },
+  {
+    name: 'Lars Nielsen',
+    role: 'Design Lead',
+    image: '/images/2CRV7Lv7j9PMwzDEghUpkq1E_9cf406.webp',
+    socials: { twitter: '#', instagram: '#', behance: '#' }
+  },
+  {
+    name: 'Freja Lindberg',
+    role: 'Product Manager',
+    image: '/images/rvdz4HAqDoqO5NrNPW0qi7zWhg_4212c2.webp',
+    socials: { twitter: '#', instagram: '#', behance: '#' }
+  }
+];
 
 export default function About() {
-  const team = [
-    {
-      name: 'Erik Jansen',
-      role: 'Head of Design',
-      image: '/images/HuqNTe7ZlAoHRwcSqCGZZ9PGYQQ_df2789.webp',
-      socials: { twitter: '#', instagram: '#', behance: '#' }
-    },
-    {
-      name: 'Ingrid Dahl',
-      role: 'Brand Director',
-      image: '/images/h1y6JnX5fmEv7JAvfZNIqpWM_3a8d82.webp',
-      socials: { twitter: '#', instagram: '#', behance: '#' }
-    },
-    {
-      name: 'Lars Nielsen',
-      role: 'Design Lead',
-      image: '/images/2CRV7Lv7j9PMwzDEghUpkq1E_9cf406.webp',
-      socials: { twitter: '#', instagram: '#', behance: '#' }
-    },
-    {
-      name: 'Freja Lindberg',
-      role: 'Product Manager',
-      image: '/images/rvdz4HAqDoqO5NrNPW0qi7zWhg_4212c2.webp',
-      socials: { twitter: '#', instagram: '#', behance: '#' }
-    }
-  ];
+  const [team, setTeam] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/team')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.team && data.team.length > 0) {
+          setTeam(data.team);
+        } else {
+          setTeam(DEFAULT_TEAM);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch team members:', err);
+        setTeam(DEFAULT_TEAM);
+      });
+  }, []);
 
   const socialCards = [
     { name: 'Twitter', href: '/' },

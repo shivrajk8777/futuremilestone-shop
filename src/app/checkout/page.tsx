@@ -11,21 +11,26 @@ interface CartItem {
   quantity: number;
 }
 
-function CheckoutImage({ cart }: { cart: CartItem[] }) {
+interface SlideshowItem {
+  image: string;
+  name: string;
+}
+
+function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    if (cart.length <= 1) {
+    if (items.length <= 1) {
       setCurrentIndex(0);
       return;
     }
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % cart.length);
+      setCurrentIndex((prev) => (prev + 1) % items.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, [cart]);
+  }, [items]);
 
-  if (cart.length === 0) {
+  if (items.length === 0) {
     return (
       <>
         <img
@@ -41,13 +46,13 @@ function CheckoutImage({ cart }: { cart: CartItem[] }) {
   return (
     <>
       {/* Dynamic cross-fading images */}
-      {cart.map((item, idx) => {
-        const imageUrl = item.product.images?.[0] || "/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp";
+      {items.map((item, idx) => {
+        const imageUrl = item.image || "/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp";
         return (
           <img
             key={idx}
             src={imageUrl}
-            alt={item.product.name}
+            alt={item.name}
             className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${
               currentIndex === idx
                 ? 'opacity-100 scale-100 pointer-events-auto'
@@ -59,13 +64,13 @@ function CheckoutImage({ cart }: { cart: CartItem[] }) {
       <div className="absolute inset-0 bg-black/10 pointer-events-none z-10" />
 
       {/* Slideshow controls / indicators */}
-      {cart.length > 1 && (
+      {items.length > 1 && (
         <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-20">
           <span className="text-[10px] font-bold text-white uppercase tracking-widest bg-black/40 backdrop-blur-md rounded-full px-3 py-1 shadow-sm select-none">
-            {currentIndex + 1} / {cart.length}
+            {currentIndex + 1} / {items.length}
           </span>
           <div className="flex gap-1.5 bg-black/40 backdrop-blur-md rounded-full p-1.5 shadow-sm">
-            {cart.map((_, idx) => (
+            {items.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -196,6 +201,13 @@ export default function CheckoutPage() {
   const [cartLoading, setCartLoading] = useState(true);
   const [addressOption, setAddressOption] = useState<'primary' | 'saved' | 'new'>('primary');
   const [selectedSavedId, setSelectedSavedId] = useState<string>('');
+  const [successOrder, setSuccessOrder] = useState<{
+    orderNumber: string;
+    total: number;
+    name: string;
+    address: string;
+    items: { name: string; image: string }[];
+  } | null>(null);
 
   // Custom shipping address state
   const [customCountry, setCustomCountry] = useState('India');
@@ -322,7 +334,7 @@ export default function CheckoutPage() {
         {/* Left image */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] md:h-[400px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-            <CheckoutImage cart={cart} />
+            <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
           </div>
         </section>
         {/* Right: sign-in prompt */}
@@ -359,13 +371,125 @@ export default function CheckoutPage() {
     );
   }
 
+  if (successOrder) {
+    const slideshowItems = successOrder.items.map(item => ({
+      image: item.image,
+      name: item.name
+    }));
+
+    // Calculate mock delivery date (5 days from today)
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + 5);
+
+    const formattedDate = deliveryDate.toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    return (
+      <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
+        
+        {/* Left Column: Stable sticky image slideshow */}
+        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
+          <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm bg-bg-secondary">
+            <CheckoutSlideshow items={slideshowItems} />
+
+            {/* Floating Order Number Badge on Left Image */}
+            <div className="absolute bottom-5 left-5 right-5 z-20">
+              <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Number</p>
+                  <p className="text-xl font-bold text-fg-primary font-dm-sans">{successOrder.orderNumber}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Total Paid</p>
+                  <p className="text-xl font-bold text-fg-primary font-dm-sans">${successOrder.total}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Right Column: Scrollable details */}
+        <div
+          ref={rightColumnRef}
+          className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col justify-center items-center gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
+        >
+          <div className="flex flex-col items-center justify-center min-h-full w-full py-8 flex-shrink-0">
+            <div className="w-full max-w-md bg-bg-secondary p-8 md:p-12 border border-border-accent/40 rounded-xl shadow-sm text-center space-y-6">
+              
+              {/* Checkmark Animation Icon */}
+              <div className="w-16 h-16 bg-green-500/10 text-green-500 border border-green-500/25 rounded-full flex items-center justify-center mx-auto shadow-sm animate-bounce">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+
+              <div className="space-y-2">
+                <h1 className="font-dm-sans text-2xl md:text-3xl font-semibold tracking-tight text-fg-primary">
+                  Order Confirmed
+                </h1>
+                <p className="text-xs text-fg-secondary leading-relaxed font-medium">
+                  Thank you for your purchase. We are preparing your Scandinavian furniture pieces!
+                </p>
+              </div>
+
+              {/* Details Box */}
+              <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/30 text-left space-y-3.5 text-xs w-full">
+                <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
+                  <span className="text-fg-secondary font-normal">Order Number</span>
+                  <span className="font-bold text-fg-primary">{successOrder.orderNumber}</span>
+                </div>
+                
+                <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
+                  <span className="text-fg-secondary font-normal">Total Amount</span>
+                  <span className="font-bold text-fg-primary">${successOrder.total}</span>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-fg-secondary block">Ship To</span>
+                  <span className="font-bold text-fg-primary block">{successOrder.name}</span>
+                  <span className="text-fg-secondary/80 font-normal block leading-relaxed">{successOrder.address}</span>
+                </div>
+
+                <div className="space-y-1 pt-2 border-t border-border-accent/20">
+                  <span className="text-fg-secondary block">Estimated Delivery</span>
+                  <span className="font-bold text-fg-primary block text-green-600 font-semibold">{formattedDate}</span>
+                </div>
+              </div>
+
+              {/* Redirect Buttons */}
+              <div className="flex flex-col gap-2 pt-2 w-full">
+                <Link
+                  href="/account?tab=orders"
+                  className="w-full bg-fg-primary text-bg-primary py-3.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity text-center block shadow-sm"
+                >
+                  View Order History
+                </Link>
+                <Link
+                  href="/shop"
+                  className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-lg text-xs font-semibold hover:bg-bg-secondary transition-colors text-center block"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (cart.length === 0) {
     return (
       <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary transition-theme relative lg:h-screen">
         {/* Left image */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] md:h-[400px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-            <CheckoutImage cart={cart} />
+            <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
           </div>
         </section>
         {/* Right: empty cart prompt */}
@@ -525,7 +649,13 @@ export default function CheckoutPage() {
         
         const dispName = shippingDetails.fullName || user.name;
         const dispAddr = shippingDetails.addressLine || `${shippingDetails.flat}, ${shippingDetails.area}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.pincode}, ${shippingDetails.country}`;
-        router.push(`/checkout/success?orderId=${data.order.id}&orderNumber=${encodeURIComponent(data.order.orderNumber)}&total=${total}&name=${encodeURIComponent(dispName)}&address=${encodeURIComponent(dispAddr)}`);
+        setSuccessOrder({
+          orderNumber: data.order.orderNumber,
+          total: total,
+          name: dispName,
+          address: dispAddr,
+          items: data.order.items || []
+        });
       } else {
         setCheckoutError(data.error || 'Failed to place order. Please try again.');
       }
@@ -543,7 +673,7 @@ export default function CheckoutPage() {
       {/* Left Column: Stable sticky image — same as FAQ */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-          <CheckoutImage cart={cart} />
+          <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
 
           {/* Floating order summary badge on image */}
           <div className="absolute bottom-5 left-5 right-5">

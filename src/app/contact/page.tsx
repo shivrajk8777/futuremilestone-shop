@@ -5,13 +5,36 @@ import { useState, useRef, useEffect } from 'react';
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.email && formData.message) {
-      setSubmitted(true);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setSubmitted(false), 5000);
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setSubmitted(false), 5000);
+      } else {
+        setError(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Failed to send message. Please check your connection and try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -111,22 +134,33 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 w-full">
+              {error && (
+                <div className="bg-red-500/10 text-red-500 border border-red-500/20 px-5 py-3.5 rounded-xl text-xs font-semibold animate-fade-in flex items-center gap-2">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text"
                   required
+                  disabled={submitting}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Your Name"
-                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
                 />
                 <input
                   type="email"
                   required
+                  disabled={submitting}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="Your Email"
-                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
                 />
               </div>
 
@@ -134,18 +168,30 @@ export default function Contact() {
                 <textarea
                   required
                   rows={6}
+                  disabled={submitting}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Your Message"
-                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors resize-none font-medium"
+                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors resize-none font-medium disabled:opacity-60"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-fg-primary text-bg-primary py-4 rounded-xl font-medium text-sm hover:opacity-90 transition-opacity"
+                disabled={submitting}
+                className="w-full bg-fg-primary text-bg-primary py-4 rounded-xl font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
               >
-                Send Message
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-bg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Sending Message...</span>
+                  </>
+                ) : (
+                  <span>Send Message</span>
+                )}
               </button>
             </form>
           )}
