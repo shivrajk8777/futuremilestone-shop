@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useUser, SavedAddress } from '@/context/UserContext';
+import { useUser } from '@/context/UserContext';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/data/products';
 import Link from 'next/link';
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 
 interface CartItem {
   product: Product & { selectedMaterial?: string; selectedDimension?: string };
@@ -15,6 +16,19 @@ interface SlideshowItem {
   image: string;
   name: string;
 }
+
+const loadRazorpayScript = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+    if ((window as any).Razorpay) return resolve(true);
+
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 
 function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -45,7 +59,6 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
 
   return (
     <>
-      {/* Dynamic cross-fading images */}
       {items.map((item, idx) => {
         const imageUrl = item.image || "/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp";
         return (
@@ -63,7 +76,6 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
       })}
       <div className="absolute inset-0 bg-black/10 pointer-events-none z-10" />
 
-      {/* Slideshow controls / indicators */}
       {items.length > 1 && (
         <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-20">
           <span className="text-[10px] font-bold text-white uppercase tracking-widest bg-black/40 backdrop-blur-md rounded-full px-3 py-1 shadow-sm select-none">
@@ -91,10 +103,8 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
 function CheckoutSkeleton() {
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-      {/* Left Column: Stable sticky image skeleton */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave relative overflow-hidden">
-          {/* Floating order summary badge on image skeleton */}
           <div className="absolute bottom-5 left-5 right-5">
             <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme animate-pulse">
               <div className="space-y-2">
@@ -110,16 +120,11 @@ function CheckoutSkeleton() {
         </div>
       </section>
 
-      {/* Right Column: Scrollable forms + order summary skeleton */}
       <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
-        
-        {/* Header card skeleton */}
         <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-3 animate-pulse">
           <div className="h-8 w-1/3 bg-fg-primary/10 rounded-md" />
           <div className="h-4 w-3/4 bg-fg-primary/10 rounded-md" />
         </div>
-
-        {/* Order Summary skeleton */}
         <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme animate-pulse">
           <div className="w-full border-b border-border-accent/40 py-4 flex justify-center">
             <div className="h-4 w-28 bg-fg-primary/10 rounded-md" />
@@ -138,47 +143,6 @@ function CheckoutSkeleton() {
             </div>
           </div>
         </div>
-
-        {/* Shipping Details skeleton */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme animate-pulse">
-          <div className="w-full border-b border-border-accent/40 py-4 flex justify-center">
-            <div className="h-4 w-32 bg-fg-primary/10 rounded-md" />
-          </div>
-          <div className="p-6 space-y-4">
-            <div className="space-y-2">
-              <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
-              <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
-            </div>
-            <div className="space-y-2">
-              <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
-              <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Details skeleton */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme animate-pulse">
-          <div className="w-full border-b border-border-accent/40 py-4 flex justify-center">
-            <div className="h-4 w-32 bg-fg-primary/10 rounded-md" />
-          </div>
-          <div className="p-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2 col-span-2">
-                <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
-                <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
-              </div>
-              <div className="space-y-2">
-                <div className="h-3.5 w-16 bg-fg-primary/10 rounded-md" />
-                <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
-              </div>
-              <div className="space-y-2">
-                <div className="h-3.5 w-16 bg-fg-primary/10 rounded-md" />
-                <div className="h-10 w-full bg-fg-primary/5 rounded-lg border border-border-accent/30" />
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
   );
@@ -220,16 +184,12 @@ export default function CheckoutPage() {
   const [customCity, setCustomCity] = useState('');
   const [customState, setCustomState] = useState('');
 
-  // Payment states
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
+  // Payment gateway selection state
+  const [paymentGateway, setPaymentGateway] = useState<'razorpay' | 'paypal'>('razorpay');
 
   const [checkoutError, setCheckoutError] = useState('');
   const [placingOrder, setPlacingOrder] = useState(false);
 
-  // Scroll priority ref — same as FAQ page
   const rightColumnRef = useRef<HTMLDivElement>(null);
 
   const hasSavedAddresses = !!(user?.address || (user?.savedAddresses && user.savedAddresses.length > 0));
@@ -278,7 +238,6 @@ export default function CheckoutPage() {
   // Set default shipping selection when user details load
   useEffect(() => {
     if (user) {
-      setCardName(user.name);
       if (user.savedAddresses && user.savedAddresses.length > 0) {
         setSelectedSavedId(user.savedAddresses[0].id);
         setAddressOption('saved');
@@ -290,9 +249,16 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
-  // Scroll priority — identical to FAQ page
-  //  ↓ Down  → right column first → then page
-  //  ↑ Up    → page first → then right column
+  // Auto-switch payment gateway based on country
+  useEffect(() => {
+    if (customCountry === 'India') {
+      setPaymentGateway('razorpay');
+    } else {
+      setPaymentGateway('paypal');
+    }
+  }, [customCountry]);
+
+  // Scroll priority
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       const el = rightColumnRef.current;
@@ -322,8 +288,6 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('wheel', handleWheel);
   }, []);
 
-  // ── Loading / Guard states ─────────────────────────────────────────────────
-
   if (loading || cartLoading) {
     return <CheckoutSkeleton />;
   }
@@ -331,13 +295,11 @@ export default function CheckoutPage() {
   if (!user) {
     return (
       <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary transition-theme relative lg:h-screen">
-        {/* Left image */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] md:h-[400px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
             <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
           </div>
         </section>
-        {/* Right: sign-in prompt */}
         <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
           <div className="flex-1 flex items-center justify-center">
             <div className="bg-bg-secondary border border-border-accent/40 rounded-xl p-10 text-center space-y-5 max-w-sm w-full shadow-sm transition-theme">
@@ -377,7 +339,6 @@ export default function CheckoutPage() {
       name: item.name
     }));
 
-    // Calculate mock delivery date (5 days from today)
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 5);
 
@@ -390,92 +351,69 @@ export default function CheckoutPage() {
 
     return (
       <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-        
-        {/* Left Column: Stable sticky image slideshow */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm bg-bg-secondary">
             <CheckoutSlideshow items={slideshowItems} />
 
-            {/* Floating Order Number Badge on Left Image */}
             <div className="absolute bottom-5 left-5 right-5 z-20">
               <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Number</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Ref</p>
                   <p className="text-xl font-bold text-fg-primary font-dm-sans">{successOrder.orderNumber}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Total Paid</p>
-                  <p className="text-xl font-bold text-fg-primary font-dm-sans">${successOrder.total}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Est. Delivery</p>
+                  <p className="text-xs font-semibold text-fg-primary">{formattedDate}</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Right Column: Scrollable details */}
-        <div
-          ref={rightColumnRef}
-          className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col justify-center items-center gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
-        >
-          <div className="flex flex-col items-center justify-center min-h-full w-full py-8 flex-shrink-0">
-            <div className="w-full max-w-md bg-bg-secondary p-8 md:p-12 border border-border-accent/40 rounded-xl shadow-sm text-center space-y-6">
-              
-              {/* Checkmark Animation Icon */}
-              <div className="w-16 h-16 bg-green-500/10 text-green-500 border border-green-500/25 rounded-full flex items-center justify-center mx-auto shadow-sm animate-bounce">
+        <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
+          <div className="flex-1 flex items-center justify-center py-6">
+            <div className="bg-bg-secondary border border-border-accent/40 rounded-xl p-8 md:p-10 text-center space-y-6 max-w-md w-full shadow-sm transition-theme">
+              <div className="w-16 h-16 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mx-auto text-green-500">
                 <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
 
-              <div className="space-y-2">
-                <h1 className="font-dm-sans text-2xl md:text-3xl font-semibold tracking-tight text-fg-primary">
-                  Order Confirmed
-                </h1>
-                <p className="text-xs text-fg-secondary leading-relaxed font-medium">
-                  Thank you for your purchase. We are preparing your Scandinavian furniture pieces!
+              <div>
+                <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                  Payment Successful
+                </span>
+                <h2 className="font-dm-sans font-bold text-2xl text-fg-primary mt-3">Order Confirmed!</h2>
+                <p className="text-xs text-fg-secondary leading-relaxed mt-2">
+                  Thank you, <strong className="text-fg-primary">{successOrder.name}</strong>. We have received your order <strong className="text-fg-primary">{successOrder.orderNumber}</strong> and sent a confirmation email to your address.
                 </p>
               </div>
 
-              {/* Details Box */}
-              <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/30 text-left space-y-3.5 text-xs w-full">
-                <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
-                  <span className="text-fg-secondary font-normal">Order Number</span>
-                  <span className="font-bold text-fg-primary">{successOrder.orderNumber}</span>
-                </div>
-                
-                <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
-                  <span className="text-fg-secondary font-normal">Total Amount</span>
+              <div className="bg-bg-primary border border-border-accent/40 rounded-xl p-4 text-left space-y-2 text-xs">
+                <div className="flex justify-between border-b border-border-accent/30 pb-2">
+                  <span className="text-fg-secondary">Amount Paid</span>
                   <span className="font-bold text-fg-primary">${successOrder.total}</span>
                 </div>
-
-                <div className="space-y-1">
-                  <span className="text-fg-secondary block">Ship To</span>
-                  <span className="font-bold text-fg-primary block">{successOrder.name}</span>
-                  <span className="text-fg-secondary/80 font-normal block leading-relaxed">{successOrder.address}</span>
-                </div>
-
-                <div className="space-y-1 pt-2 border-t border-border-accent/20">
-                  <span className="text-fg-secondary block">Estimated Delivery</span>
-                  <span className="font-bold text-fg-primary block text-green-600 font-semibold">{formattedDate}</span>
+                <div>
+                  <span className="text-fg-secondary block text-[10px] uppercase font-bold tracking-wider">Shipping Location</span>
+                  <span className="text-fg-primary font-medium">{successOrder.address}</span>
                 </div>
               </div>
 
-              {/* Redirect Buttons */}
-              <div className="flex flex-col gap-2 pt-2 w-full">
+              <div className="flex flex-col gap-2 pt-2">
                 <Link
-                  href="/account?tab=orders"
-                  className="w-full bg-fg-primary text-bg-primary py-3.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity text-center block shadow-sm"
+                  href="/orders"
+                  className="w-full bg-fg-primary text-bg-primary py-3.5 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity text-center"
                 >
-                  View Order History
+                  View My Orders
                 </Link>
                 <Link
                   href="/shop"
-                  className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-lg text-xs font-semibold hover:bg-bg-secondary transition-colors text-center block"
+                  className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-xl text-xs font-bold hover:bg-bg-secondary transition-colors text-center"
                 >
                   Continue Shopping
                 </Link>
               </div>
-
             </div>
           </div>
         </div>
@@ -486,13 +424,11 @@ export default function CheckoutPage() {
   if (cart.length === 0) {
     return (
       <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary transition-theme relative lg:h-screen">
-        {/* Left image */}
         <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[300px] md:h-[400px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0">
           <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-            <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
+            <CheckoutSlideshow items={[]} />
           </div>
         </section>
-        {/* Right: empty cart prompt */}
         <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
           <div className="flex-1 flex items-center justify-center">
             <div className="bg-bg-secondary border border-border-accent/40 rounded-xl p-10 text-center space-y-5 max-w-sm w-full shadow-sm transition-theme">
@@ -518,7 +454,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // ── Pricing ────────────────────────────────────────────────────────────────
+  // Pricing calculations
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const shipping = subtotal >= 500 ? 0 : 15;
   const tax = Math.round(subtotal * 0.08);
@@ -598,514 +534,631 @@ export default function CheckoutPage() {
     return null;
   };
 
-  const handlePlaceOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCheckoutError('');
-
-    const shippingDetails = getShippingDetails() as any;
-    if (!shippingDetails || !shippingDetails.fullName || !shippingDetails.flat || !shippingDetails.area) {
-      setCheckoutError('Please enter valid shipping details (Full Name, Flat/House no., and Area are required).');
-      return;
+  const finalizeSuccessfulOrder = async (orderData: any, shippingDetails: any) => {
+    if (user) {
+      await fetch('/api/cart', { method: 'DELETE' }).catch(() => {});
     }
-    if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
-      setCheckoutError('Please enter mock payment card details.');
+    localStorage.removeItem('cart');
+    setCart([]);
+    window.dispatchEvent(new Event('cart-updated'));
+    window.dispatchEvent(new Event('orders-updated'));
+    window.dispatchEvent(new Event('auth-changed'));
+    
+    const dispName = shippingDetails.fullName || user.name;
+    const dispAddr = shippingDetails.addressLine || `${shippingDetails.flat}, ${shippingDetails.area}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.pincode}, ${shippingDetails.country}`;
+    setSuccessOrder({
+      orderNumber: orderData.orderNumber,
+      total: total,
+      name: dispName,
+      address: dispAddr,
+      items: orderData.items || []
+    });
+  };
+
+  // Razorpay Handler
+  const handleRazorpayPayment = async () => {
+    setCheckoutError('');
+    const shippingDetails = getShippingDetails() as any;
+    if (!shippingDetails || !shippingDetails.fullName || (!shippingDetails.flat && !shippingDetails.area)) {
+      setCheckoutError('Please enter complete shipping details before proceeding.');
       return;
     }
 
     setPlacingOrder(true);
 
+    const scriptLoaded = await loadRazorpayScript();
+    if (!scriptLoaded) {
+      setCheckoutError('Failed to load Razorpay SDK. Please check your internet connection.');
+      setPlacingOrder(false);
+      return;
+    }
+
     try {
-      const res = await fetch('/api/orders/create', {
+      // 1. Create order on server
+      const res = await fetch('/api/checkout/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.map(item => ({
-            slug: item.product.slug,
-            name: item.product.name,
-            material: item.product.selectedMaterial || 'Oak',
-            dimension: item.product.selectedDimension || 'Standard',
-            quantity: item.quantity,
-            price: item.product.price,
-            image: item.product.images[0],
-            customerName: user.name,
-          })),
-          total,
-          shippingAddress: shippingDetails,
-        }),
+        body: JSON.stringify({ amount: total }),
       });
 
-      const data = await res.json();
-      setPlacingOrder(false);
-
-      if (data.success && data.order) {
-        if (user) {
-          await fetch('/api/cart', { method: 'DELETE' }).catch(() => {});
-        }
-        localStorage.removeItem('cart');
-        setCart([]);
-        window.dispatchEvent(new Event('cart-updated'));
-        window.dispatchEvent(new Event('orders-updated'));
-        window.dispatchEvent(new Event('auth-changed'));
-        
-        const dispName = shippingDetails.fullName || user.name;
-        const dispAddr = shippingDetails.addressLine || `${shippingDetails.flat}, ${shippingDetails.area}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.pincode}, ${shippingDetails.country}`;
-        setSuccessOrder({
-          orderNumber: data.order.orderNumber,
-          total: total,
-          name: dispName,
-          address: dispAddr,
-          items: data.order.items || []
-        });
-      } else {
-        setCheckoutError(data.error || 'Failed to place order. Please try again.');
+      const orderData = await res.json();
+      if (!orderData.success) {
+        throw new Error(orderData.error || 'Failed to initiate Razorpay payment.');
       }
-    } catch (err) {
+
+      // 2. Open Razorpay Modal
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Future Milestone',
+        description: 'Scandinavian Furniture Purchase',
+        order_id: orderData.orderId,
+        prefill: {
+          name: shippingDetails.fullName || user.name,
+          email: user.email,
+          contact: shippingDetails.phone || user.phone || '',
+        },
+        theme: {
+          color: '#0f172a',
+        },
+        handler: async (response: any) => {
+          try {
+            // 3. Verify signature on server
+            const verifyRes = await fetch('/api/checkout/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                items: cart.map(item => ({
+                  slug: item.product.slug,
+                  name: item.product.name,
+                  material: item.product.selectedMaterial || 'Oak',
+                  dimension: item.product.selectedDimension || 'Standard',
+                  quantity: item.quantity,
+                  price: item.product.price,
+                  image: item.product.images[0],
+                  customerName: user.name,
+                })),
+                total,
+                shippingAddress: shippingDetails,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            setPlacingOrder(false);
+
+            if (verifyData.success && verifyData.order) {
+              await finalizeSuccessfulOrder(verifyData.order, shippingDetails);
+            } else {
+              setCheckoutError(verifyData.error || 'Payment verification failed.');
+            }
+          } catch (err: any) {
+            console.error(err);
+            setCheckoutError('Payment verification failed.');
+            setPlacingOrder(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPlacingOrder(false);
+          },
+        },
+      };
+
+      const razorpayInstance = new (window as any).Razorpay(options);
+      razorpayInstance.open();
+    } catch (err: any) {
       console.error(err);
-      setCheckoutError('An error occurred during checkout. Please try again.');
+      setCheckoutError(err.message || 'Error initializing Razorpay payment.');
       setPlacingOrder(false);
     }
   };
 
-  // ── Main Layout (mirrors FAQ page exactly) ─────────────────────────────────
+  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
+
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
+    <PayPalScriptProvider options={{ clientId: paypalClientId, currency: 'USD' }}>
+      <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
+        
+        {/* Left Column: Stable sticky image */}
+        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
+          <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
+            <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
 
-      {/* Left Column: Stable sticky image — same as FAQ */}
-      <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
-        <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-          <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
-
-          {/* Floating order summary badge on image */}
-          <div className="absolute bottom-5 left-5 right-5">
-            <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Total</p>
-                <p className="text-2xl font-bold text-fg-primary font-dm-sans">${total}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">{cart.length} Item{cart.length !== 1 ? 's' : ''}</p>
-                <p className="text-xs text-fg-secondary">
-                  {shipping === 0 ? '✓ Free shipping' : `+ $${shipping} shipping`}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Right Column: Scrollable forms + order summary — same scroll behaviour as FAQ */}
-      <div
-        ref={rightColumnRef}
-        className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
-      >
-
-        {/* Header card */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2">
-          <h1 className="font-dm-sans text-3xl md:text-4xl font-bold tracking-tight text-fg-primary">Checkout</h1>
-          <p className="text-sm text-fg-secondary leading-relaxed font-medium">
-            Complete your order below. Your cart is securely saved to your account.
-          </p>
-        </div>
-
-        <form onSubmit={handlePlaceOrder} className="flex flex-col gap-3">
-
-          {/* Error banner */}
-          {checkoutError && (
-            <div className="bg-red-500/10 text-red-500 border border-red-500/20 px-5 py-3.5 rounded-xl text-xs font-semibold animate-fade-in flex items-center gap-2">
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
-              </svg>
-              {checkoutError}
-            </div>
-          )}
-
-          {/* ── 1. Order Summary ─────────────────────────────────────────────── */}
-          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-            {/* Category label — same style as FAQ category pills */}
-            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                Order Summary
-              </h2>
-            </div>
-
-            <div className="p-6 flex flex-col gap-4">
-              {cart.map((item, index) => {
-                const itemMat = item.product.selectedMaterial || 'Oak';
-                const itemDim = item.product.selectedDimension || 'Standard';
-                const itemKey = `${item.product.slug}-${itemMat}-${itemDim}`;
-                return (
-                  <div key={itemKey} className={`flex gap-4 ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}>
-                    <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden border border-border-accent/30 flex-shrink-0">
-                      <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 flex flex-col justify-between text-xs">
-                      <div>
-                        <div className="flex justify-between font-semibold text-fg-primary">
-                          <h4>{item.product.name}</h4>
-                          <p>${item.product.price * item.quantity}</p>
-                        </div>
-                        <p className="text-fg-secondary/70 capitalize mt-0.5">{item.product.category} Collection</p>
-                        <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
-                          <span>{itemMat}</span>
-                          <span>•</span>
-                          <span>{itemDim}</span>
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-fg-secondary/70 mt-1.5">Qty: {item.quantity}</p>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Price breakdown */}
-              <div className="border-t border-border-accent/40 pt-4 space-y-2.5 text-xs font-semibold text-fg-primary">
-                <div className="flex justify-between">
-                  <span className="text-fg-secondary font-normal">Subtotal</span>
-                  <span>${subtotal}</span>
+            <div className="absolute bottom-5 left-5 right-5">
+              <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Total</p>
+                  <p className="text-2xl font-bold text-fg-primary font-dm-sans">${total}</p>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-fg-secondary font-normal">Shipping</span>
-                  <span className={shipping === 0 ? 'text-green-500' : ''}>{shipping === 0 ? 'Free' : `$${shipping}`}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-fg-secondary font-normal">Tax (8%)</span>
-                  <span>${tax}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold border-t border-border-accent/40 pt-3 mt-1">
-                  <span>Total</span>
-                  <span>${total}</span>
+                <div className="text-right">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">{cart.length} Item{cart.length !== 1 ? 's' : ''}</p>
+                  <p className="text-xs text-fg-secondary">
+                    {shipping === 0 ? '✓ Free shipping' : `+ $${shipping} shipping`}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* ── 2. Delivery Location ─────────────────────────────────────────── */}
-          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                Delivery Location
-              </h2>
+        {/* Right Column: Scrollable forms */}
+        <div
+          ref={rightColumnRef}
+          className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
+        >
+          <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2">
+            <h1 className="font-dm-sans text-3xl md:text-4xl font-bold tracking-tight text-fg-primary">Checkout</h1>
+            <p className="text-sm text-fg-secondary leading-relaxed font-medium">
+              Select your delivery location and preferred payment gateway below.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {checkoutError && (
+              <div className="bg-red-500/10 text-red-500 border border-red-500/20 px-5 py-3.5 rounded-xl text-xs font-semibold animate-fade-in flex items-center gap-2">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
+                </svg>
+                {checkoutError}
+              </div>
+            )}
+
+            {/* ── 1. Order Summary ─────────────────────────────────────────────── */}
+            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                  Order Summary
+                </h2>
+              </div>
+
+              <div className="p-6 flex flex-col gap-4">
+                {cart.map((item, index) => {
+                  const itemMat = item.product.selectedMaterial || 'Oak';
+                  const itemDim = item.product.selectedDimension || 'Standard';
+                  const itemKey = `${item.product.slug}-${itemMat}-${itemDim}`;
+                  return (
+                    <div key={itemKey} className={`flex gap-4 ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}>
+                      <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden border border-border-accent/30 flex-shrink-0">
+                        <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between text-xs">
+                        <div>
+                          <div className="flex justify-between font-semibold text-fg-primary">
+                            <h4>{item.product.name}</h4>
+                            <p>${item.product.price * item.quantity}</p>
+                          </div>
+                          <p className="text-fg-secondary/70 capitalize mt-0.5">{item.product.category} Collection</p>
+                          <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
+                            <span>{itemMat}</span>
+                            <span>•</span>
+                            <span>{itemDim}</span>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-fg-secondary/70 mt-1.5">Qty: {item.quantity}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div className="border-t border-border-accent/40 pt-4 space-y-2.5 text-xs font-semibold text-fg-primary">
+                  <div className="flex justify-between">
+                    <span className="text-fg-secondary font-normal">Subtotal</span>
+                    <span>${subtotal}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-fg-secondary font-normal">Shipping</span>
+                    <span className={shipping === 0 ? 'text-green-500' : ''}>{shipping === 0 ? 'Free' : `$${shipping}`}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-fg-secondary font-normal">Tax (8%)</span>
+                    <span>${tax}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold border-t border-border-accent/40 pt-3 mt-1">
+                    <span>Total</span>
+                    <span>${total}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="p-6 space-y-3">
-              {/* Option 1: Default address */}
-              {user.address && (
-                <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                  addressOption === 'primary' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-                }`}>
-                  <input
-                    type="radio"
-                    name="shipping_addr"
-                    checked={addressOption === 'primary'}
-                    onChange={() => setAddressOption('primary')}
-                    className="mt-1 accent-fg-primary flex-shrink-0"
-                  />
-                  <div className="text-xs">
-                    <span className="font-bold text-fg-primary block">Default Account Address</span>
-                    <p className="text-fg-secondary mt-1">
-                      {typeof user.address === 'object' ? (
-                        `${user.address.flat}, ${user.address.area}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}, ${user.address.country}`
-                      ) : (
-                        user.address
-                      )}
-                    </p>
-                    {user.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {user.phone}</p>}
-                  </div>
-                </label>
-              )}
+            {/* ── 2. Delivery Location ─────────────────────────────────────────── */}
+            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                  Delivery Location
+                </h2>
+              </div>
 
-              {/* Option 2: Saved addresses */}
-              {user.savedAddresses && user.savedAddresses.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary block px-1">Saved Locations</span>
-                  {user.savedAddresses.map((addr) => (
-                    <label key={addr.id} className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                      addressOption === 'saved' && selectedSavedId === addr.id ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-                    }`}>
-                      <input
-                        type="radio"
-                        name="shipping_addr"
-                        checked={addressOption === 'saved' && selectedSavedId === addr.id}
-                        onChange={() => { setAddressOption('saved'); setSelectedSavedId(addr.id); }}
-                        className="mt-1 accent-fg-primary flex-shrink-0"
-                      />
-                      <div className="text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</span>
-                          <span className="px-1.5 py-0.5 bg-fg-primary/5 text-fg-primary text-[8px] font-bold uppercase tracking-wider rounded border border-border-accent/20">{addr.label}</span>
+              <div className="p-6 space-y-3">
+                {user.address && (
+                  <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
+                    addressOption === 'primary' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="shipping_addr"
+                      checked={addressOption === 'primary'}
+                      onChange={() => setAddressOption('primary')}
+                      className="mt-1 accent-fg-primary flex-shrink-0"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold text-fg-primary block">Default Account Address</span>
+                      <p className="text-fg-secondary mt-1">
+                        {typeof user.address === 'object' ? (
+                          `${user.address.flat}, ${user.address.area}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}, ${user.address.country}`
+                        ) : (
+                          user.address
+                        )}
+                      </p>
+                      {user.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {user.phone}</p>}
+                    </div>
+                  </label>
+                )}
+
+                {user.savedAddresses && user.savedAddresses.length > 0 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary block px-1">Saved Locations</span>
+                    {user.savedAddresses.map((addr) => (
+                      <label key={addr.id} className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
+                        addressOption === 'saved' && selectedSavedId === addr.id ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="shipping_addr"
+                          checked={addressOption === 'saved' && selectedSavedId === addr.id}
+                          onChange={() => { setAddressOption('saved'); setSelectedSavedId(addr.id); }}
+                          className="mt-1 accent-fg-primary flex-shrink-0"
+                        />
+                        <div className="text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</span>
+                            <span className="px-1.5 py-0.5 bg-fg-primary/5 text-fg-primary text-[8px] font-bold uppercase tracking-wider rounded border border-border-accent/20">{addr.label}</span>
+                          </div>
+                          <p className="text-fg-secondary mt-1">
+                            {addr.addressLine ? (
+                              addr.addressLine
+                            ) : (
+                              `${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state} - ${addr.pincode}, ${addr.country}`
+                            )}
+                          </p>
+                          {addr.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {addr.phone}</p>}
                         </div>
-                        <p className="text-fg-secondary mt-1">
-                          {addr.addressLine ? (
-                            addr.addressLine
-                          ) : (
-                            `${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state} - ${addr.pincode}, ${addr.country}`
-                          )}
-                        </p>
-                        {addr.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {addr.phone}</p>}
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
+                      </label>
+                    ))}
+                  </div>
+                )}
 
-              {/* Option 3: Custom address */}
-              {hasSavedAddresses && (
-                <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                  addressOption === 'new' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-                }`}>
-                  <input
-                    type="radio"
-                    name="shipping_addr"
-                    checked={addressOption === 'new'}
-                    onChange={() => setAddressOption('new')}
-                    className="mt-1 accent-fg-primary flex-shrink-0"
-                  />
-                  <div className="text-xs">
-                    <span className="font-bold text-fg-primary">Deliver to a different address</span>
-                  </div>
-                </label>
-              )}
+                {hasSavedAddresses && (
+                  <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
+                    addressOption === 'new' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="shipping_addr"
+                      checked={addressOption === 'new'}
+                      onChange={() => setAddressOption('new')}
+                      className="mt-1 accent-fg-primary flex-shrink-0"
+                    />
+                    <div className="text-xs">
+                      <span className="font-bold text-fg-primary">Deliver to a different address</span>
+                    </div>
+                  </label>
+                )}
 
-              {showCustomForm && (
-                <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-3.5 animate-fade-in shadow-sm">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
-                    <select
-                      value={customCountry}
-                      onChange={(e) => {
-                        setCustomCountry(e.target.value);
-                        setCustomState('');
-                      }}
-                      className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
-                    >
-                      <option value="India">India</option>
-                      <option value="United States">United States</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                      <option value="Germany">Germany</option>
-                      <option value="France">France</option>
-                      <option value="Canada">Canada</option>
-                      <option value="Australia">Australia</option>
-                      <option value="United Arab Emirates">United Arab Emirates</option>
-                      <option value="Saudi Arabia">Saudi Arabia</option>
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {showCustomForm && (
+                  <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-3.5 animate-fade-in shadow-sm">
                     <div className="space-y-1">
-                      <label htmlFor="ship-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Full Name (First and Last name)</label>
-                      <input
-                        id="ship-name"
-                        type="text"
-                        required={showCustomForm}
-                        value={customFullName}
-                        onChange={(e) => setCustomFullName(e.target.value)}
-                        placeholder="Jane Smith"
-                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label htmlFor="ship-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
-                      <input
-                        id="ship-phone"
-                        type="text"
-                        required={showCustomForm}
-                        value={customPhone}
-                        onChange={(e) => setCustomPhone(e.target.value)}
-                        placeholder="Mobile number"
-                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label htmlFor="ship-flat" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Building, Company, Apartment</label>
-                    <input
-                      id="ship-flat"
-                      type="text"
-                      required={showCustomForm}
-                      value={customFlat}
-                      onChange={(e) => setCustomFlat(e.target.value)}
-                      placeholder="Flat, House no., Apartment etc."
-                      className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label htmlFor="ship-area" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector, Village</label>
-                    <input
-                      id="ship-area"
-                      type="text"
-                      required={showCustomForm}
-                      value={customArea}
-                      onChange={(e) => setCustomArea(e.target.value)}
-                      placeholder="Area, Street, village etc."
-                      className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label htmlFor="ship-landmark" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Landmark (Optional)</label>
-                    <input
-                      id="ship-landmark"
-                      type="text"
-                      value={customLandmark}
-                      onChange={(e) => setCustomLandmark(e.target.value)}
-                      placeholder="E.g. near apollo hospital"
-                      className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label htmlFor="ship-pincode" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
-                      <input
-                        id="ship-pincode"
-                        type="text"
-                        required={showCustomForm}
-                        value={customPincode}
-                        onChange={(e) => setCustomPincode(e.target.value)}
-                        placeholder="6-digit Pincode"
-                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label htmlFor="ship-city" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
-                      <input
-                        id="ship-city"
-                        type="text"
-                        required={showCustomForm}
-                        value={customCity}
-                        onChange={(e) => setCustomCity(e.target.value)}
-                        placeholder="Town/City"
-                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">State</label>
-                    {customCountry === 'India' ? (
+                      <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
                       <select
-                        value={customState}
-                        onChange={(e) => setCustomState(e.target.value)}
-                        required={showCustomForm}
+                        value={customCountry}
+                        onChange={(e) => {
+                          setCustomCountry(e.target.value);
+                          setCustomState('');
+                        }}
                         className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
                       >
-                        <option value="">Select State</option>
-                        {INDIAN_STATES.map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
+                        <option value="India">India (Razorpay - UPI/NetBanking/Cards)</option>
+                        <option value="United States">United States (PayPal / International Cards)</option>
+                        <option value="United Kingdom">United Kingdom (PayPal / International Cards)</option>
+                        <option value="Germany">Germany (PayPal / International Cards)</option>
+                        <option value="France">France (PayPal / International Cards)</option>
+                        <option value="Canada">Canada (PayPal / International Cards)</option>
+                        <option value="Australia">Australia (PayPal / International Cards)</option>
+                        <option value="United Arab Emirates">United Arab Emirates (PayPal)</option>
+                        <option value="Saudi Arabia">Saudi Arabia (PayPal)</option>
                       </select>
-                    ) : (
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label htmlFor="ship-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Full Name</label>
+                        <input
+                          id="ship-name"
+                          type="text"
+                          required={showCustomForm}
+                          value={customFullName}
+                          onChange={(e) => setCustomFullName(e.target.value)}
+                          placeholder="Jane Smith"
+                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label htmlFor="ship-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
+                        <input
+                          id="ship-phone"
+                          type="text"
+                          required={showCustomForm}
+                          value={customPhone}
+                          onChange={(e) => setCustomPhone(e.target.value)}
+                          placeholder="Mobile number"
+                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="ship-flat" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Apartment</label>
                       <input
+                        id="ship-flat"
                         type="text"
                         required={showCustomForm}
-                        value={customState}
-                        onChange={(e) => setCustomState(e.target.value)}
-                        placeholder="State/Province/Region"
-                        className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        value={customFlat}
+                        onChange={(e) => setCustomFlat(e.target.value)}
+                        placeholder="Flat, House no. etc."
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
                       />
-                    )}
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="ship-area" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector</label>
+                      <input
+                        id="ship-area"
+                        type="text"
+                        required={showCustomForm}
+                        value={customArea}
+                        onChange={(e) => setCustomArea(e.target.value)}
+                        placeholder="Area, Street etc."
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label htmlFor="ship-pincode" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
+                        <input
+                          id="ship-pincode"
+                          type="text"
+                          required={showCustomForm}
+                          value={customPincode}
+                          onChange={(e) => setCustomPincode(e.target.value)}
+                          placeholder="Pincode/Zip"
+                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label htmlFor="ship-city" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
+                        <input
+                          id="ship-city"
+                          type="text"
+                          required={showCustomForm}
+                          value={customCity}
+                          onChange={(e) => setCustomCity(e.target.value)}
+                          placeholder="Town/City"
+                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">State</label>
+                      {customCountry === 'India' ? (
+                        <select
+                          value={customState}
+                          onChange={(e) => setCustomState(e.target.value)}
+                          required={showCustomForm}
+                          className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                        >
+                          <option value="">Select State</option>
+                          {INDIAN_STATES.map(s => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          required={showCustomForm}
+                          value={customState}
+                          onChange={(e) => setCustomState(e.target.value)}
+                          placeholder="State/Province/Region"
+                          className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* ── 3. Secure Payment ────────────────────────────────────────────── */}
-          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                Secure Payment
-              </h2>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="space-y-1.5">
-                <label htmlFor="card-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Name on Card</label>
-                <input
-                  id="card-name"
-                  type="text"
-                  required
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value)}
-                  placeholder="John Doe"
-                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-5 py-3.5 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label htmlFor="card-number" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Card Number</label>
-                <input
-                  id="card-number"
-                  type="text"
-                  required
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  placeholder="4111 2222 3333 4444"
-                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-5 py-3.5 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label htmlFor="card-expiry" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Expiry Date</label>
-                  <input
-                    id="card-expiry"
-                    type="text"
-                    required
-                    value={cardExpiry}
-                    onChange={(e) => setCardExpiry(e.target.value)}
-                    placeholder="MM/YY"
-                    className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-5 py-3.5 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="card-cvv" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">CVV</label>
-                  <input
-                    id="card-cvv"
-                    type="text"
-                    required
-                    value={cardCvv}
-                    onChange={(e) => setCardCvv(e.target.value)}
-                    placeholder="123"
-                    className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-5 py-3.5 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={placingOrder}
-                className="w-full bg-fg-primary text-bg-primary py-4 rounded-xl font-bold text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed mt-2 shadow-sm"
-              >
-                {placingOrder ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4 text-bg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span>Placing Order...</span>
-                  </>
-                ) : (
-                  <span>Complete Purchase — ${total}</span>
                 )}
-              </button>
-
-              {/* Trust signals */}
-              <div className="flex items-center justify-center gap-6 pt-1">
-                {[
-                  { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: 'Secure' },
-                  { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Protected' },
-                  { icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z', label: 'Encrypted' },
-                ].map(({ icon, label }) => (
-                  <div key={label} className="flex flex-col items-center gap-1">
-                    <svg className="w-4 h-4 text-fg-secondary/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
-                    </svg>
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary/50">{label}</span>
-                  </div>
-                ))}
               </div>
             </div>
-          </div>
 
-          {/* Bottom spacing */}
-          <div className="pb-8" />
-        </form>
+            {/* ── 3. Payment Gateway Selection ──────────────────────────────────── */}
+            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                  Select Payment Method
+                </h2>
+              </div>
+
+              <div className="p-6 space-y-5">
+                {/* Gateway Tab Selectors */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentGateway('razorpay')}
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center transition-all cursor-pointer ${
+                      paymentGateway === 'razorpay'
+                        ? 'border-fg-primary bg-bg-primary shadow-sm font-bold text-fg-primary'
+                        : 'border-border-accent/40 bg-bg-primary/50 text-fg-secondary hover:bg-bg-primary/80'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-base">🇮🇳</span>
+                      <span className="text-xs font-bold">Razorpay</span>
+                    </div>
+                    <span className="text-[9px] text-fg-secondary">UPI, Cards, NetBanking (INR)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentGateway('paypal')}
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center transition-all cursor-pointer ${
+                      paymentGateway === 'paypal'
+                        ? 'border-fg-primary bg-bg-primary shadow-sm font-bold text-fg-primary'
+                        : 'border-border-accent/40 bg-bg-primary/50 text-fg-secondary hover:bg-bg-primary/80'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-base">🌐</span>
+                      <span className="text-xs font-bold">PayPal</span>
+                    </div>
+                    <span className="text-[9px] text-fg-secondary">PayPal Wallet, International (USD)</span>
+                  </button>
+                </div>
+
+                {/* Razorpay Option Body */}
+                {paymentGateway === 'razorpay' && (
+                  <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-4 animate-fade-in">
+                    <div className="flex items-center justify-between text-xs border-b border-border-accent/30 pb-3">
+                      <div>
+                        <span className="font-bold text-fg-primary block">Razorpay Checkout</span>
+                        <span className="text-[10px] text-fg-secondary">Supports UPI (GPay, PhonePe, Paytm), Cards & NetBanking</span>
+                      </div>
+                      <span className="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-[9px] font-bold">Recommended for India</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleRazorpayPayment}
+                      disabled={placingOrder}
+                      className="w-full bg-fg-primary text-bg-primary py-4 rounded-xl font-bold text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed shadow-sm"
+                    >
+                      {placingOrder ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 text-bg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          <span>Processing Razorpay...</span>
+                        </>
+                      ) : (
+                        <span>Pay via Razorpay — ${total}</span>
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {/* PayPal Option Body */}
+                {paymentGateway === 'paypal' && (
+                  <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-4 animate-fade-in">
+                    <div className="flex items-center justify-between text-xs border-b border-border-accent/30 pb-3">
+                      <div>
+                        <span className="font-bold text-fg-primary block">PayPal Express Checkout</span>
+                        <span className="text-[10px] text-fg-secondary">Pay securely using your PayPal account or International Cards</span>
+                      </div>
+                      <span className="px-2 py-1 bg-yellow-500/10 text-yellow-600 rounded text-[9px] font-bold">International</span>
+                    </div>
+
+                    <div className="pt-2">
+                      <PayPalButtons
+                        style={{ layout: 'vertical', shape: 'rect', label: 'pay' }}
+                        createOrder={async () => {
+                          setCheckoutError('');
+                          const shippingDetails = getShippingDetails() as any;
+                          if (!shippingDetails || !shippingDetails.fullName || (!shippingDetails.flat && !shippingDetails.area)) {
+                            setCheckoutError('Please fill in valid delivery address details above first.');
+                            throw new Error('Missing shipping details');
+                          }
+
+                          const res = await fetch('/api/checkout/paypal/create-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ total }),
+                          });
+
+                          const data = await res.json();
+                          if (!data.success || !data.id) {
+                            setCheckoutError(data.error || 'Could not initiate PayPal transaction.');
+                            throw new Error(data.error || 'Failed PayPal order creation');
+                          }
+
+                          return data.id;
+                        }}
+                        onApprove={async (data) => {
+                          setPlacingOrder(true);
+                          const shippingDetails = getShippingDetails() as any;
+                          try {
+                            const res = await fetch('/api/checkout/paypal/capture-order', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                orderID: data.orderID,
+                                items: cart.map(item => ({
+                                  slug: item.product.slug,
+                                  name: item.product.name,
+                                  material: item.product.selectedMaterial || 'Oak',
+                                  dimension: item.product.selectedDimension || 'Standard',
+                                  quantity: item.quantity,
+                                  price: item.product.price,
+                                  image: item.product.images[0],
+                                  customerName: user.name,
+                                })),
+                                total,
+                                shippingAddress: shippingDetails,
+                              }),
+                            });
+
+                            const captureData = await res.json();
+                            setPlacingOrder(false);
+
+                            if (captureData.success && captureData.order) {
+                              await finalizeSuccessfulOrder(captureData.order, shippingDetails);
+                            } else {
+                              setCheckoutError(captureData.error || 'PayPal capture failed.');
+                            }
+                          } catch (err: any) {
+                            console.error(err);
+                            setCheckoutError('Error finalizing PayPal payment.');
+                            setPlacingOrder(false);
+                          }
+                        }}
+                        onError={(err) => {
+                          console.error('PayPal button error:', err);
+                          setCheckoutError('An error occurred during PayPal processing.');
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Trust signals */}
+                <div className="flex items-center justify-center gap-6 pt-2">
+                  {[
+                    { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: '256-bit SSL' },
+                    { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Buyer Protection' },
+                    { icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z', label: 'Instant Verification' },
+                  ].map(({ icon, label }) => (
+                    <div key={label} className="flex flex-col items-center gap-1">
+                      <svg className="w-4 h-4 text-fg-secondary/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
+                      </svg>
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary/50">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="pb-8" />
+          </div>
+        </div>
       </div>
-    </div>
+    </PayPalScriptProvider>
   );
 }
