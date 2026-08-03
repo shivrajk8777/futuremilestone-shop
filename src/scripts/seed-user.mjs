@@ -11,11 +11,11 @@ function hashPassword(password) {
 }
 
 const seedUser = {
-  name: "John Doe",
+  name: "Enter Your Name",
   email: "enter your email",
-  password: "password123",
-  phone: "+420 123 456 789",
-  address: "Vinohradská 121, 130 00 Praha 3, Czech Republic",
+  password: "password",
+  phone: "+1 000 000 000",
+  address: "jaipur india",
 };
 
 async function main() {
