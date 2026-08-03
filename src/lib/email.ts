@@ -13,7 +13,7 @@ export async function sendEmail({ to, subject, html, orderId }: SendEmailParams)
   const smtpPort = Number(process.env.SMTP_PORT) || 587;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
-  const smtpFrom = process.env.SMTP_FROM || "no-reply@fjord.com";
+  const smtpFrom = process.env.SMTP_FROM || "no-reply@futuremilestone.shop";
 
   let success = false;
   let errorMsg: string | null = null;

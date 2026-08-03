@@ -12,7 +12,7 @@ function hashPassword(password) {
 
 const seedUser = {
   name: "John Doe",
-  email: "user@fjord.com",
+  email: "enter your email",
   password: "password123",
   phone: "+420 123 456 789",
   address: "Vinohradská 121, 130 00 Praha 3, Czech Republic",

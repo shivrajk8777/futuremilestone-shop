@@ -8,13 +8,13 @@ export default function AuthModal() {
   const [mode, setMode] = useState<'login' | 'signup' | 'forgot_password'>('login');
   const [signupStep, setSignupStep] = useState<'form' | 'otp'>('form');
   const [resetStep, setResetStep] = useState<'email' | 'otp_reset'>('email');
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [otp, setOtp] = useState('');
-  
+
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -171,14 +171,14 @@ export default function AuthModal() {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
-        onClick={handleClose} 
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        onClick={handleClose}
       />
 
       {/* Modal Container */}
       <div className="w-full max-w-md bg-bg-primary transition-theme border border-border-accent/80 rounded-2xl shadow-2xl overflow-hidden z-10 p-8 flex flex-col gap-6 relative select-text animate-fade-in">
-        
+
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -250,7 +250,7 @@ export default function AuthModal() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@fjord.com"
+                placeholder="Enter your email"
                 className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium"
               />
             </div>
@@ -315,7 +315,7 @@ export default function AuthModal() {
                   className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-center text-xl tracking-[10px] font-mono focus:outline-none focus:border-fg-primary transition-colors font-semibold"
                 />
               </div>
-              
+
               <div className="flex items-center justify-between text-[11px]">
                 <button
                   type="button"
@@ -449,8 +449,8 @@ export default function AuthModal() {
               onClick={toggleMode}
               className="text-xs text-fg-secondary hover:text-fg-primary hover:underline cursor-pointer font-medium"
             >
-              {mode === 'login' 
-                ? "Don't have an account? Sign Up" 
+              {mode === 'login'
+                ? "Don't have an account? Sign Up"
                 : 'Already have an account? Sign In'}
             </button>
           )}
