@@ -16,6 +16,11 @@ import { CurrencyProvider } from '@/context/CurrencyContext';
 export const metadata: Metadata = {
   title: 'Future Milestone - Scandinavian Furniture',
   description: 'A clean and modern Framer E-Commerce template with local state. Designed for flexibility, responsiveness, and premium aesthetics.',
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
   openGraph: {
     title: 'Future Milestone - Scandinavian Furniture',
     description: 'A clean and modern Framer E-Commerce template ported to Next.js and Tailwind CSS.',

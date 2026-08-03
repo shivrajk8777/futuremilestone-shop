@@ -4,6 +4,7 @@ import { use, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface OrderItem {
   slug: string;
@@ -167,6 +168,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
   const { user, loading: userLoading } = useUser();
+  const { formatPrice } = useCurrency();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -351,7 +353,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Value</p>
-                <p className="text-xl font-bold text-fg-primary font-dm-sans">${order.total}</p>
+                <p className="text-xl font-bold text-fg-primary font-dm-sans">{formatPrice(order.total)}</p>
               </div>
             </div>
           </div>
@@ -723,7 +725,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-fg-primary">${item.price}</p>
+                    <p className="font-semibold text-fg-primary">{formatPrice(item.price)}</p>
                     <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
                   </div>
                 </div>

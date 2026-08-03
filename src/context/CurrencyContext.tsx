@@ -104,50 +104,111 @@ const DEFAULT_COUNTRY = uniqueCountries.find((c) => c.code === 'US')!;
 const CurrencyContext = createContext<CurrencyContextValue | undefined>(undefined);
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
+  const [countriesList, setCountriesList] = useState<Country[]>(uniqueCountries);
   const [country, setCountryState] = useState<Country>(DEFAULT_COUNTRY);
-  const [detected, setDetected] = useState(false);
 
-  // Load saved preference from localStorage on mount
-  useEffect(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('fm_country') : null;
-    if (saved) {
-      const found = uniqueCountries.find((c) => c.code === saved);
-      if (found) {
-        setCountryState(found);
-        setDetected(true);
-        return;
-      }
-    }
-    // Auto-detect via free IP geolocation API (no API key required)
-    fetch('https://ip-api.com/json/?fields=countryCode')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.countryCode) {
-          const found = uniqueCountries.find((c) => c.code === data.countryCode);
-          if (found) setCountryState(found);
-        }
-      })
-      .catch(() => {/* silently fall back to USD */})
-      .finally(() => setDetected(true));
-  }, []);
-
-  const setCountry = useCallback((code: string) => {
-    const found = uniqueCountries.find((c) => c.code === code);
+  // Keep selected country in sync if exchange rate updates
+  const updateSelectedCountry = useCallback((code: string, currentList: Country[]) => {
+    const found = currentList.find((c) => c.code === code);
     if (found) {
       setCountryState(found);
-      localStorage.setItem('fm_country', code);
     }
   }, []);
+
+  // Load saved preference / IP detect & Live Exchange Rates
+  useEffect(() => {
+    let active = true;
+
+    // 1. Fetch live rates from open exchange rate API
+    fetch('https://open.er-api.com/v6/latest/USD')
+      .then((r) => r.json())
+      .then((data) => {
+        if (active && data?.result === 'success' && data?.rates) {
+          const updated = uniqueCountries.map((c) => {
+            const liveRate = data.rates[c.currency];
+            return liveRate && typeof liveRate === 'number' ? { ...c, rate: liveRate } : c;
+          });
+          setCountriesList(updated);
+          // Sync active country with live rate
+          setCountryState((prev) => {
+            const match = updated.find((c) => c.code === prev.code);
+            return match || prev;
+          });
+        }
+      })
+      .catch(() => {/* Use default pre-configured rates */});
+
+    // 2. Determine User Country via IP Detection Chain (Server API route -> ipapi.co -> ipwho.is -> api.country.is)
+    async function detectCountry() {
+      try {
+        const res = await fetch('/api/geolocation');
+        const data = await res.json();
+        if (data?.countryCode) {
+          const found = uniqueCountries.find((c) => c.code === data.countryCode);
+          if (found) return setCountryState(found);
+        }
+      } catch {}
+
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        if (data?.country_code) {
+          const found = uniqueCountries.find((c) => c.code === data.country_code);
+          if (found) return setCountryState(found);
+        }
+      } catch {}
+
+      try {
+        const res = await fetch('https://ipwho.is/');
+        const data = await res.json();
+        if (data?.country_code) {
+          const found = uniqueCountries.find((c) => c.code === data.country_code);
+          if (found) return setCountryState(found);
+        }
+      } catch {}
+
+      try {
+        const res = await fetch('https://api.country.is/');
+        const data = await res.json();
+        if (data?.country) {
+          const found = uniqueCountries.find((c) => c.code === data.country);
+          if (found) return setCountryState(found);
+        }
+      } catch {}
+    }
+
+    detectCountry();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const setCountry = useCallback(
+    (code: string) => {
+      const found = countriesList.find((c) => c.code === code) || uniqueCountries.find((c) => c.code === code);
+      if (found) {
+        setCountryState(found);
+      }
+    },
+    [countriesList]
+  );
 
   const formatPrice = useCallback(
     (usdAmount: number): string => {
-      const converted = usdAmount * country.rate;
-      // Format based on currency
-      if (country.currency === 'JPY' || country.currency === 'KRW' ||
-          country.currency === 'IDR' || country.currency === 'VND' ||
-          country.currency === 'MMK' || country.currency === 'IRR' ||
-          country.currency === 'LBP' || country.currency === 'IQD') {
-        // No decimal for large value currencies
+      const num = Number(usdAmount) || 0;
+      const converted = num * (country.rate || 1);
+      // Format based on currency type
+      if (
+        country.currency === 'JPY' ||
+        country.currency === 'KRW' ||
+        country.currency === 'IDR' ||
+        country.currency === 'VND' ||
+        country.currency === 'MMK' ||
+        country.currency === 'IRR' ||
+        country.currency === 'LBP' ||
+        country.currency === 'IQD'
+      ) {
         return `${country.symbol}${Math.round(converted).toLocaleString()}`;
       }
       return `${country.symbol}${converted.toLocaleString(undefined, {
@@ -159,7 +220,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <CurrencyContext.Provider value={{ country, setCountry, formatPrice, countries: uniqueCountries }}>
+    <CurrencyContext.Provider value={{ country, setCountry, formatPrice, countries: countriesList }}>
       {children}
     </CurrencyContext.Provider>
   );

@@ -1,40 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { capturePayPalOrder } from '@/lib/paypal';
 import { getDatabase } from '@/lib/mongodb';
 import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
 import { sendEmail } from '@/lib/email';
-
-async function getPayPalAccessToken() {
-  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
-  const mode = process.env.PAYPAL_MODE || 'sandbox';
-
-  if (!clientId || !clientSecret) {
-    throw new Error('PayPal credentials missing on server');
-  }
-
-  const baseUrl = mode === 'live'
-    ? 'https://api-m.paypal.com'
-    : 'https://api-m.sandbox.paypal.com';
-
-  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-
-  const response = await fetch(`${baseUrl}/v1/oauth2/token`, {
-    method: 'POST',
-    body: 'grant_type=client_credentials',
-    headers: {
-      Authorization: `Basic ${auth}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error_description || 'Failed to authenticate with PayPal');
-  }
-
-  return { accessToken: data.access_token, baseUrl };
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,26 +26,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { accessToken, baseUrl } = await getPayPalAccessToken();
+    // 1. Capture the PayPal payment
+    const captureData = await capturePayPalOrder(orderID);
 
-    // Capture payment
-    const captureResponse = await fetch(`${baseUrl}/v2/checkout/orders/${orderID}/capture`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const captureData = await captureResponse.json();
-
-    if (!captureResponse.ok || captureData.status !== 'COMPLETED') {
-      console.error('PayPal capture error response:', captureData);
+    if (captureData.status !== 'COMPLETED') {
       return NextResponse.json(
-        { success: false, error: captureData.message || 'Payment capture failed' },
+        { success: false, error: `Payment status is ${captureData.status}` },
         { status: 400 }
       );
     }
+
+    const captureDetail = captureData.purchase_units?.[0]?.payments?.captures?.[0];
+    const paypalCaptureId = captureDetail?.id || '';
 
     const db = await getDatabase();
     let objId: ObjectId;
@@ -89,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save address to user's saved locations if requested
+    // 2. Save address if requested
     if (shippingAddress && typeof shippingAddress === 'object' && shippingAddress.saveAddress) {
       const addressId = `addr_${Math.random().toString(36).slice(2, 10)}`;
       const savedAddr = {
@@ -138,18 +99,17 @@ export async function POST(request: NextRequest) {
     const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
     const orderNumber = `#FJ-${rand}`;
 
-    const captureId = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id || null;
-
+    // 3. Save order document
     const orderDoc = {
       userId: objId,
       orderNumber,
       items,
-      total: Number(total) || 0,
+      total: total || '',
       status: 'Processing',
       paymentMethod: 'PayPal',
       paymentStatus: 'Paid',
       paypalOrderId: orderID,
-      paypalCaptureId: captureId,
+      paypalCaptureId: paypalCaptureId,
       shippingAddress: cleanShippingAddress,
       createdAt: new Date(),
       trackingId: null,
@@ -166,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     const result = await db.collection('orders').insertOne(orderDoc);
 
-    // Send email confirmation
+    // 4. Send Confirmation Email
     try {
       const user = await db.collection('users').findOne({ _id: objId });
       if (user && user.email) {
@@ -177,8 +137,8 @@ export async function POST(request: NextRequest) {
               ${item.material || item.dimension ? `<div style="font-size: 11px; color: #64748b; margin-top: 2px;">${[item.material, item.dimension].filter(Boolean).join(' • ')}</div>` : ''}
             </td>
             <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: center;">${item.quantity}</td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: right;">$${Number(item.price).toFixed(2)}</td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #0f172a; text-align: right; font-weight: 600;">$${(Number(item.price) * Number(item.quantity)).toFixed(2)}</td>
+            <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: right;">${item.price}</td>
+            <td style="padding: 12px 8px; font-size: 14px; color: #0f172a; text-align: right; font-weight: 600;">${item.price * item.quantity}</td>
           </tr>
         `).join('');
 
@@ -192,7 +152,7 @@ export async function POST(request: NextRequest) {
           <body style="font-family: Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
             <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
               <h2 style="color: #0f172a; margin-top: 0;">Order Confirmation ${orderNumber}</h2>
-              <p>Hi ${user.name || 'Customer'}, thank you for your payment via PayPal! Your order has been placed.</p>
+              <p>Hi ${user.name || 'Customer'}, thank you for your payment via PayPal! Your order has been placed successfully.</p>
               <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
                 <thead>
                   <tr style="background: #f1f5f9; text-align: left;">
@@ -206,7 +166,7 @@ export async function POST(request: NextRequest) {
                   ${itemsListHtml}
                 </tbody>
               </table>
-              <h3 style="text-align: right; color: #0f172a; margin-top: 20px;">Total Paid: $${Number(total).toFixed(2)}</h3>
+              <h3 style="text-align: right; color: #0f172a; margin-top: 20px;">Total Paid: ${total}</h3>
             </div>
           </body>
           </html>
@@ -220,7 +180,7 @@ export async function POST(request: NextRequest) {
         });
       }
     } catch (emailErr) {
-      console.error('Failed to send email confirmation:', emailErr);
+      console.error('Failed to send PayPal email confirmation:', emailErr);
     }
 
     return NextResponse.json({
@@ -235,7 +195,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('PayPal capture error exception:', error);
+    console.error('PayPal capture error:', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Payment capture failed' },
       { status: 500 }

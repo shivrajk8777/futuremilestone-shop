@@ -19,6 +19,15 @@ const saleBadges: Record<string, string> = {
 export default function Home() {
   const { settings, loading: settingsLoading } = useSettings();
   const { formatPrice } = useCurrency();
+
+  const formatDiscountBadge = (badge?: string) => {
+    if (!badge) return '';
+    if (badge.startsWith('$')) {
+      const val = parseFloat(badge.replace('$', ''));
+      if (!isNaN(val)) return `${formatPrice(val)} OFF`;
+    }
+    return badge;
+  };
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -410,7 +419,7 @@ export default function Home() {
                   {/* Top-Right Sale Badge */}
                   {(product.discountBadge || saleBadges[product.slug]) && (
                     <div className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase shadow-md">
-                      {product.discountBadge || saleBadges[product.slug]}
+                      {formatDiscountBadge(product.discountBadge || saleBadges[product.slug])}
                     </div>
                   )}
 
@@ -439,9 +448,14 @@ export default function Home() {
 
                   {/* Animated Pop-up Bottom Price Bar */}
                   <div className="absolute left-3 right-3 bottom-3 bg-bg-primary rounded-xl p-5 hidden md:flex items-center justify-between shadow-xl z-10 border border-border-accent/20 transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.42,0.64,1)] opacity-0 translate-y-8 group-hover:opacity-100 group-hover:translate-y-0">
-                    <span className="text-sm font-bold text-fg-primary">{formatPrice(product.price)}</span>
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-bold text-fg-primary">{formatPrice(product.price)}</span>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-[10px] text-fg-secondary line-through">{formatPrice(product.originalPrice)}</span>
+                      )}
+                    </div>
                     <span
-                      className="px-4 py-2 rounded-lg text-sm tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
+                      className="px-4 py-2 rounded-lg text-xs tracking-wider hover:opacity-90 transition-opacity underline underline-offset-4"
                     >
                       View
                     </span>

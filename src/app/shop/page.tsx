@@ -40,6 +40,15 @@ function ShopContent() {
 
   const { state: productState, fetchMoreProducts, fetchCategoryProducts } = useProducts();
   const { formatPrice } = useCurrency();
+
+  const formatDiscountBadge = (badge?: string) => {
+    if (!badge) return '';
+    if (badge.startsWith('$')) {
+      const val = parseFloat(badge.replace('$', ''));
+      if (!isNaN(val)) return `${formatPrice(val)} OFF`;
+    }
+    return badge;
+  };
   const productsList = productState.productsByCategory[selectedCategory] || [];
   const isPage1Loading =
     !productState.initialFetched ||
@@ -191,7 +200,7 @@ function ShopContent() {
                   {/* Top-Right Sale Badge */}
                   {(product.discountBadge || saleBadges[product.slug]) && (
                     <div className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase shadow-md">
-                      {product.discountBadge || saleBadges[product.slug]}
+                      {formatDiscountBadge(product.discountBadge || saleBadges[product.slug])}
                     </div>
                   )}
 

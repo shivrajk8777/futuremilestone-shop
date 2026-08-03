@@ -7,6 +7,7 @@ import { products, Product } from '@/data/products';
 import { useCollections } from '@/context/CollectionContext';
 import { useUser } from '@/context/UserContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import AuthModal from '@/components/auth-modal';
 
 export default function Navbar() {
@@ -14,6 +15,7 @@ export default function Navbar() {
   const router = useRouter();
   const { settings, loading } = useSettings();
   const { user, setAuthModalOpen, logout } = useUser();
+  const { country, setCountry, formatPrice, countries } = useCurrency();
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -25,6 +27,37 @@ export default function Navbar() {
   const [cart, setCart] = useState<{ product: Product & { selectedMaterial?: string; selectedDimension?: string }; quantity: number }[]>([]);
   const [hoveredLink, setHoveredLink] = useState<'collections' | 'about' | null>(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+
+  // Currency Dropdown state
+  const [isCurrencyDropdownOpen, setIsCurrencyDropdownOpen] = useState(false);
+  const [currencySearch, setCurrencySearch] = useState('');
+  const currencyDropdownRef = useRef<HTMLDivElement>(null);
+  const currencySearchRef = useRef<HTMLInputElement>(null);
+
+  const filteredCountries = countries.filter((c) =>
+    c.name.toLowerCase().includes(currencySearch.toLowerCase()) ||
+    c.currency.toLowerCase().includes(currencySearch.toLowerCase()) ||
+    c.code.toLowerCase().includes(currencySearch.toLowerCase())
+  );
+
+  // Close currency dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (currencyDropdownRef.current && !currencyDropdownRef.current.contains(e.target as Node)) {
+        setIsCurrencyDropdownOpen(false);
+        setCurrencySearch('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Focus currency search on open
+  useEffect(() => {
+    if (isCurrencyDropdownOpen && currencySearchRef.current) {
+      setTimeout(() => currencySearchRef.current?.focus(), 50);
+    }
+  }, [isCurrencyDropdownOpen]);
 
   // ── Cart DB helpers ────────────────────────────────────────────────────────
 
@@ -495,6 +528,83 @@ export default function Navbar() {
             </svg>
           </div>
 
+          {/* Currency / Region Selector */}
+          <div className="relative mr-1" ref={currencyDropdownRef}>
+            <button
+              onClick={() => { setIsCurrencyDropdownOpen((prev) => !prev); setCurrencySearch(''); }}
+              className="p-1 md:px-2 md:py-1 text-fg-secondary hover:text-fg-primary transition-colors focus:outline-none flex items-center gap-1 cursor-pointer text-xs font-semibold rounded-lg hover:bg-bg-secondary"
+              aria-label="Select Currency"
+              title={`${country.name} (${country.currency})`}
+            >
+              <span className="text-sm leading-none flex-shrink-0">{country.flag}</span>
+              <span className="text-[11px] font-bold text-fg-primary">{country.currency}</span>
+              <svg className={`w-3 h-3 text-fg-secondary transition-transform duration-200 ${isCurrencyDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Currency Dropdown Menu */}
+            {isCurrencyDropdownOpen && (
+              <div className="absolute top-full right-0 mt-2 w-[240px] md:w-[260px] bg-bg-primary rounded-2xl border border-border-accent/60 shadow-2xl overflow-hidden z-50 flex flex-col transition-theme animate-fade-in" style={{ maxHeight: '300px' }}>
+                {/* Search */}
+                <div className="p-2 border-b border-border-accent/40 flex-shrink-0">
+                  <div className="flex items-center gap-2 bg-bg-secondary rounded-xl px-2.5 py-1.5 border border-border-accent/60">
+                    <svg className="w-3.5 h-3.5 text-fg-secondary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                      ref={currencySearchRef}
+                      type="text"
+                      value={currencySearch}
+                      onChange={(e) => setCurrencySearch(e.target.value)}
+                      placeholder="Search country or currency…"
+                      className="flex-1 bg-transparent text-fg-primary text-xs placeholder-fg-secondary/50 focus:outline-none"
+                    />
+                    {currencySearch && (
+                      <button onClick={() => setCurrencySearch('')} className="text-fg-secondary hover:text-fg-primary cursor-pointer">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Country List */}
+                <div className="overflow-y-auto flex-1 p-1 space-y-0.5">
+                  {filteredCountries.length === 0 ? (
+                    <div className="py-6 text-center text-fg-secondary text-xs">No matching currency</div>
+                  ) : (
+                    filteredCountries.map((c) => {
+                      const isSelected = c.code === country.code;
+                      return (
+                        <button
+                          key={c.code}
+                          onClick={() => {
+                            setCountry(c.code);
+                            setIsCurrencyDropdownOpen(false);
+                            setCurrencySearch('');
+                          }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer text-left ${isSelected
+                            ? 'bg-fg-primary/10 text-fg-primary font-bold'
+                            : 'text-fg-secondary hover:bg-bg-secondary hover:text-fg-primary'
+                            }`}
+                        >
+                          <span className="text-base leading-none w-5 flex-shrink-0 text-center">{c.flag}</span>
+                          <span className="flex-1 min-w-0 truncate">{c.name}</span>
+                          <span className="text-[10px] font-bold text-fg-secondary/60 flex-shrink-0">{c.symbol} {c.currency}</span>
+                          {isSelected && (
+                            <svg className="w-3.5 h-3.5 text-fg-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Search Button */}
           <button
             onClick={() => setIsSearchOpen(true)}
@@ -798,7 +908,7 @@ export default function Navbar() {
                           <div>
                             <div className="flex justify-between text-sm font-semibold text-fg-primary">
                               <h3>{item.product.name}</h3>
-                              <p>${item.product.price * item.quantity}</p>
+                              <p>{formatPrice(item.product.price * item.quantity)}</p>
                             </div>
                             <p className="text-xs text-fg-secondary mt-1 capitalize">{item.product.category} Collection</p>
                             <div className="flex gap-2 text-[10px] text-fg-secondary/80 mt-1.5 font-medium uppercase tracking-wider">
@@ -842,7 +952,7 @@ export default function Navbar() {
                 <div className="border-t border-border-accent p-6 space-y-4">
                   <div className="flex justify-between text-base font-bold text-fg-primary">
                     <span>Subtotal</span>
-                    <span>${cartTotal}</span>
+                    <span>{formatPrice(cartTotal)}</span>
                   </div>
                   <p className="text-xs text-fg-secondary">Shipping and taxes calculated at checkout.</p>
                   <button
@@ -940,7 +1050,7 @@ export default function Navbar() {
                           )}
                         </div>
                         <div className="flex flex-col items-end justify-between flex-shrink-0">
-                          <span className="text-sm font-bold text-fg-primary">${product.price}</span>
+                          <span className="text-sm font-bold text-fg-primary">{formatPrice(product.price)}</span>
                           <svg className="w-3.5 h-3.5 text-fg-secondary/40 group-hover/result:text-fg-primary group-hover/result:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>

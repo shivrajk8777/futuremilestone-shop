@@ -109,7 +109,7 @@ export default function FAQ() {
       items: [
         {
           question: 'What payment methods do you accept?',
-          answer: 'We accept major credit cards, PayPal, and other secure payment options at checkout.'
+          answer: 'We accept major credit/debit cards, UPI, net banking, and other secure payment options via Razorpay at checkout.'
         },
         {
           question: 'Can I change or cancel my order?',

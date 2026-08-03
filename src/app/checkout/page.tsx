@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/context/UserContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/data/products';
 import Link from 'next/link';
-import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+import { Country, State } from 'country-state-city';
 
 interface CartItem {
   product: Product & { selectedMaterial?: string; selectedDimension?: string };
@@ -29,6 +30,46 @@ const loadRazorpayScript = (): Promise<boolean> => {
     document.body.appendChild(script);
   });
 };
+
+const PAYPAL_SUPPORTED_CURRENCIES = [
+  'USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'SEK', 'NOK', 'DKK',
+  'HKD', 'SGD', 'NZD', 'MXN', 'BRL', 'PLN', 'CZK', 'HUF', 'ILS', 'THB', 'TWD', 'PHP'
+];
+
+const getPayPalSupportedCurrency = (curr: string): string => {
+  const upper = (curr || 'USD').toUpperCase();
+  return PAYPAL_SUPPORTED_CURRENCIES.includes(upper) ? upper : 'USD';
+};
+
+const loadPayPalScript = (clientId: string, currency: string = 'USD'): Promise<boolean> => {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') return resolve(false);
+
+    const validCurrency = getPayPalSupportedCurrency(currency);
+    const existingScript = document.getElementById('paypal-js-sdk');
+    const currentScriptCurrency = existingScript?.getAttribute('data-currency');
+
+    if ((window as any).paypal && currentScriptCurrency === validCurrency) {
+      return resolve(true);
+    }
+
+    if (existingScript) {
+      existingScript.remove();
+    }
+    if ((window as any).paypal) {
+      try { delete (window as any).paypal; } catch {}
+    }
+
+    const script = document.createElement('script');
+    script.id = 'paypal-js-sdk';
+    script.setAttribute('data-currency', validCurrency);
+    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${validCurrency}&intent=capture&components=buttons&disable-funding=card`;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 
 function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -66,11 +107,10 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
             key={idx}
             src={imageUrl}
             alt={item.name}
-            className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${
-              currentIndex === idx
+            className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${currentIndex === idx
                 ? 'opacity-100 scale-100 pointer-events-auto'
                 : 'opacity-0 scale-[0.99] pointer-events-none'
-            }`}
+              }`}
           />
         );
       })}
@@ -87,9 +127,8 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
                 key={idx}
                 type="button"
                 onClick={() => setCurrentIndex(idx)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  currentIndex === idx ? 'bg-white scale-110' : 'bg-white/40 hover:bg-white/60'
-                }`}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${currentIndex === idx ? 'bg-white scale-110' : 'bg-white/40 hover:bg-white/60'
+                  }`}
                 title={`View slide ${idx + 1}`}
               />
             ))}
@@ -149,16 +188,19 @@ function CheckoutSkeleton() {
 }
 
 const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 
-  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
-  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 
-  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
+  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh',
   'Lakshadweep', 'Puducherry'
 ];
 
+
+
 export default function CheckoutPage() {
   const { user, loading, setAuthModalOpen } = useUser();
+  const { country, formatPrice } = useCurrency();
   const router = useRouter();
 
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -183,17 +225,62 @@ export default function CheckoutPage() {
   const [customPincode, setCustomPincode] = useState('');
   const [customCity, setCustomCity] = useState('');
   const [customState, setCustomState] = useState('');
+  const [selectedCountryIso, setSelectedCountryIso] = useState<string>('IN');
+  const [selectedStateIso, setSelectedStateIso] = useState<string>('');
 
-  // Payment gateway selection state
-  const [paymentGateway, setPaymentGateway] = useState<'razorpay' | 'paypal'>('razorpay');
+
 
   const [checkoutError, setCheckoutError] = useState('');
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [paypalLoading, setPaypalLoading] = useState(false);
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
 
   const hasSavedAddresses = !!(user?.address || (user?.savedAddresses && user.savedAddresses.length > 0));
   const showCustomForm = addressOption === 'new' || !hasSavedAddresses;
+
+  // Determine active shipping location (India vs Outside India)
+  const activeShippingCountryIso = (() => {
+    if (addressOption === 'new' || !hasSavedAddresses) {
+      return selectedCountryIso || 'IN';
+    }
+    if (addressOption === 'primary' && user?.address) {
+      if (typeof user.address === 'object') {
+        const c = user.address.country || '';
+        if (/india|\bin\b/i.test(c)) return 'IN';
+        const found = Country.getAllCountries().find(cnt => cnt.name.toLowerCase() === c.toLowerCase() || cnt.isoCode === c);
+        return found ? found.isoCode : 'IN';
+      }
+      if (typeof user.address === 'string' && /india|\bin\b/i.test(user.address)) {
+        return 'IN';
+      }
+      return 'IN';
+    }
+    if (addressOption === 'saved') {
+      const selected = user?.savedAddresses?.find(a => a.id === selectedSavedId);
+      if (selected) {
+        const c = selected.country || '';
+        const fullStr = `${c} ${selected.addressLine || ''}`;
+        if (/india|\bin\b/i.test(fullStr)) return 'IN';
+        if (c) {
+          const found = Country.getAllCountries().find(cnt => cnt.name.toLowerCase() === c.toLowerCase() || cnt.isoCode === c);
+          if (found) return found.isoCode;
+        }
+        // Fallback: check if addressLine ends with or contains country name
+        const matchCountry = Country.getAllCountries().find(cnt => new RegExp(`\\b${cnt.name}\\b`, 'i').test(selected.addressLine || ''));
+        if (matchCountry) return matchCountry.isoCode;
+      }
+    }
+    return country.code || 'IN';
+  })();
+
+  const isIndia = activeShippingCountryIso === 'IN';
+
+  // Pricing calculations
+  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const shipping = subtotal >= 500 ? 0 : 15;
+  const tax = Math.round(subtotal * 0.08);
+  const total = subtotal + shipping + tax;
 
   // Load cart: from DB when logged in, otherwise from localStorage
   useEffect(() => {
@@ -249,15 +336,6 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
-  // Auto-switch payment gateway based on country
-  useEffect(() => {
-    if (customCountry === 'India') {
-      setPaymentGateway('razorpay');
-    } else {
-      setPaymentGateway('paypal');
-    }
-  }, [customCountry]);
-
   // Scroll priority
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -265,7 +343,7 @@ export default function CheckoutPage() {
       if (!el) return;
 
       const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      const atTop    = el.scrollTop <= 0;
+      const atTop = el.scrollTop <= 0;
       const pageAtTop = (window.scrollY || document.documentElement.scrollTop) <= 0;
 
       if (e.deltaY > 0) {
@@ -288,9 +366,154 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('wheel', handleWheel);
   }, []);
 
+  // Initialize PayPal Buttons when outside India
+  useEffect(() => {
+    if (loading || cartLoading || !user || isIndia || cart.length === 0) return;
+
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    if (!clientId) {
+      console.error('NEXT_PUBLIC_PAYPAL_CLIENT_ID is missing');
+      return;
+    }
+
+    let isMounted = true;
+    let buttonsInstance: any = null;
+    setPaypalLoading(true);
+
+    const paypalCurrency = getPayPalSupportedCurrency(country.currency);
+
+    loadPayPalScript(clientId, paypalCurrency).then((loaded) => {
+      if (!isMounted) return;
+      setPaypalLoading(false);
+
+      if (loaded && (window as any).paypal) {
+        const container = document.getElementById('paypal-button-container');
+        if (container) {
+          container.innerHTML = '';
+          try {
+            buttonsInstance = (window as any).paypal.Buttons({
+              style: {
+                layout: 'vertical',
+                color: 'gold',
+                shape: 'rect',
+                label: 'paypal',
+              },
+              createOrder: async () => {
+                setCheckoutError('');
+                const shippingDetails = getShippingDetails() as any;
+                if (!shippingDetails || !shippingDetails.fullName || (!shippingDetails.flat && !shippingDetails.area)) {
+                  setCheckoutError('Please enter complete shipping details before proceeding with PayPal.');
+                  throw new Error('Incomplete shipping details');
+                }
+
+                const calcAmount = (paypalCurrency === 'USD' && country.currency !== 'USD')
+                  ? total.toFixed(2)
+                  : (total * (country.rate || 1)).toFixed(2);
+
+                const res = await fetch('/api/checkout/paypal/create-order', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    amount: calcAmount,
+                    currency: paypalCurrency,
+                  }),
+                });
+                const data = await res.json();
+                if (!data.success) {
+                  setCheckoutError(data.error || 'Failed to initialize PayPal order.');
+                  throw new Error(data.error || 'PayPal order creation failed');
+                }
+                return data.orderID;
+              },
+              onApprove: async (data: any) => {
+                setPlacingOrder(true);
+                setCheckoutError('');
+                try {
+                  const shippingDetails = getShippingDetails() as any;
+                  const captureRes = await fetch('/api/checkout/paypal/capture-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      orderID: data.orderID,
+                      items: cart.map(item => ({
+                        slug: item.product.slug,
+                        name: item.product.name,
+                        material: item.product.selectedMaterial || 'Oak',
+                        dimension: item.product.selectedDimension || 'Standard',
+                        quantity: item.quantity,
+                        price: item.product.price,
+                        image: item.product.images[0],
+                        customerName: user?.name,
+                      })),
+                      total: formatPrice(total),
+                      shippingAddress: shippingDetails,
+                    }),
+                  });
+                  const captureData = await captureRes.json();
+                  setPlacingOrder(false);
+                  if (captureData.success && captureData.order) {
+                    await finalizeSuccessfulOrder(captureData.order, shippingDetails);
+                  } else {
+                    setCheckoutError(captureData.error || 'PayPal payment capture failed.');
+                  }
+                } catch (err: any) {
+                  console.error(err);
+                  setCheckoutError(err.message || 'PayPal payment verification failed.');
+                  setPlacingOrder(false);
+                }
+              },
+              onError: (err: any) => {
+                const msg = err?.message || err?.toString() || '';
+                if (msg.includes('zoid destroyed') || msg.includes('component destroyed')) {
+                  return;
+                }
+                console.error('PayPal Buttons Error:', err);
+                setCheckoutError('PayPal payment error occurred. Please try again.');
+                setPlacingOrder(false);
+              },
+            });
+
+            if (buttonsInstance.isEligible()) {
+              buttonsInstance.render('#paypal-button-container').catch((err: any) => {
+                // Ignore DOM container unmount and Zoid lifecycle cleanup during React state updates
+                const msg = err?.message || err?.toString() || '';
+                if (
+                  msg.includes('target_element_not_found') ||
+                  msg.includes('container element removed') ||
+                  msg.includes('Detected container element removed') ||
+                  msg.includes('zoid destroyed') ||
+                  msg.includes('component destroyed')
+                ) {
+                  return;
+                }
+                console.error('PayPal button render error:', err);
+              });
+            }
+          } catch (err: any) {
+            const msg = err?.message || err?.toString() || '';
+            if (!msg.includes('zoid destroyed') && !msg.includes('component destroyed')) {
+              console.error('Error rendering PayPal buttons:', err);
+            }
+          }
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      if (buttonsInstance) {
+        try {
+          buttonsInstance.close().catch(() => {});
+        } catch {}
+      }
+    };
+  }, [loading, cartLoading, user, isIndia, cart, country, total, addressOption, selectedCountryIso, selectedSavedId]);
+
+
   if (loading || cartLoading) {
     return <CheckoutSkeleton />;
   }
+
 
   if (!user) {
     return (
@@ -392,7 +615,7 @@ export default function CheckoutPage() {
               <div className="bg-bg-primary border border-border-accent/40 rounded-xl p-4 text-left space-y-2 text-xs">
                 <div className="flex justify-between border-b border-border-accent/30 pb-2">
                   <span className="text-fg-secondary">Amount Paid</span>
-                  <span className="font-bold text-fg-primary">${successOrder.total}</span>
+                  <span className="font-bold text-fg-primary">{formatPrice(successOrder.total)}</span>
                 </div>
                 <div>
                   <span className="text-fg-secondary block text-[10px] uppercase font-bold tracking-wider">Shipping Location</span>
@@ -453,12 +676,6 @@ export default function CheckoutPage() {
       </div>
     );
   }
-
-  // Pricing calculations
-  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shipping = subtotal >= 500 ? 0 : 15;
-  const tax = Math.round(subtotal * 0.08);
-  const total = subtotal + shipping + tax;
 
   const getShippingDetails = () => {
     if (addressOption === 'new' || !hasSavedAddresses) {
@@ -536,14 +753,14 @@ export default function CheckoutPage() {
 
   const finalizeSuccessfulOrder = async (orderData: any, shippingDetails: any) => {
     if (user) {
-      await fetch('/api/cart', { method: 'DELETE' }).catch(() => {});
+      await fetch('/api/cart', { method: 'DELETE' }).catch(() => { });
     }
     localStorage.removeItem('cart');
     setCart([]);
     window.dispatchEvent(new Event('cart-updated'));
     window.dispatchEvent(new Event('orders-updated'));
     window.dispatchEvent(new Event('auth-changed'));
-    
+
     const dispName = shippingDetails.fullName || user.name;
     const dispAddr = shippingDetails.addressLine || `${shippingDetails.flat}, ${shippingDetails.area}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.pincode}, ${shippingDetails.country}`;
     setSuccessOrder({
@@ -574,11 +791,12 @@ export default function CheckoutPage() {
     }
 
     try {
-      // 1. Create order on server
+      const convertedAmount = Math.round(total * (country.rate || 83.5));
+      // 1. Create order on server in converted INR amount
       const res = await fetch('/api/checkout/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total }),
+        body: JSON.stringify({ amount: convertedAmount }),
       });
 
       const orderData = await res.json();
@@ -622,7 +840,7 @@ export default function CheckoutPage() {
                   image: item.product.images[0],
                   customerName: user.name,
                 })),
-                total,
+                total: formatPrice(total),
                 shippingAddress: shippingDetails,
               }),
             });
@@ -657,508 +875,396 @@ export default function CheckoutPage() {
     }
   };
 
-  const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'test';
-
   return (
-    <PayPalScriptProvider options={{ clientId: paypalClientId, currency: 'USD' }}>
-      <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-        
-        {/* Left Column: Stable sticky image */}
-        <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
-          <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
-            <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
+    <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
 
-            <div className="absolute bottom-5 left-5 right-5">
-              <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Total</p>
-                  <p className="text-2xl font-bold text-fg-primary font-dm-sans">${total}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">{cart.length} Item{cart.length !== 1 ? 's' : ''}</p>
-                  <p className="text-xs text-fg-secondary">
-                    {shipping === 0 ? '✓ Free shipping' : `+ $${shipping} shipping`}
-                  </p>
-                </div>
+      {/* Left Column: Stable sticky image */}
+      <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
+        <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
+          <CheckoutSlideshow items={cart.map(item => ({ image: item.product.images?.[0] || '', name: item.product.name }))} />
+
+          <div className="absolute bottom-5 left-5 right-5">
+            <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Total</p>
+                <p className="text-2xl font-bold text-fg-primary font-dm-sans">{formatPrice(total)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">{cart.length} Item{cart.length !== 1 ? 's' : ''}</p>
+                <p className="text-xs text-fg-secondary">
+                  {shipping === 0 ? '✓ Free shipping' : `+ ${formatPrice(shipping)} shipping`}
+                </p>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Right Column: Scrollable forms */}
-        <div
-          ref={rightColumnRef}
-          className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
-        >
-          <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2">
-            <h1 className="font-dm-sans text-3xl md:text-4xl font-bold tracking-tight text-fg-primary">Checkout</h1>
-            <p className="text-sm text-fg-secondary leading-relaxed font-medium">
-              Select your delivery location and preferred payment gateway below.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {checkoutError && (
-              <div className="bg-red-500/10 text-red-500 border border-red-500/20 px-5 py-3.5 rounded-xl text-xs font-semibold animate-fade-in flex items-center gap-2">
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
-                </svg>
-                {checkoutError}
-              </div>
-            )}
-
-            {/* ── 1. Order Summary ─────────────────────────────────────────────── */}
-            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                  Order Summary
-                </h2>
-              </div>
-
-              <div className="p-6 flex flex-col gap-4">
-                {cart.map((item, index) => {
-                  const itemMat = item.product.selectedMaterial || 'Oak';
-                  const itemDim = item.product.selectedDimension || 'Standard';
-                  const itemKey = `${item.product.slug}-${itemMat}-${itemDim}`;
-                  return (
-                    <div key={itemKey} className={`flex gap-4 ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}>
-                      <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden border border-border-accent/30 flex-shrink-0">
-                        <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 flex flex-col justify-between text-xs">
-                        <div>
-                          <div className="flex justify-between font-semibold text-fg-primary">
-                            <h4>{item.product.name}</h4>
-                            <p>${item.product.price * item.quantity}</p>
-                          </div>
-                          <p className="text-fg-secondary/70 capitalize mt-0.5">{item.product.category} Collection</p>
-                          <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
-                            <span>{itemMat}</span>
-                            <span>•</span>
-                            <span>{itemDim}</span>
-                          </div>
-                        </div>
-                        <p className="text-[10px] text-fg-secondary/70 mt-1.5">Qty: {item.quantity}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div className="border-t border-border-accent/40 pt-4 space-y-2.5 text-xs font-semibold text-fg-primary">
-                  <div className="flex justify-between">
-                    <span className="text-fg-secondary font-normal">Subtotal</span>
-                    <span>${subtotal}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-fg-secondary font-normal">Shipping</span>
-                    <span className={shipping === 0 ? 'text-green-500' : ''}>{shipping === 0 ? 'Free' : `$${shipping}`}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-fg-secondary font-normal">Tax (8%)</span>
-                    <span>${tax}</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-bold border-t border-border-accent/40 pt-3 mt-1">
-                    <span>Total</span>
-                    <span>${total}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ── 2. Delivery Location ─────────────────────────────────────────── */}
-            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                  Delivery Location
-                </h2>
-              </div>
-
-              <div className="p-6 space-y-3">
-                {user.address && (
-                  <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                    addressOption === 'primary' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="shipping_addr"
-                      checked={addressOption === 'primary'}
-                      onChange={() => setAddressOption('primary')}
-                      className="mt-1 accent-fg-primary flex-shrink-0"
-                    />
-                    <div className="text-xs">
-                      <span className="font-bold text-fg-primary block">Default Account Address</span>
-                      <p className="text-fg-secondary mt-1">
-                        {typeof user.address === 'object' ? (
-                          `${user.address.flat}, ${user.address.area}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}, ${user.address.country}`
-                        ) : (
-                          user.address
-                        )}
-                      </p>
-                      {user.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {user.phone}</p>}
-                    </div>
-                  </label>
-                )}
-
-                {user.savedAddresses && user.savedAddresses.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary block px-1">Saved Locations</span>
-                    {user.savedAddresses.map((addr) => (
-                      <label key={addr.id} className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                        addressOption === 'saved' && selectedSavedId === addr.id ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-                      }`}>
-                        <input
-                          type="radio"
-                          name="shipping_addr"
-                          checked={addressOption === 'saved' && selectedSavedId === addr.id}
-                          onChange={() => { setAddressOption('saved'); setSelectedSavedId(addr.id); }}
-                          className="mt-1 accent-fg-primary flex-shrink-0"
-                        />
-                        <div className="text-xs">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</span>
-                            <span className="px-1.5 py-0.5 bg-fg-primary/5 text-fg-primary text-[8px] font-bold uppercase tracking-wider rounded border border-border-accent/20">{addr.label}</span>
-                          </div>
-                          <p className="text-fg-secondary mt-1">
-                            {addr.addressLine ? (
-                              addr.addressLine
-                            ) : (
-                              `${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state} - ${addr.pincode}, ${addr.country}`
-                            )}
-                          </p>
-                          {addr.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {addr.phone}</p>}
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                )}
-
-                {hasSavedAddresses && (
-                  <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${
-                    addressOption === 'new' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
-                  }`}>
-                    <input
-                      type="radio"
-                      name="shipping_addr"
-                      checked={addressOption === 'new'}
-                      onChange={() => setAddressOption('new')}
-                      className="mt-1 accent-fg-primary flex-shrink-0"
-                    />
-                    <div className="text-xs">
-                      <span className="font-bold text-fg-primary">Deliver to a different address</span>
-                    </div>
-                  </label>
-                )}
-
-                {showCustomForm && (
-                  <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-3.5 animate-fade-in shadow-sm">
-                    <div className="space-y-1">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
-                      <select
-                        value={customCountry}
-                        onChange={(e) => {
-                          setCustomCountry(e.target.value);
-                          setCustomState('');
-                        }}
-                        className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
-                      >
-                        <option value="India">India (Razorpay - UPI/NetBanking/Cards)</option>
-                        <option value="United States">United States (PayPal / International Cards)</option>
-                        <option value="United Kingdom">United Kingdom (PayPal / International Cards)</option>
-                        <option value="Germany">Germany (PayPal / International Cards)</option>
-                        <option value="France">France (PayPal / International Cards)</option>
-                        <option value="Canada">Canada (PayPal / International Cards)</option>
-                        <option value="Australia">Australia (PayPal / International Cards)</option>
-                        <option value="United Arab Emirates">United Arab Emirates (PayPal)</option>
-                        <option value="Saudi Arabia">Saudi Arabia (PayPal)</option>
-                      </select>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label htmlFor="ship-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Full Name</label>
-                        <input
-                          id="ship-name"
-                          type="text"
-                          required={showCustomForm}
-                          value={customFullName}
-                          onChange={(e) => setCustomFullName(e.target.value)}
-                          placeholder="Jane Smith"
-                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label htmlFor="ship-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
-                        <input
-                          id="ship-phone"
-                          type="text"
-                          required={showCustomForm}
-                          value={customPhone}
-                          onChange={(e) => setCustomPhone(e.target.value)}
-                          placeholder="Mobile number"
-                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label htmlFor="ship-flat" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Apartment</label>
-                      <input
-                        id="ship-flat"
-                        type="text"
-                        required={showCustomForm}
-                        value={customFlat}
-                        onChange={(e) => setCustomFlat(e.target.value)}
-                        placeholder="Flat, House no. etc."
-                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label htmlFor="ship-area" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector</label>
-                      <input
-                        id="ship-area"
-                        type="text"
-                        required={showCustomForm}
-                        value={customArea}
-                        onChange={(e) => setCustomArea(e.target.value)}
-                        placeholder="Area, Street etc."
-                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <label htmlFor="ship-pincode" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
-                        <input
-                          id="ship-pincode"
-                          type="text"
-                          required={showCustomForm}
-                          value={customPincode}
-                          onChange={(e) => setCustomPincode(e.target.value)}
-                          placeholder="Pincode/Zip"
-                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label htmlFor="ship-city" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
-                        <input
-                          id="ship-city"
-                          type="text"
-                          required={showCustomForm}
-                          value={customCity}
-                          onChange={(e) => setCustomCity(e.target.value)}
-                          placeholder="Town/City"
-                          className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">State</label>
-                      {customCountry === 'India' ? (
-                        <select
-                          value={customState}
-                          onChange={(e) => setCustomState(e.target.value)}
-                          required={showCustomForm}
-                          className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
-                        >
-                          <option value="">Select State</option>
-                          {INDIAN_STATES.map(s => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          required={showCustomForm}
-                          value={customState}
-                          onChange={(e) => setCustomState(e.target.value)}
-                          placeholder="State/Province/Region"
-                          className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
-                        />
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* ── 3. Payment Gateway Selection ──────────────────────────────────── */}
-            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                  Select Payment Method
-                </h2>
-              </div>
-
-              <div className="p-6 space-y-5">
-                {/* Gateway Tab Selectors */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentGateway('razorpay')}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center transition-all cursor-pointer ${
-                      paymentGateway === 'razorpay'
-                        ? 'border-fg-primary bg-bg-primary shadow-sm font-bold text-fg-primary'
-                        : 'border-border-accent/40 bg-bg-primary/50 text-fg-secondary hover:bg-bg-primary/80'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-base">🇮🇳</span>
-                      <span className="text-xs font-bold">Razorpay</span>
-                    </div>
-                    <span className="text-[9px] text-fg-secondary">UPI, Cards, NetBanking (INR)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setPaymentGateway('paypal')}
-                    className={`flex flex-col items-center justify-center p-4 rounded-xl border text-center transition-all cursor-pointer ${
-                      paymentGateway === 'paypal'
-                        ? 'border-fg-primary bg-bg-primary shadow-sm font-bold text-fg-primary'
-                        : 'border-border-accent/40 bg-bg-primary/50 text-fg-secondary hover:bg-bg-primary/80'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-base">🌐</span>
-                      <span className="text-xs font-bold">PayPal</span>
-                    </div>
-                    <span className="text-[9px] text-fg-secondary">PayPal Wallet, International (USD)</span>
-                  </button>
-                </div>
-
-                {/* Razorpay Option Body */}
-                {paymentGateway === 'razorpay' && (
-                  <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-4 animate-fade-in">
-                    <div className="flex items-center justify-between text-xs border-b border-border-accent/30 pb-3">
-                      <div>
-                        <span className="font-bold text-fg-primary block">Razorpay Checkout</span>
-                        <span className="text-[10px] text-fg-secondary">Supports UPI (GPay, PhonePe, Paytm), Cards & NetBanking</span>
-                      </div>
-                      <span className="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-[9px] font-bold">Recommended for India</span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleRazorpayPayment}
-                      disabled={placingOrder}
-                      className="w-full bg-fg-primary text-bg-primary py-4 rounded-xl font-bold text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed shadow-sm"
-                    >
-                      {placingOrder ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4 text-bg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          <span>Processing Razorpay...</span>
-                        </>
-                      ) : (
-                        <span>Pay via Razorpay — ${total}</span>
-                      )}
-                    </button>
-                  </div>
-                )}
-
-                {/* PayPal Option Body */}
-                {paymentGateway === 'paypal' && (
-                  <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-4 animate-fade-in">
-                    <div className="flex items-center justify-between text-xs border-b border-border-accent/30 pb-3">
-                      <div>
-                        <span className="font-bold text-fg-primary block">PayPal Express Checkout</span>
-                        <span className="text-[10px] text-fg-secondary">Pay securely using your PayPal account or International Cards</span>
-                      </div>
-                      <span className="px-2 py-1 bg-yellow-500/10 text-yellow-600 rounded text-[9px] font-bold">International</span>
-                    </div>
-
-                    <div className="pt-2">
-                      <PayPalButtons
-                        style={{ layout: 'vertical', shape: 'rect', label: 'pay' }}
-                        createOrder={async () => {
-                          setCheckoutError('');
-                          const shippingDetails = getShippingDetails() as any;
-                          if (!shippingDetails || !shippingDetails.fullName || (!shippingDetails.flat && !shippingDetails.area)) {
-                            setCheckoutError('Please fill in valid delivery address details above first.');
-                            throw new Error('Missing shipping details');
-                          }
-
-                          const res = await fetch('/api/checkout/paypal/create-order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ total }),
-                          });
-
-                          const data = await res.json();
-                          if (!data.success || !data.id) {
-                            setCheckoutError(data.error || 'Could not initiate PayPal transaction.');
-                            throw new Error(data.error || 'Failed PayPal order creation');
-                          }
-
-                          return data.id;
-                        }}
-                        onApprove={async (data) => {
-                          setPlacingOrder(true);
-                          const shippingDetails = getShippingDetails() as any;
-                          try {
-                            const res = await fetch('/api/checkout/paypal/capture-order', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                orderID: data.orderID,
-                                items: cart.map(item => ({
-                                  slug: item.product.slug,
-                                  name: item.product.name,
-                                  material: item.product.selectedMaterial || 'Oak',
-                                  dimension: item.product.selectedDimension || 'Standard',
-                                  quantity: item.quantity,
-                                  price: item.product.price,
-                                  image: item.product.images[0],
-                                  customerName: user.name,
-                                })),
-                                total,
-                                shippingAddress: shippingDetails,
-                              }),
-                            });
-
-                            const captureData = await res.json();
-                            setPlacingOrder(false);
-
-                            if (captureData.success && captureData.order) {
-                              await finalizeSuccessfulOrder(captureData.order, shippingDetails);
-                            } else {
-                              setCheckoutError(captureData.error || 'PayPal capture failed.');
-                            }
-                          } catch (err: any) {
-                            console.error(err);
-                            setCheckoutError('Error finalizing PayPal payment.');
-                            setPlacingOrder(false);
-                          }
-                        }}
-                        onError={(err) => {
-                          console.error('PayPal button error:', err);
-                          setCheckoutError('An error occurred during PayPal processing.');
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Trust signals */}
-                <div className="flex items-center justify-center gap-6 pt-2">
-                  {[
-                    { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: '256-bit SSL' },
-                    { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Buyer Protection' },
-                    { icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z', label: 'Instant Verification' },
-                  ].map(({ icon, label }) => (
-                    <div key={label} className="flex flex-col items-center gap-1">
-                      <svg className="w-4 h-4 text-fg-secondary/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
-                      </svg>
-                      <span className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary/50">{label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="pb-8" />
           </div>
         </div>
+      </section>
+
+      {/* Right Column: Scrollable forms */}
+      <div
+        ref={rightColumnRef}
+        className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
+      >
+        <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2">
+          <h1 className="font-dm-sans text-3xl md:text-4xl font-bold tracking-tight text-fg-primary">Checkout</h1>
+          <p className="text-sm text-fg-secondary leading-relaxed font-medium">
+            Select your delivery location and proceed to payment below.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {checkoutError && (
+            <div className="bg-red-500/10 text-red-500 border border-red-500/20 px-5 py-3.5 rounded-xl text-xs font-semibold animate-fade-in flex items-center gap-2">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M12 2a10 10 0 110 20A10 10 0 0112 2z" />
+              </svg>
+              {checkoutError}
+            </div>
+          )}
+
+          {/* ── 1. Order Summary ─────────────────────────────────────────────── */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                Order Summary
+              </h2>
+            </div>
+
+            <div className="p-6 flex flex-col gap-4">
+              {cart.map((item, index) => {
+                const itemMat = item.product.selectedMaterial || 'Oak';
+                const itemDim = item.product.selectedDimension || 'Standard';
+                const itemKey = `${item.product.slug}-${itemMat}-${itemDim}`;
+                return (
+                  <div key={itemKey} className={`flex gap-4 ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}>
+                    <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden border border-border-accent/30 flex-shrink-0">
+                      <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-between text-xs">
+                      <div>
+                        <div className="flex justify-between font-semibold text-fg-primary">
+                          <h4>{item.product.name}</h4>
+                          <p>{formatPrice(item.product.price * item.quantity)}</p>
+                        </div>
+                        <p className="text-fg-secondary/70 capitalize mt-0.5">{item.product.category} Collection</p>
+                        <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
+                          <span>{itemMat}</span>
+                          <span>•</span>
+                          <span>{itemDim}</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-fg-secondary/70 mt-1.5">Qty: {item.quantity}</p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="border-t border-border-accent/40 pt-4 space-y-2.5 text-xs font-semibold text-fg-primary">
+                <div className="flex justify-between">
+                  <span className="text-fg-secondary font-normal">Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-fg-secondary font-normal">Shipping</span>
+                  <span className={shipping === 0 ? 'text-green-500' : ''}>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-fg-secondary font-normal">Tax (8%)</span>
+                  <span>{formatPrice(tax)}</span>
+                </div>
+                <div className="flex justify-between text-sm font-bold border-t border-border-accent/40 pt-3 mt-1">
+                  <span>Total</span>
+                  <span>{formatPrice(total)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 2. Delivery Location ─────────────────────────────────────────── */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                Delivery Location
+              </h2>
+            </div>
+
+            <div className="p-6 space-y-3">
+              {user.address && (
+                <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${addressOption === 'primary' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                  }`}>
+                  <input
+                    type="radio"
+                    name="shipping_addr"
+                    checked={addressOption === 'primary'}
+                    onChange={() => setAddressOption('primary')}
+                    className="mt-1 accent-fg-primary flex-shrink-0"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-fg-primary block">Default Account Address</span>
+                    <p className="text-fg-secondary mt-1">
+                      {typeof user.address === 'object' ? (
+                        `${user.address.flat}, ${user.address.area}, ${user.address.city}, ${user.address.state} - ${user.address.pincode}, ${user.address.country}`
+                      ) : (
+                        user.address
+                      )}
+                    </p>
+                    {user.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {user.phone}</p>}
+                  </div>
+                </label>
+              )}
+
+              {user.savedAddresses && user.savedAddresses.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary block px-1">Saved Locations</span>
+                  {user.savedAddresses.map((addr) => (
+                    <label key={addr.id} className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${addressOption === 'saved' && selectedSavedId === addr.id ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                      }`}>
+                      <input
+                        type="radio"
+                        name="shipping_addr"
+                        checked={addressOption === 'saved' && selectedSavedId === addr.id}
+                        onChange={() => { setAddressOption('saved'); setSelectedSavedId(addr.id); }}
+                        className="mt-1 accent-fg-primary flex-shrink-0"
+                      />
+                      <div className="text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</span>
+                          <span className="px-1.5 py-0.5 bg-fg-primary/5 text-fg-primary text-[8px] font-bold uppercase tracking-wider rounded border border-border-accent/20">{addr.label}</span>
+                        </div>
+                        <p className="text-fg-secondary mt-1">
+                          {addr.addressLine ? (
+                            addr.addressLine
+                          ) : (
+                            `${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state} - ${addr.pincode}, ${addr.country}`
+                          )}
+                        </p>
+                        {addr.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {addr.phone}</p>}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {hasSavedAddresses && (
+                <label className={`flex items-start gap-3 border p-4 rounded-xl cursor-pointer transition-all ${addressOption === 'new' ? 'border-fg-primary bg-bg-primary shadow-sm' : 'border-border-accent/40 bg-bg-primary/50 hover:bg-bg-primary/80'
+                  }`}>
+                  <input
+                    type="radio"
+                    name="shipping_addr"
+                    checked={addressOption === 'new'}
+                    onChange={() => setAddressOption('new')}
+                    className="mt-1 accent-fg-primary flex-shrink-0"
+                  />
+                  <div className="text-xs">
+                    <span className="font-bold text-fg-primary">Deliver to a different address</span>
+                  </div>
+                </label>
+              )}
+
+              {showCustomForm && (
+                <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 space-y-3.5 animate-fade-in shadow-sm">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
+                    <select
+                      value={selectedCountryIso}
+                      onChange={(e) => {
+                        const iso = e.target.value;
+                        const cObj = Country.getCountryByCode(iso);
+                        setSelectedCountryIso(iso);
+                        setCustomCountry(cObj ? cObj.name : iso);
+                        setSelectedStateIso('');
+                        setCustomState('');
+                      }}
+                      className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                    >
+                      {Country.getAllCountries().map((c) => (
+                        <option key={c.isoCode} value={c.isoCode}>
+                          {c.flag} {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label htmlFor="ship-name" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Full Name</label>
+                      <input
+                        id="ship-name"
+                        type="text"
+                        required={showCustomForm}
+                        value={customFullName}
+                        onChange={(e) => setCustomFullName(e.target.value)}
+                        placeholder="Jane Smith"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="ship-phone" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Mobile Number</label>
+                      <input
+                        id="ship-phone"
+                        type="text"
+                        required={showCustomForm}
+                        value={customPhone}
+                        onChange={(e) => setCustomPhone(e.target.value)}
+                        placeholder="Mobile number"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="ship-flat" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Flat, House no., Apartment</label>
+                    <input
+                      id="ship-flat"
+                      type="text"
+                      required={showCustomForm}
+                      value={customFlat}
+                      onChange={(e) => setCustomFlat(e.target.value)}
+                      placeholder="Flat, House no. etc."
+                      className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="ship-area" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Area, Street, Sector</label>
+                    <input
+                      id="ship-area"
+                      type="text"
+                      required={showCustomForm}
+                      value={customArea}
+                      onChange={(e) => setCustomArea(e.target.value)}
+                      placeholder="Area, Street etc."
+                      className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label htmlFor="ship-pincode" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Pincode / Zip Code</label>
+                      <input
+                        id="ship-pincode"
+                        type="text"
+                        required={showCustomForm}
+                        value={customPincode}
+                        onChange={(e) => setCustomPincode(e.target.value)}
+                        placeholder="Pincode/Zip"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="ship-city" className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">Town/City</label>
+                      <input
+                        id="ship-city"
+                        type="text"
+                        required={showCustomForm}
+                        value={customCity}
+                        onChange={(e) => setCustomCity(e.target.value)}
+                        placeholder="Town/City"
+                        className="w-full bg-bg-secondary text-fg-primary placeholder:text-fg-secondary/40 border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary">State / Region</label>
+                    {selectedCountryIso && State.getStatesOfCountry(selectedCountryIso).length > 0 ? (
+                      <select
+                        value={selectedStateIso}
+                        onChange={(e) => {
+                          const sIso = e.target.value;
+                          const sObj = State.getStateByCodeAndCountry(sIso, selectedCountryIso);
+                          setSelectedStateIso(sIso);
+                          setCustomState(sObj ? sObj.name : sIso);
+                        }}
+                        required={showCustomForm}
+                        className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium cursor-pointer"
+                      >
+                        <option value="">Select State / Region</option>
+                        {State.getStatesOfCountry(selectedCountryIso).map((s) => (
+                          <option key={s.isoCode} value={s.isoCode}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        required={showCustomForm}
+                        value={customState}
+                        onChange={(e) => setCustomState(e.target.value)}
+                        placeholder="State/Province/Region"
+                        className="w-full bg-bg-secondary text-fg-primary border border-border-accent/40 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-fg-primary transition-colors font-medium"
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── 3. Payment Section ──────────────────────────────────── */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                Payment
+              </h2>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {isIndia ? (
+                <div className="space-y-4">
+                  <button
+                    type="button"
+                    onClick={handleRazorpayPayment}
+                    disabled={placingOrder}
+                    className="w-full bg-fg-primary text-bg-primary py-4 rounded-xl font-bold text-sm hover:opacity-95 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed shadow-sm"
+                  >
+                    {placingOrder ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4 text-bg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Processing Payment...</span>
+                      </>
+                    ) : (
+                      <span>Pay Now — {formatPrice(total)}</span>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {paypalLoading && (
+                    <div className="py-6 text-center text-xs text-fg-secondary flex items-center justify-center gap-2 bg-bg-primary rounded-xl border border-border-accent/40">
+                      <svg className="animate-spin h-4 w-4 text-fg-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Loading PayPal Secure Button...</span>
+                    </div>
+                  )}
+
+                  <div id="paypal-button-container" className="w-full min-h-[50px] relative z-0" />
+                </div>
+              )}
+
+
+              {/* Trust signals */}
+              <div className="flex items-center justify-center gap-6 pt-2">
+                {[
+                  { icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', label: '256-bit SSL' },
+                  { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label: 'Buyer Protection' },
+                  { icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z', label: 'Instant Verification' },
+                ].map(({ icon, label }) => (
+                  <div key={label} className="flex flex-col items-center gap-1">
+                    <svg className="w-4 h-4 text-fg-secondary/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
+                    </svg>
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-fg-secondary/50">{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="pb-8" />
+        </div>
       </div>
-    </PayPalScriptProvider>
+    </div>
   );
 }

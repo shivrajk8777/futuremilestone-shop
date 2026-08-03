@@ -99,6 +99,15 @@ export default function ProductDetails({ params }: PageProps) {
   const { warning } = useToast();
   const { formatPrice } = useCurrency();
 
+  const formatDiscountBadge = (badge?: string) => {
+    if (!badge) return '';
+    if (badge.startsWith('$')) {
+      const val = parseFloat(badge.replace('$', ''));
+      if (!isNaN(val)) return `${formatPrice(val)} OFF`;
+    }
+    return badge;
+  };
+
   // Find static product fallback
   const staticProduct = products.find((p) => p.slug === slug);
 
@@ -483,7 +492,7 @@ export default function ProductDetails({ params }: PageProps) {
               </div>
               {(activeProduct.discountBadge || saleBadges[activeProduct.slug]) && (
                 <div className="bg-fg-primary text-bg-primary text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider select-none">
-                  {activeProduct.discountBadge || saleBadges[activeProduct.slug]}
+                  {formatDiscountBadge(activeProduct.discountBadge || saleBadges[activeProduct.slug])}
                 </div>
               )}
             </div>
@@ -539,7 +548,7 @@ export default function ProductDetails({ params }: PageProps) {
                         : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
                         }`}
                     >
-                      {dim.label} {priceDiff > 0 ? `(+$${priceDiff})` : ''}
+                      {dim.label} {priceDiff > 0 ? `(+${formatPrice(priceDiff)})` : ''}
                     </button>
                   );
                 })}
@@ -740,7 +749,7 @@ export default function ProductDetails({ params }: PageProps) {
               className="overflow-hidden"
             >
               <div className="px-5 md:px-6 pb-5 md:pb-6 text-sm text-fg-secondary leading-relaxed space-y-2">
-                <p>{activeProduct.shippingReturns}</p>
+                <p>{(activeProduct.shippingReturns || '').replace('$500', formatPrice(500))}</p>
                 <p>We ship securely within 14 business days. Delivery times vary by location, and tracking details are provided upon dispatch.</p>
               </div>
             </div>
@@ -947,7 +956,7 @@ export default function ProductDetails({ params }: PageProps) {
                 {/* Top-Right Sale Badge */}
                 {(p.discountBadge || saleBadges[p.slug]) && (
                   <div className="absolute top-3 right-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-lg z-10 tracking-wider uppercase shadow-md">
-                    {p.discountBadge || saleBadges[p.slug]}
+                    {formatDiscountBadge(p.discountBadge || saleBadges[p.slug])}
                   </div>
                 )}
 
