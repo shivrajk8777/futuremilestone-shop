@@ -45,13 +45,13 @@ export default function Footer() {
                     className="flex flex-col transition-transform duration-300 -translate-y-[20px] group-hover/logo:translate-y-0"
                     style={{ lineHeight: '20px' }}
                   >
-                    <span>Home</span>
+                    <span>future milestone</span>
                     <span>future milestone</span>
                   </span>
                 </span>
               </Link>
               <p className="text-sm text-bg-primary/70 leading-relaxed font-medium">
-                01 Scandinavian furniture, meticulously handcrafted to bring warmth and elegance into your home.
+                Your Finest Destination For Premium Wooden handicrafts & Furniture.
               </p>
             </div>
 
@@ -65,69 +65,68 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-bg-primary underline transition-colors"
                 >
-                  Future Milestone Furniture
+                  Future Milestone
                 </a>
               </p>
             </div>
           </div>
 
           {/* Links columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 md:gap-12 lg:gap-16">
+          <div className="flex flex-wrap sm:flex-nowrap gap-12 sm:gap-16 lg:gap-20 shrink-0">
             {/* Pages Column */}
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-bg-primary/40 select-none">Pages</h4>
-              <ul className="space-y-2.5 text-sm">
-                <li className='mb-4'>
-                  <Link href="/" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link href="/" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>Home</span>
                       <span>Home</span>
                     </span>
                   </Link>
                 </li>
-                <li className='mb-4'>
-                  <Link href="/about" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                <li>
+                  <Link href="/about" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>About</span>
                       <span>About</span>
                     </span>
                   </Link>
                 </li>
-                <li className='mb-4'>
-                  <Link href="/licensing" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                {/* <li>
+                  <Link href="/licensing" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>Licensing</span>
                       <span>Licensing</span>
                     </span>
                   </Link>
-                </li>
-
+                </li> */}
               </ul>
             </div>
 
             {/* Help Column */}
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-bg-primary/40 select-none">Help</h4>
-              <ul className="space-y-2.5 text-sm ">
-                <li className='mb-4'>
-                  <Link href="/faq" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link href="/faq" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>FAQ</span>
                       <span>FAQ</span>
                     </span>
                   </Link>
                 </li>
-                <li className='mb-4'>
-                  <Link href="/contact" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
-                      <span>Contact </span>
-                      <span>Contact </span>
+                <li>
+                  <Link href="/contact" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
+                      <span>Contact Us</span>
+                      <span>Contact Us</span>
                     </span>
                   </Link>
                 </li>
-                <li className='mb-4'>
-                  <Link href="/terms" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                <li>
+                  <Link href="/terms" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>Terms</span>
                       <span>Terms</span>
                     </span>
@@ -137,22 +136,20 @@ export default function Footer() {
             </div>
 
             {/* CMS Column */}
-            <div className="space-y-4 col-span-2 sm:col-span-1">
+            <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-bg-primary/40 select-none">CMS</h4>
-              <ul className="space-y-2.5 text-sm">
-                <li className='mb-4'>
-                  <Link href="/shop" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link href="/shop" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>Shop</span>
                       <span>Shop</span>
                     </span>
                   </Link>
                 </li>
-
-
-                <li className='mb-4'>
-                  <Link href="/blog" className="footer-menu-link group/fitem overflow-hidden h-[16px] flex flex-col">
-                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-[16px]" style={{ lineHeight: '16px' }}>
+                <li>
+                  <Link href="/blog" className="footer-menu-link group/fitem overflow-hidden h-5 inline-block">
+                    <span className="flex flex-col transition-transform duration-300 group-hover/fitem:-translate-y-5" style={{ lineHeight: '20px' }}>
                       <span>Blog</span>
                       <span>Blog</span>
                     </span>

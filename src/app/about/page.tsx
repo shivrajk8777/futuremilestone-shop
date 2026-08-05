@@ -113,7 +113,7 @@ export default function About() {
           <div className="absolute bottom-0 right-0 bg-bg-primary pr-5 pb-3.5 pt-3.5 pl-6 rounded-tl-2xl select-none z-10 transition-theme border-t border-l border-border-accent/10">
 
             <span className="font-dm-sans font-bold text-fg-primary text-xs tracking-wider">
-              Future Milestone Furniture
+              Future Milestone
             </span>
           </div>
         </div>
