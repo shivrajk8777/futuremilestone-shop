@@ -15,7 +15,7 @@ const saleBadges: Record<string, string> = {
 
 function ShopSkeletonGrid() {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 animate-fade-in">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 animate-fade-in">
       {Array.from({ length: 8 }).map((_, idx) => (
         <div
           key={idx}
