@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       name: member.name || '',
       role: member.role || '',
       image: member.image || '',
-      socials: member.socials || { twitter: '#', instagram: '#', facebook: '#' },
+      socials: member.socials || { youtube: 'https://www.youtube.com/@futuremilestoneindia', instagram: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr', facebook: '#' },
     }));
 
     return NextResponse.json({ success: true, team: formatted });

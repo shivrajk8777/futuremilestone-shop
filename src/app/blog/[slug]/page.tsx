@@ -24,9 +24,9 @@ interface BlogPost {
 export default function BlogPost({ params }: PageProps) {
   const { slug } = use(params);
 
-  const [post, setPost]           = useState<BlogPost | null>(null);
-  const [related, setRelated]     = useState<BlogPost[]>([]);
-  const [loading, setLoading]     = useState(true);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [related, setRelated] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const [notFoundFlag, setNotFoundFlag] = useState(false);
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
@@ -75,7 +75,7 @@ export default function BlogPost({ params }: PageProps) {
       const el = rightColumnRef.current;
       if (!el) return;
       const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      const atTop    = el.scrollTop <= 0;
+      const atTop = el.scrollTop <= 0;
       const pageAtTop = (window.scrollY || document.documentElement.scrollTop) <= 0;
       if (e.deltaY > 0) {
         if (!atBottom) { e.preventDefault(); el.scrollTop += e.deltaY; }
@@ -154,7 +154,7 @@ export default function BlogPost({ params }: PageProps) {
     notFound();
   }
 
-  const category         = post!.category || 'Design';
+  const category = post!.category || 'Design';
   const readTimeFormatted = (post!.readTime || '5 min read').replace(' min read', ' Min').replace(' mins read', ' Min');
 
   return (
@@ -250,7 +250,7 @@ export default function BlogPost({ params }: PageProps) {
           {[
             { name: 'Pinterest', href: 'https://pinterest.com' },
             { name: 'Facebook', href: 'https://facebook.com' },
-            { name: 'Instagram', href: 'https://instagram.com' },
+            { name: 'Instagram', href: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr' },
           ].map((social) => (
             <a
               key={social.name}

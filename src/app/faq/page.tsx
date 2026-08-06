@@ -137,8 +137,8 @@ export default function FAQ() {
   };
 
   const socialCards = [
-    { name: 'Twitter', href: '/' },
-    { name: 'Instagram', href: '/' },
+    { name: 'YouTube', href: 'https://www.youtube.com/@futuremilestoneindia' },
+    { name: 'Instagram', href: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr' },
     { name: 'Pinterest', href: '/' },
     { name: 'Facebook', href: '/' }
   ];

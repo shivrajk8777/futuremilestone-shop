@@ -92,7 +92,7 @@ export default function Contact() {
   ];
 
   const socialCards = [
-    { name: 'Twitter', href: '/' },
+    { name: 'YouTube', href: 'https://www.youtube.com/@futuremilestoneindia' },
     { name: 'Instagram', href: '/' },
     { name: 'Pinterest', href: '/' },
     { name: 'Facebook', href: '/' }
