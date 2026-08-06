@@ -232,15 +232,6 @@ export default function Terms() {
               </a>
             </p>
             <p>
-              <span className="text-fg-secondary">Phone:</span>{' '}
-              <a href="tel:+917073803090" className="hover:opacity-80">
-                +91-7073803090
-              </a>
-            </p>
-            <p>
-              <span className="text-fg-secondary">Address:</span> A-50, Kanaram Nagar, Sikar Road, Jaipur-302039, Rajasthan, India
-            </p>
-            <p>
               <span className="text-fg-secondary">Website:</span>{' '}
               <a href="https://www.futuremilestone.shop" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">
                 www.futuremilestone.shop

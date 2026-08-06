@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       name: member.name || '',
       role: member.role || '',
       image: member.image || '',
-      socials: member.socials || { twitter: '#', instagram: '#', behance: '#' },
+      socials: member.socials || { twitter: '#', instagram: '#', facebook: '#' },
     }));
 
     return NextResponse.json({ success: true, team: formatted });

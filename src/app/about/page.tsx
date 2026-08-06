@@ -9,13 +9,13 @@ const DEFAULT_TEAM = [
     name: 'Shrawan',
     role: 'Founder & Lead Artisan',
     image: '/images/HuqNTe7ZlAoHRwcSqCGZZ9PGYQQ_df2789.webp',
-    socials: { twitter: '#', instagram: '#', behance: '#' }
+    socials: { twitter: '#', instagram: '#', facebook: '#' }
   },
   {
     name: 'Team FM',
     role: 'Master Craftsmen',
     image: '/images/h1y6JnX5fmEv7JAvfZNIqpWM_3a8d82.webp',
-    socials: { twitter: '#', instagram: '#', behance: '#' }
+    socials: { twitter: '#', instagram: '#', facebook: '#' }
   }
 ];
 
@@ -42,7 +42,7 @@ export default function About() {
     { name: 'Twitter', href: '/' },
     { name: 'Instagram', href: '/' },
     { name: 'Pinterest', href: '/' },
-    { name: 'Behance', href: '/' }
+    { name: 'Facebook', href: '/' }
   ];
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
@@ -272,10 +272,10 @@ export default function About() {
                           <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37zM17.5 6.5h.01" />
                         </svg>
                       </a>
-                      {/* Behance */}
-                      <a href={member.socials?.behance || '#'} className="hover:text-fg-primary transition-colors p-1" aria-label="Behance">
+                      {/* Facebook */}
+                      <a href={member.socials?.facebook || member.socials?.behance || '#'} className="hover:text-fg-primary transition-colors p-1" aria-label="Facebook">
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                          <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.2 17.93c-3.17-.4-5.83-2.31-7.14-5.06a8.96 8.96 0 005.15 1.54c.73 0 1.43-.1 2.1-.28a9.42 9.42 0 01-.11 3.8zm2.46-.8c.09-.79.13-1.63.11-2.51.69-.1 1.34-.23 1.94-.4a7.99 7.99 0 01-2.05 2.91zm-1.6-3.8c-.59.16-1.2.26-1.85.28A10.87 10.87 0 016.9 14.16a7.7 7.7 0 01-.84-2.28 10.15 10.15 0 004.99-.08 17.57 17.57 0 011.66 3.65 14.12 14.12 0 001.35-.12zm-3-4.9c-.31.39-.6.82-.87 1.28a8.2 8.2 0 01-4.14.07 7.96 7.96 0 012.38-3.5 12.18 12.18 0 002.63 2.15zm3.87.65a15.82 15.82 0 00-1.57-3.4 10.5 10.5 0 013.9 1.63 7.8 7.8 0 01-2.33 1.77zm-3.23-4.52a14.2 14.2 0 012.28 3.06c-.66.36-1.37.66-2.12.87A10.3 10.3 0 018.66 4.9c.75-.28 1.56-.44 2.4-.44z" clipRule="evenodd" />
+                          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                         </svg>
                       </a>
                     </div>

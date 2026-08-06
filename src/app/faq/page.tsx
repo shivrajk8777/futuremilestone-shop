@@ -140,7 +140,7 @@ export default function FAQ() {
     { name: 'Twitter', href: '/' },
     { name: 'Instagram', href: '/' },
     { name: 'Pinterest', href: '/' },
-    { name: 'Behance', href: '/' }
+    { name: 'Facebook', href: '/' }
   ];
 
   return (
