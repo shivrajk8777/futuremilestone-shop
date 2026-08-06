@@ -651,7 +651,7 @@ export default function Home() {
         {/* Left Card content (Light gray background) */}
         <div className="w-full md:w-[45%] lg:w-[40%] bg-bg-secondary border border-border-accent/40 rounded-xl p-6 md:p-10 lg:p-16 flex flex-col justify-between gap-8 md:gap-12 order-last md:order-none h-auto md:h-full transition-theme">
           <h3 className="font-dm-sans text-[24px] md:text-[28px] lg:text-[32px] font-bold text-fg-primary leading-[1.2] tracking-tight">
-            Designing Spaces, <br className="hidden md:inline" />Inspiring Connection
+            Where Craftsmanship <br className="hidden md:inline" />Meets Everyday Living
           </h3>
           <div className="flex flex-col gap-6">
             <p className="text-xs md:text-sm lg:text-base text-fg-secondary leading-[1.6]">

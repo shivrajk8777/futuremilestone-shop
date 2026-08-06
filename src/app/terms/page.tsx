@@ -227,8 +227,8 @@ export default function Terms() {
                 info@futuremilestone.shop
               </a>
               ,{' '}
-              <a href="mailto:futuremiliestone.official@gmail.com" className="underline hover:opacity-80">
-                futuremiliestone.official@gmail.com
+              <a href="mailto:shop.futuremilestone@gmail.com" className="underline hover:opacity-80">
+                shop.futuremilestone@gmail.com
               </a>
             </p>
             <p>

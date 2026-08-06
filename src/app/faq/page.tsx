@@ -63,7 +63,7 @@ export default function FAQ() {
         },
         {
           question: 'Do you ship internationally?',
-          answer: 'Yes, we ship to select countries. Additional customs fees or duties may apply depending on your location.'
+          answer: 'Yes, we ship to worldwide. Additional customs fees or duties may apply depending on your location.'
         },
         {
           question: 'How can I track my order?',
