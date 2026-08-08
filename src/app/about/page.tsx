@@ -12,9 +12,9 @@ const DEFAULT_TEAM = [
     socials: { youtube: 'https://www.youtube.com/@futuremilestoneindia', instagram: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr', facebook: '#' }
   },
   {
-    name: 'Team FM',
-    role: 'Master Craftsmen',
-    image: '/images/h1y6JnX5fmEv7JAvfZNIqpWM_3a8d82.webp',
+    name: 'Rekha',
+    role: 'Designing head',
+    image: '/images/Rekha.jpg',
     socials: { youtube: 'https://www.youtube.com/@futuremilestoneindia', instagram: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr', facebook: '#' }
   }
 ];
