@@ -57,7 +57,7 @@ const loadPayPalScript = (clientId: string, currency: string = 'USD'): Promise<b
       existingScript.remove();
     }
     if ((window as any).paypal) {
-      try { delete (window as any).paypal; } catch {}
+      try { delete (window as any).paypal; } catch { }
     }
 
     const script = document.createElement('script');
@@ -89,7 +89,7 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
     return (
       <>
         <img
-          src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
+          src="/images/about.png"
           alt="Checkout"
           className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
         />
@@ -101,15 +101,15 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
   return (
     <>
       {items.map((item, idx) => {
-        const imageUrl = item.image || "/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp";
+        const imageUrl = item.image || "/images/about.png";
         return (
           <img
             key={idx}
             src={imageUrl}
             alt={item.name}
             className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${currentIndex === idx
-                ? 'opacity-100 scale-100 pointer-events-auto'
-                : 'opacity-0 scale-[0.99] pointer-events-none'
+              ? 'opacity-100 scale-100 pointer-events-auto'
+              : 'opacity-0 scale-[0.99] pointer-events-none'
               }`}
           />
         );
@@ -503,8 +503,8 @@ export default function CheckoutPage() {
       isMounted = false;
       if (buttonsInstance) {
         try {
-          buttonsInstance.close().catch(() => {});
-        } catch {}
+          buttonsInstance.close().catch(() => { });
+        } catch { }
       }
     };
   }, [loading, cartLoading, user, isIndia, cart, country, total, addressOption, selectedCountryIso, selectedSavedId]);

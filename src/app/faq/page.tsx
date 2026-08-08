@@ -150,7 +150,7 @@ export default function FAQ() {
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
           <img
-            src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
+            src="/images/about.png"
             alt="FAQ"
             className="absolute inset-0 w-full h-full object-cover brightness-[0.95] transition-transform duration-700 group-hover:scale-101"
           />

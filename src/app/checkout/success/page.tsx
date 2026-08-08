@@ -22,7 +22,7 @@ interface Order {
 function CheckoutSuccessSkeleton() {
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-      
+
       {/* Left Column Image Skeleton */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave relative overflow-hidden bg-bg-secondary">
@@ -46,7 +46,7 @@ function CheckoutSuccessSkeleton() {
       <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col justify-center items-center gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
         <div className="flex flex-col items-center justify-center min-h-full w-full py-8 flex-shrink-0">
           <div className="w-full max-w-md bg-bg-secondary p-8 md:p-12 border border-border-accent/40 rounded-xl shadow-sm text-center space-y-6 animate-pulse">
-            
+
             {/* Checkmark Animation Icon Placeholder */}
             <div className="w-16 h-16 bg-fg-primary/5 border border-border-accent/40 rounded-full flex items-center justify-center mx-auto shadow-sm" />
 
@@ -61,7 +61,7 @@ function CheckoutSuccessSkeleton() {
                 <div className="h-3.5 w-20 bg-fg-primary/5 rounded-md" />
                 <div className="h-3.5 w-24 bg-fg-primary/10 rounded-md" />
               </div>
-              
+
               <div className="flex justify-between pb-2 border-b border-border-accent/20">
                 <div className="h-3.5 w-20 bg-fg-primary/5 rounded-md" />
                 <div className="h-3.5 w-16 bg-fg-primary/10 rounded-md" />
@@ -155,14 +155,14 @@ function SuccessDetails() {
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-      
+
       {/* Left Column: Stable sticky image slide show (mirroring Checkout Page exactly) */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm bg-bg-secondary">
           {items.length === 0 ? (
             <>
               <img
-                src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
+                src="/images/about.png"
                 alt="Checkout Success"
                 className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
               />
@@ -175,11 +175,10 @@ function SuccessDetails() {
                   key={idx}
                   src={item.image}
                   alt={item.name}
-                  className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${
-                    currentIndex === idx
+                  className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${currentIndex === idx
                       ? 'opacity-100 scale-100 pointer-events-auto'
                       : 'opacity-0 scale-[0.99] pointer-events-none'
-                  }`}
+                    }`}
                 />
               ))}
               <div className="absolute inset-0 bg-black/10 pointer-events-none z-10" />
@@ -208,65 +207,65 @@ function SuccessDetails() {
         className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col justify-center items-center gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
       >
         <div className="flex flex-col items-center justify-center min-h-full w-full py-8 flex-shrink-0">
-        <div className="w-full max-w-md bg-bg-secondary p-8 md:p-12 border border-border-accent/40 rounded-xl shadow-sm text-center space-y-6">
-          
-          {/* Checkmark Animation Icon */}
-          <div className="w-16 h-16 bg-green-500/10 text-green-500 border border-green-500/25 rounded-full flex items-center justify-center mx-auto shadow-sm animate-bounce">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
+          <div className="w-full max-w-md bg-bg-secondary p-8 md:p-12 border border-border-accent/40 rounded-xl shadow-sm text-center space-y-6">
 
-          <div className="space-y-2">
-            <h1 className="font-dm-sans text-2xl md:text-3xl font-semibold tracking-tight text-fg-primary">
-              Order Confirmed
-            </h1>
-            <p className="text-xs text-fg-secondary leading-relaxed font-medium">
-              Thank you for your purchase. We are preparing your Scandinavian furniture pieces!
-            </p>
-          </div>
-
-          {/* Details Box */}
-          <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/30 text-left space-y-3.5 text-xs w-full">
-            <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
-              <span className="text-fg-secondary font-normal">Order Number</span>
-              <span className="font-bold text-fg-primary">{displayOrderNumber}</span>
-            </div>
-            
-            <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
-              <span className="text-fg-secondary font-normal">Total Amount</span>
-              <span className="font-bold text-fg-primary">${displayTotal}</span>
+            {/* Checkmark Animation Icon */}
+            <div className="w-16 h-16 bg-green-500/10 text-green-500 border border-green-500/25 rounded-full flex items-center justify-center mx-auto shadow-sm animate-bounce">
+              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+              </svg>
             </div>
 
-            <div className="space-y-1">
-              <span className="text-fg-secondary block">Ship To</span>
-              <span className="font-bold text-fg-primary block">{displayName}</span>
-              <span className="text-fg-secondary/80 font-normal block leading-relaxed">{displayAddress}</span>
+            <div className="space-y-2">
+              <h1 className="font-dm-sans text-2xl md:text-3xl font-semibold tracking-tight text-fg-primary">
+                Order Confirmed
+              </h1>
+              <p className="text-xs text-fg-secondary leading-relaxed font-medium">
+                Thank you for your purchase. We are preparing your Scandinavian furniture pieces!
+              </p>
             </div>
 
-            <div className="space-y-1 pt-2 border-t border-border-accent/20">
-              <span className="text-fg-secondary block">Estimated Delivery</span>
-              <span className="font-bold text-fg-primary block text-green-600 font-semibold">{formattedDate}</span>
+            {/* Details Box */}
+            <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/30 text-left space-y-3.5 text-xs w-full">
+              <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
+                <span className="text-fg-secondary font-normal">Order Number</span>
+                <span className="font-bold text-fg-primary">{displayOrderNumber}</span>
+              </div>
+
+              <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
+                <span className="text-fg-secondary font-normal">Total Amount</span>
+                <span className="font-bold text-fg-primary">${displayTotal}</span>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-fg-secondary block">Ship To</span>
+                <span className="font-bold text-fg-primary block">{displayName}</span>
+                <span className="text-fg-secondary/80 font-normal block leading-relaxed">{displayAddress}</span>
+              </div>
+
+              <div className="space-y-1 pt-2 border-t border-border-accent/20">
+                <span className="text-fg-secondary block">Estimated Delivery</span>
+                <span className="font-bold text-fg-primary block text-green-600 font-semibold">{formattedDate}</span>
+              </div>
             </div>
-          </div>
 
-          {/* Redirect Buttons */}
-          <div className="flex flex-col gap-2 pt-2 w-full">
-            <Link
-              href="/account?tab=orders"
-              className="w-full bg-fg-primary text-bg-primary py-3.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity text-center block shadow-sm"
-            >
-              View Order History
-            </Link>
-            <Link
-              href="/shop"
-              className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-lg text-xs font-semibold hover:bg-bg-secondary transition-colors text-center block"
-            >
-              Continue Shopping
-            </Link>
-          </div>
+            {/* Redirect Buttons */}
+            <div className="flex flex-col gap-2 pt-2 w-full">
+              <Link
+                href="/account?tab=orders"
+                className="w-full bg-fg-primary text-bg-primary py-3.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity text-center block shadow-sm"
+              >
+                View Order History
+              </Link>
+              <Link
+                href="/shop"
+                className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-lg text-xs font-semibold hover:bg-bg-secondary transition-colors text-center block"
+              >
+                Continue Shopping
+              </Link>
+            </div>
 
-        </div>
+          </div>
         </div>
       </div>
 

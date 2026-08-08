@@ -46,7 +46,7 @@ interface PageProps {
 function OrderTrackingSkeleton() {
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-      
+
       {/* Left Column Image Skeleton */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl w-full border border-border-accent/40 animate-wave relative overflow-hidden bg-bg-secondary">
@@ -69,7 +69,7 @@ function OrderTrackingSkeleton() {
       {/* Right Column Details Skeleton */}
       <div className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none">
         <div className="flex flex-col gap-3 w-full flex-shrink-0">
-          
+
           {/* Header Card Skeleton */}
           <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2 animate-pulse">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -305,14 +305,14 @@ export default function OrderTrackingPage({ params }: PageProps) {
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-      
+
       {/* Left Column: Stable sticky image slideshow (mirroring Checkout Page exactly) */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm bg-bg-secondary">
           {items.length === 0 ? (
             <>
               <img
-                src="/images/xz7hJ6ESQ5b48HiLq5UkSZLMyM_a48801.webp"
+                src="/images/about.png"
                 alt="Order Tracking"
                 className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
               />
@@ -325,11 +325,10 @@ export default function OrderTrackingPage({ params }: PageProps) {
                   key={idx}
                   src={item.image}
                   alt={item.name}
-                  className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${
-                    currentIndex === idx
+                  className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${currentIndex === idx
                       ? 'opacity-100 scale-100 pointer-events-auto'
                       : 'opacity-0 scale-[0.99] pointer-events-none'
-                  }`}
+                    }`}
                 />
               ))}
               <div className="absolute inset-0 bg-black/10 pointer-events-none z-10" />
@@ -341,13 +340,12 @@ export default function OrderTrackingPage({ params }: PageProps) {
             <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Status</p>
-                <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black tracking-widest ${
-                  order.status === 'Cancelled' || order.status === 'Canceled'
+                <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black tracking-widest ${order.status === 'Cancelled' || order.status === 'Canceled'
                     ? 'bg-red-500/20 text-red-600'
                     : order.status === 'Delivered'
                       ? 'bg-green-500/20 text-green-600'
                       : 'bg-indigo-500/20 text-indigo-600'
-                }`}>
+                  }`}>
                   {order.status}
                 </span>
               </div>
@@ -366,410 +364,404 @@ export default function OrderTrackingPage({ params }: PageProps) {
         className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
       >
         <div className="flex flex-col gap-3 w-full flex-shrink-0">
-        
-        {/* Header Card */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <Link
-              href="/account?tab=orders"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-fg-secondary hover:text-fg-primary transition-colors uppercase tracking-wider"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to Account
-            </Link>
-            <span className="text-[10px] font-bold text-fg-secondary/50 uppercase tracking-widest">
-              Order ID: <span className="font-mono">{order.id}</span>
-            </span>
-          </div>
 
-          <h1 className="font-dm-sans text-3xl font-bold tracking-tight text-fg-primary mt-4">
-            Tracking {order.orderNumber}
-          </h1>
-          <p className="text-xs text-fg-secondary leading-relaxed font-semibold">
-            Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
-
-        {/* ── 1. Delivery Tracker (Stepper) ─────────────────────────────────── */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-          <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-            <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-              Delivery Tracker
-            </h2>
-          </div>
-          
-          <div className="p-6 space-y-6">
-            {order.status === 'Cancelled' || order.status === 'Canceled' ? (
-              <div className="flex items-center w-full max-w-md mx-auto relative justify-between py-2">
-                <div className="absolute left-0 right-0 top-6 -translate-y-1/2 h-0.5 bg-red-500/20 -z-10" />
-                
-                <div className="flex flex-col items-center flex-1">
-                  <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-sm shadow-sm z-10">
-                    ✓
-                  </div>
-                  <span className="font-bold text-fg-primary mt-2 text-xs">Ordered</span>
-                  <span className="text-[9px] text-fg-secondary/60 mt-0.5">
-                    {formatTimelineDate(order.statusTimeline?.find(t => t.status === 'Processing')?.timestamp || order.createdAt)}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center flex-1">
-                  <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-sm shadow-sm z-10">
-                    ✕
-                  </div>
-                  <span className="font-bold text-red-500 mt-2 text-xs">Cancelled</span>
-                  <span className="text-[9px] text-red-500/80 mt-0.5">
-                    {formatTimelineDate(order.statusTimeline?.find(t => t.status === 'Cancelled' || t.status === 'Canceled')?.timestamp)}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              (() => {
-                const timeline = order.statusTimeline || [];
-                const orderedItem = timeline.find(t => t.status === 'Processing');
-                const acceptedItem = timeline.find(t => t.status === 'Accepted');
-                const dispatchedItem = timeline.find(t => t.status === 'Dispatched' || t.status === 'Shipped');
-                const deliveredItem = timeline.find(t => t.status === 'Delivered');
-
-                const isAccepted = !!acceptedItem || ['Accepted', 'Dispatched', 'Shipped', 'Delivered'].includes(order.status);
-                const isDispatched = !!dispatchedItem || ['Dispatched', 'Shipped', 'Delivered'].includes(order.status);
-                const isDelivered = !!deliveredItem || order.status === 'Delivered';
-
-                return (
-                  <div className="flex items-center w-full relative justify-between py-2">
-                    <div className="absolute left-[12.5%] right-[12.5%] top-6 -translate-y-1/2 h-0.5 bg-border-accent/60 -z-10">
-                      <div 
-                        className="h-full bg-green-500 transition-all duration-500" 
-                        style={{
-                          width: isDelivered ? '100%' : isDispatched ? '66%' : isAccepted ? '33%' : '0%'
-                        }}
-                      />
-                    </div>
-
-                    <div className="flex flex-col items-center flex-1">
-                      <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-[13px] shadow-sm z-10">
-                        ✓
-                      </div>
-                      <span className="font-bold text-fg-primary mt-2 text-xs">Ordered</span>
-                      <span className="text-[9px] text-fg-secondary/60 mt-0.5">
-                        {formatTimelineDate(orderedItem?.timestamp || order.createdAt)}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col items-center flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${
-                        isAccepted ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
-                      }`}>
-                        {isAccepted ? '✓' : '2'}
-                      </div>
-                      <span className={`font-bold mt-2 text-xs ${isAccepted ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Accepted</span>
-                      <span className="text-[9px] text-fg-secondary/60 mt-0.5">
-                        {acceptedItem ? formatTimelineDate(acceptedItem.timestamp) : ''}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col items-center flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${
-                        isDispatched ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
-                      }`}>
-                        {isDispatched ? '✓' : '3'}
-                      </div>
-                      <span className={`font-bold mt-2 text-xs ${isDispatched ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Dispatched</span>
-                      <span className="text-[9px] text-fg-secondary/60 mt-0.5">
-                        {dispatchedItem ? formatTimelineDate(dispatchedItem.timestamp) : ''}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col items-center flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${
-                        isDelivered ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
-                      }`}>
-                        {isDelivered ? '✓' : '4'}
-                      </div>
-                      <span className={`font-bold mt-2 text-xs ${isDelivered ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Delivered</span>
-                      <span className="text-[9px] text-fg-secondary/60 mt-0.5">
-                        {deliveredItem ? formatTimelineDate(deliveredItem.timestamp) : ''}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })()
-            )}
-
-            {/* Carrier Details Box */}
-            <div className="bg-bg-primary p-4 rounded-xl border border-border-accent/40 flex flex-wrap justify-between items-center gap-4 text-xs">
-              <div>
-                <span className="text-[10px] text-fg-secondary/50 uppercase font-bold tracking-wider block">Courier Partner</span>
-                <span className="font-bold text-fg-primary mt-0.5 block">{order.deliveryPartnerName || 'Standard International Shipping'}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-fg-secondary/50 uppercase font-bold tracking-wider block">Tracking Reference</span>
-                {order.trackingId ? (
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-mono text-indigo-600 font-bold select-all">{order.trackingId}</span>
-                    <button
-                      onClick={() => copyToClipboard(order.trackingId || '')}
-                      className="text-fg-secondary hover:text-fg-primary transition-colors p-1"
-                      title="Copy tracking ID"
-                    >
-                      {copied ? (
-                        <span className="text-[10px] text-green-500 font-semibold uppercase tracking-wider">Copied</span>
-                      ) : (
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <span className="text-fg-secondary/70 italic mt-0.5 block">Reference code will be updated shortly</span>
-                )}
-              </div>
+          {/* Header Card */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 p-8 md:p-10 rounded-xl transition-theme flex flex-col gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <Link
+                href="/account?tab=orders"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-fg-secondary hover:text-fg-primary transition-colors uppercase tracking-wider"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Account
+              </Link>
+              <span className="text-[10px] font-bold text-fg-secondary/50 uppercase tracking-widest">
+                Order ID: <span className="font-mono">{order.id}</span>
+              </span>
             </div>
 
-            {/* Live Shipment Tracking details panel */}
-            {order.trackingId && (
-              <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/40 space-y-4 text-xs mt-1">
-                <div className="flex justify-between items-center border-b border-border-accent/20 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[18px]">✈️</span>
-                    <div>
-                      <span className="font-bold text-fg-primary block">Live Shipment Status</span>
-                      <span className="text-[9px] text-fg-secondary/50 uppercase font-bold tracking-wider">DHL Real-Time Tracker</span>
+            <h1 className="font-dm-sans text-3xl font-bold tracking-tight text-fg-primary mt-4">
+              Tracking {order.orderNumber}
+            </h1>
+            <p className="text-xs text-fg-secondary leading-relaxed font-semibold">
+              Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
+
+          {/* ── 1. Delivery Tracker (Stepper) ─────────────────────────────────── */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                Delivery Tracker
+              </h2>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {order.status === 'Cancelled' || order.status === 'Canceled' ? (
+                <div className="flex items-center w-full max-w-md mx-auto relative justify-between py-2">
+                  <div className="absolute left-0 right-0 top-6 -translate-y-1/2 h-0.5 bg-red-500/20 -z-10" />
+
+                  <div className="flex flex-col items-center flex-1">
+                    <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-sm shadow-sm z-10">
+                      ✓
                     </div>
-                  </div>
-                  {trackingLoading ? (
-                    <span className="text-[10px] text-fg-secondary/60 animate-pulse font-medium">Updating...</span>
-                  ) : tracking ? (
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-extrabold tracking-wider border ${
-                      tracking.status === "Delivered"
-                        ? "bg-green-500/10 text-green-600 border-green-500/20"
-                        : tracking.status === "Out for Delivery"
-                          ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                          : "bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
-                    }`}>
-                      {tracking.status}
+                    <span className="font-bold text-fg-primary mt-2 text-xs">Ordered</span>
+                    <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                      {formatTimelineDate(order.statusTimeline?.find(t => t.status === 'Processing')?.timestamp || order.createdAt)}
                     </span>
+                  </div>
+
+                  <div className="flex flex-col items-center flex-1">
+                    <div className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-sm shadow-sm z-10">
+                      ✕
+                    </div>
+                    <span className="font-bold text-red-500 mt-2 text-xs">Cancelled</span>
+                    <span className="text-[9px] text-red-500/80 mt-0.5">
+                      {formatTimelineDate(order.statusTimeline?.find(t => t.status === 'Cancelled' || t.status === 'Canceled')?.timestamp)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                (() => {
+                  const timeline = order.statusTimeline || [];
+                  const orderedItem = timeline.find(t => t.status === 'Processing');
+                  const acceptedItem = timeline.find(t => t.status === 'Accepted');
+                  const dispatchedItem = timeline.find(t => t.status === 'Dispatched' || t.status === 'Shipped');
+                  const deliveredItem = timeline.find(t => t.status === 'Delivered');
+
+                  const isAccepted = !!acceptedItem || ['Accepted', 'Dispatched', 'Shipped', 'Delivered'].includes(order.status);
+                  const isDispatched = !!dispatchedItem || ['Dispatched', 'Shipped', 'Delivered'].includes(order.status);
+                  const isDelivered = !!deliveredItem || order.status === 'Delivered';
+
+                  return (
+                    <div className="flex items-center w-full relative justify-between py-2">
+                      <div className="absolute left-[12.5%] right-[12.5%] top-6 -translate-y-1/2 h-0.5 bg-border-accent/60 -z-10">
+                        <div
+                          className="h-full bg-green-500 transition-all duration-500"
+                          style={{
+                            width: isDelivered ? '100%' : isDispatched ? '66%' : isAccepted ? '33%' : '0%'
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex flex-col items-center flex-1">
+                        <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-[13px] shadow-sm z-10">
+                          ✓
+                        </div>
+                        <span className="font-bold text-fg-primary mt-2 text-xs">Ordered</span>
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                          {formatTimelineDate(orderedItem?.timestamp || order.createdAt)}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col items-center flex-1">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isAccepted ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
+                          }`}>
+                          {isAccepted ? '✓' : '2'}
+                        </div>
+                        <span className={`font-bold mt-2 text-xs ${isAccepted ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Accepted</span>
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                          {acceptedItem ? formatTimelineDate(acceptedItem.timestamp) : ''}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col items-center flex-1">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isDispatched ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
+                          }`}>
+                          {isDispatched ? '✓' : '3'}
+                        </div>
+                        <span className={`font-bold mt-2 text-xs ${isDispatched ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Dispatched</span>
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                          {dispatchedItem ? formatTimelineDate(dispatchedItem.timestamp) : ''}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col items-center flex-1">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isDelivered ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
+                          }`}>
+                          {isDelivered ? '✓' : '4'}
+                        </div>
+                        <span className={`font-bold mt-2 text-xs ${isDelivered ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Delivered</span>
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                          {deliveredItem ? formatTimelineDate(deliveredItem.timestamp) : ''}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+
+              {/* Carrier Details Box */}
+              <div className="bg-bg-primary p-4 rounded-xl border border-border-accent/40 flex flex-wrap justify-between items-center gap-4 text-xs">
+                <div>
+                  <span className="text-[10px] text-fg-secondary/50 uppercase font-bold tracking-wider block">Courier Partner</span>
+                  <span className="font-bold text-fg-primary mt-0.5 block">{order.deliveryPartnerName || 'Standard International Shipping'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-fg-secondary/50 uppercase font-bold tracking-wider block">Tracking Reference</span>
+                  {order.trackingId ? (
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="font-mono text-indigo-600 font-bold select-all">{order.trackingId}</span>
+                      <button
+                        onClick={() => copyToClipboard(order.trackingId || '')}
+                        className="text-fg-secondary hover:text-fg-primary transition-colors p-1"
+                        title="Copy tracking ID"
+                      >
+                        {copied ? (
+                          <span className="text-[10px] text-green-500 font-semibold uppercase tracking-wider">Copied</span>
+                        ) : (
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   ) : (
-                    <span className="text-[9px] text-fg-secondary/50 font-bold uppercase">Dispatched</span>
+                    <span className="text-fg-secondary/70 italic mt-0.5 block">Reference code will be updated shortly</span>
                   )}
                 </div>
+              </div>
 
-                {trackingLoading ? (
-                  <div className="py-6 flex flex-col items-center justify-center gap-2 text-fg-secondary/60">
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span className="text-[10px] font-medium animate-pulse">Connecting to carrier servers...</span>
-                  </div>
-                ) : tracking && tracking.checkpoints && tracking.checkpoints.length > 0 ? (
-                  <div className="space-y-4">
-                    {/* Est delivery date badge if not delivered */}
-                    {tracking.status !== "Delivered" && tracking.estimatedDelivery && (
-                      <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-lg text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                        <span>📅</span>
-                        <span>Estimated Arrival: <strong>{new Intl.DateTimeFormat("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric"
-                        }).format(new Date(tracking.estimatedDelivery))}</strong></span>
+              {/* Live Shipment Tracking details panel */}
+              {order.trackingId && (
+                <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/40 space-y-4 text-xs mt-1">
+                  <div className="flex justify-between items-center border-b border-border-accent/20 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[18px]">✈️</span>
+                      <div>
+                        <span className="font-bold text-fg-primary block">Live Shipment Status</span>
+                        <span className="text-[9px] text-fg-secondary/50 uppercase font-bold tracking-wider">DHL Real-Time Tracker</span>
                       </div>
+                    </div>
+                    {trackingLoading ? (
+                      <span className="text-[10px] text-fg-secondary/60 animate-pulse font-medium">Updating...</span>
+                    ) : tracking ? (
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-extrabold tracking-wider border ${tracking.status === "Delivered"
+                          ? "bg-green-500/10 text-green-600 border-green-500/20"
+                          : tracking.status === "Out for Delivery"
+                            ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                            : "bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
+                        }`}>
+                        {tracking.status}
+                      </span>
+                    ) : (
+                      <span className="text-[9px] text-fg-secondary/50 font-bold uppercase">Dispatched</span>
                     )}
+                  </div>
 
-                    {/* Timeline List */}
-                    <div className="relative border-l border-border-accent/60 pl-4 space-y-4.5 ml-1.5 py-1">
-                      {tracking.checkpoints.map((cp: any, idx: number) => {
-                        const isLatest = idx === 0;
-                        return (
-                          <div key={idx} className="relative">
-                            {/* Circle dot marker */}
-                            <div className={`absolute -left-[21.5px] top-1.5 w-3 h-3 rounded-full border bg-bg-primary transition-all ${
-                              isLatest 
-                                ? "border-indigo-600 ring-4 ring-indigo-500/10 bg-indigo-600 scale-110" 
-                                : "border-fg-secondary/30 bg-bg-secondary"
-                            }`} />
-                            <div className="flex justify-between items-start gap-4">
-                              <div>
-                                <span className={`font-bold block text-[13px] ${isLatest ? "text-indigo-600 dark:text-indigo-400" : "text-fg-primary"}`}>
-                                  {cp.description}
-                                </span>
-                                <span className="text-[10px] text-fg-secondary/60 mt-0.5 block font-medium">
-                                  📍 {cp.location}
+                  {trackingLoading ? (
+                    <div className="py-6 flex flex-col items-center justify-center gap-2 text-fg-secondary/60">
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span className="text-[10px] font-medium animate-pulse">Connecting to carrier servers...</span>
+                    </div>
+                  ) : tracking && tracking.checkpoints && tracking.checkpoints.length > 0 ? (
+                    <div className="space-y-4">
+                      {/* Est delivery date badge if not delivered */}
+                      {tracking.status !== "Delivered" && tracking.estimatedDelivery && (
+                        <div className="p-3 bg-indigo-500/5 border border-indigo-500/10 rounded-lg text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                          <span>📅</span>
+                          <span>Estimated Arrival: <strong>{new Intl.DateTimeFormat("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric"
+                          }).format(new Date(tracking.estimatedDelivery))}</strong></span>
+                        </div>
+                      )}
+
+                      {/* Timeline List */}
+                      <div className="relative border-l border-border-accent/60 pl-4 space-y-4.5 ml-1.5 py-1">
+                        {tracking.checkpoints.map((cp: any, idx: number) => {
+                          const isLatest = idx === 0;
+                          return (
+                            <div key={idx} className="relative">
+                              {/* Circle dot marker */}
+                              <div className={`absolute -left-[21.5px] top-1.5 w-3 h-3 rounded-full border bg-bg-primary transition-all ${isLatest
+                                  ? "border-indigo-600 ring-4 ring-indigo-500/10 bg-indigo-600 scale-110"
+                                  : "border-fg-secondary/30 bg-bg-secondary"
+                                }`} />
+                              <div className="flex justify-between items-start gap-4">
+                                <div>
+                                  <span className={`font-bold block text-[13px] ${isLatest ? "text-indigo-600 dark:text-indigo-400" : "text-fg-primary"}`}>
+                                    {cp.description}
+                                  </span>
+                                  <span className="text-[10px] text-fg-secondary/60 mt-0.5 block font-medium">
+                                    📍 {cp.location}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-fg-secondary/60 font-semibold whitespace-nowrap mt-0.5">
+                                  {new Intl.DateTimeFormat("en-IN", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: false
+                                  }).format(new Date(cp.timestamp))}
                                 </span>
                               </div>
-                              <span className="text-[10px] text-fg-secondary/60 font-semibold whitespace-nowrap mt-0.5">
-                                {new Intl.DateTimeFormat("en-IN", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                  hour12: false
-                                }).format(new Date(cp.timestamp))}
-                              </span>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {tracking.trackingUrl && (
-                      <a
-                        href={tracking.trackingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full text-center block bg-fg-primary text-bg-primary py-3 rounded-xl text-xs font-bold hover:opacity-90 active:scale-[0.99] transition-all"
-                      >
-                        Track on DHL Express Portal ↗
-                      </a>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-6 text-fg-secondary/60">
-                    <p className="font-semibold text-xs">No active checkpoints found.</p>
-                    <p className="text-[10px] mt-0.5">Transit scan details will update shortly.</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Est Date Alert */}
-            {order.status !== 'Delivered' && order.status !== 'Cancelled' && order.status !== 'Canceled' && (
-              <div className="bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-500 p-4 rounded-xl text-xs font-semibold flex items-center gap-3">
-                <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span>Estimated Delivery: <strong className="underline">{formattedEstDate}</strong></span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── 2. Admin & Warehouse Message Updates ─────────────────────────── */}
-        {order.adminMessage && (
-          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                Message from Warehouse
-              </h2>
-            </div>
-            <div className="p-6">
-              <div className="bg-bg-primary p-4 rounded-xl border border-border-accent/30 text-xs">
-                <p className="text-fg-primary leading-relaxed font-semibold">{order.adminMessage}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── 3. Chronological Log History ─────────────────────────────────── */}
-        {order.statusTimeline && order.statusTimeline.length > 0 && (
-          <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-            <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-              <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                Log History
-              </h2>
-            </div>
-            <div className="p-6">
-              <div className="relative border-l border-border-accent pl-4 space-y-5 ml-2.5">
-                {order.statusTimeline.slice().reverse().map((t, idx) => (
-                  <div key={idx} className="relative">
-                    <div className={`absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full border bg-bg-primary ${
-                      t.status === 'Cancelled' || t.status === 'Canceled'
-                        ? 'border-red-500'
-                        : t.status === 'Delivered'
-                          ? 'border-green-600'
-                          : 'border-fg-primary'
-                    }`} />
-                    <div className="flex justify-between items-start gap-4 text-xs">
-                      <div>
-                        <span className="font-bold text-fg-primary block text-sm">{t.status}</span>
-                        {t.comment && <p className="text-fg-secondary mt-1 leading-relaxed font-medium">{t.comment}</p>}
+                          );
+                        })}
                       </div>
-                      <span className="text-[10px] text-fg-secondary/60 font-semibold whitespace-nowrap">
-                        {formatTimelineDate(t.timestamp)}
-                      </span>
+
+                      {tracking.trackingUrl && (
+                        <a
+                          href={tracking.trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full text-center block bg-fg-primary text-bg-primary py-3 rounded-xl text-xs font-bold hover:opacity-90 active:scale-[0.99] transition-all"
+                        >
+                          Track on DHL Express Portal ↗
+                        </a>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ) : (
+                    <div className="text-center py-6 text-fg-secondary/60">
+                      <p className="font-semibold text-xs">No active checkpoints found.</p>
+                      <p className="text-[10px] mt-0.5">Transit scan details will update shortly.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Est Date Alert */}
+              {order.status !== 'Delivered' && order.status !== 'Cancelled' && order.status !== 'Canceled' && (
+                <div className="bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-500 p-4 rounded-xl text-xs font-semibold flex items-center gap-3">
+                  <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>Estimated Delivery: <strong className="underline">{formattedEstDate}</strong></span>
+                </div>
+              )}
             </div>
           </div>
-        )}
 
-        {/* ── 4. Order Items Summary ────────────────────────────────────────── */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
-          <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
-            <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-              Items Summary
-            </h2>
-          </div>
-          <div className="p-6 flex flex-col gap-4">
-            {order.items.map((item, index) => (
-              <Link 
-                key={index} 
-                href={`/shop/${item.slug}`}
-                className={`flex gap-4 group/item hover:opacity-90 transition-opacity ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}
-              >
-                <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden flex-shrink-0 relative border border-border-accent/30">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300" />
+          {/* ── 2. Admin & Warehouse Message Updates ─────────────────────────── */}
+          {order.adminMessage && (
+            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                  Message from Warehouse
+                </h2>
+              </div>
+              <div className="p-6">
+                <div className="bg-bg-primary p-4 rounded-xl border border-border-accent/30 text-xs">
+                  <p className="text-fg-primary leading-relaxed font-semibold">{order.adminMessage}</p>
                 </div>
-                <div className="flex-1 flex justify-between items-start text-xs">
-                  <div>
-                    <h4 className="font-semibold text-fg-primary group-hover/item:underline decoration-fg-primary transition-all">{item.name}</h4>
-                    <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
-                      <span>{item.material}</span>
-                      <span>•</span>
-                      <span>{item.dimension}</span>
+              </div>
+            </div>
+          )}
+
+          {/* ── 3. Chronological Log History ─────────────────────────────────── */}
+          {order.statusTimeline && order.statusTimeline.length > 0 && (
+            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                  Log History
+                </h2>
+              </div>
+              <div className="p-6">
+                <div className="relative border-l border-border-accent pl-4 space-y-5 ml-2.5">
+                  {order.statusTimeline.slice().reverse().map((t, idx) => (
+                    <div key={idx} className="relative">
+                      <div className={`absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full border bg-bg-primary ${t.status === 'Cancelled' || t.status === 'Canceled'
+                          ? 'border-red-500'
+                          : t.status === 'Delivered'
+                            ? 'border-green-600'
+                            : 'border-fg-primary'
+                        }`} />
+                      <div className="flex justify-between items-start gap-4 text-xs">
+                        <div>
+                          <span className="font-bold text-fg-primary block text-sm">{t.status}</span>
+                          {t.comment && <p className="text-fg-secondary mt-1 leading-relaxed font-medium">{t.comment}</p>}
+                        </div>
+                        <span className="text-[10px] text-fg-secondary/60 font-semibold whitespace-nowrap">
+                          {formatTimelineDate(t.timestamp)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-fg-primary">{formatPrice(item.price)}</p>
-                    <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
-                  </div>
+                  ))}
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+              </div>
+            </div>
+          )}
 
-        {/* ── 5. Delivery Location (Shipping Address) ───────────────────────── */}
-        {order.shippingAddress && (
+          {/* ── 4. Order Items Summary ────────────────────────────────────────── */}
           <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
             <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
               <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                Delivery Location
+                Items Summary
               </h2>
             </div>
-            <div className="p-6">
-              <div className="text-xs space-y-1 bg-bg-primary p-4 rounded-xl border border-border-accent/30 leading-relaxed font-semibold">
-                <span className="font-bold text-fg-primary block">{order.shippingAddress.name}</span>
-                <p className="text-fg-secondary">{order.shippingAddress.addressLine}</p>
-                {order.shippingAddress.phone && <p className="text-fg-secondary/70 mt-1 font-semibold">📞 {order.shippingAddress.phone}</p>}
-              </div>
+            <div className="p-6 flex flex-col gap-4">
+              {order.items.map((item, index) => (
+                <Link
+                  key={index}
+                  href={`/shop/${item.slug}`}
+                  className={`flex gap-4 group/item hover:opacity-90 transition-opacity ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}
+                >
+                  <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden flex-shrink-0 relative border border-border-accent/30">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-300" />
+                  </div>
+                  <div className="flex-1 flex justify-between items-start text-xs">
+                    <div>
+                      <h4 className="font-semibold text-fg-primary group-hover/item:underline decoration-fg-primary transition-all">{item.name}</h4>
+                      <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
+                        <span>{item.material}</span>
+                        <span>•</span>
+                        <span>{item.dimension}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-fg-primary">{formatPrice(item.price)}</p>
+                      <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
-        )}
 
-        {/* ── 6. Bottom Navigation Shortcuts ───────────────────────────────── */}
-        <div className="w-full bg-bg-secondary border border-border-accent/40 p-6 rounded-xl transition-theme flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/shop"
-            className="flex-1 border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-xl text-xs font-bold hover:bg-bg-secondary transition-colors text-center block"
-          >
-            Continue Shopping
-          </Link>
-          <Link
-            href="/faq"
-            className="flex-1 text-fg-secondary py-3.5 rounded-xl text-[11px] font-semibold hover:text-fg-primary transition-colors text-center block"
-          >
-            Need Help? Visit FAQs
-          </Link>
-        </div>
+          {/* ── 5. Delivery Location (Shipping Address) ───────────────────────── */}
+          {order.shippingAddress && (
+            <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
+              <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
+                <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
+                  Delivery Location
+                </h2>
+              </div>
+              <div className="p-6">
+                <div className="text-xs space-y-1 bg-bg-primary p-4 rounded-xl border border-border-accent/30 leading-relaxed font-semibold">
+                  <span className="font-bold text-fg-primary block">{order.shippingAddress.name}</span>
+                  <p className="text-fg-secondary">{order.shippingAddress.addressLine}</p>
+                  {order.shippingAddress.phone && <p className="text-fg-secondary/70 mt-1 font-semibold">📞 {order.shippingAddress.phone}</p>}
+                </div>
+              </div>
+            </div>
+          )}
 
-        {/* Bottom spacing */}
-        <div className="pb-8" />
+          {/* ── 6. Bottom Navigation Shortcuts ───────────────────────────────── */}
+          <div className="w-full bg-bg-secondary border border-border-accent/40 p-6 rounded-xl transition-theme flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/shop"
+              className="flex-1 border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-xl text-xs font-bold hover:bg-bg-secondary transition-colors text-center block"
+            >
+              Continue Shopping
+            </Link>
+            <Link
+              href="/faq"
+              className="flex-1 text-fg-secondary py-3.5 rounded-xl text-[11px] font-semibold hover:text-fg-primary transition-colors text-center block"
+            >
+              Need Help? Visit FAQs
+            </Link>
+          </div>
+
+          {/* Bottom spacing */}
+          <div className="pb-8" />
         </div>
       </div>
 

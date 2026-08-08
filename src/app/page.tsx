@@ -672,7 +672,7 @@ export default function Home() {
         {/* Right staged Image card */}
         <div className="w-full md:w-[55%] lg:w-[60%] h-[300px] md:h-full rounded-xl overflow-hidden relative border border-border-accent/40 order-first md:order-none">
           <img
-            src="/images/TRNAt6di5Swwdq8nGr6m4FLg4AU_76cb7c.webp"
+            src="/images/home-about.jpg"
             alt="Staged Interior Design"
             className="w-full h-full object-cover"
           />

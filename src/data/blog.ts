@@ -86,7 +86,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Creating a Cozy Home with Scandinavian Minimalism',
     date: 'January 28, 2026',
     readTime: '5 min read',
-    image: '/images/TRNAt6di5Swwdq8nGr6m4FLg4AU_76cb7c.webp',
+    image: '/images/home-about.jpg',
     summary: 'Minimalism doesn’t have to feel cold or sterile. Discover the secrets to combining clean geometric lines with warm textures and ambient lighting to build a cozy, clutter-free sanctuary.',
     content: `
       <p>Minimalism is often misunderstood as cold, stark, and empty. In Scandinavia, however, minimalism is deeply tied to warmth and comfort. The challenge is to create a space that feels uncluttered and simple, yet cozy and welcoming. By focusing on sensory elements, textures, and lighting, you can craft a home that is both quiet and comforting.</p>
