@@ -285,7 +285,7 @@ export default function Home() {
           </button>
 
           {/* Dot Indicators — bottom center */}
-          <div className="absolute bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+          <div className="absolute bottom-28 md:bottom-6 left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 z-20">
             {activeSlides.map((_: any, idx: number) => {
               const activeDotIdx = (currentSlide - 1 + activeSlides.length) % activeSlides.length;
               return (

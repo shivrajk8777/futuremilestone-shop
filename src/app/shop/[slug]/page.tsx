@@ -434,8 +434,8 @@ export default function ProductDetails({ params }: PageProps) {
               ))}
             </div>
 
-            {/* Mobile Dots Indicators (Mobile only) */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20 pointer-events-none lg:hidden">
+            {/* Mobile Dots Indicators (Mobile only - hidden per design spec) */}
+            <div className="absolute bottom-4 left-0 right-0 hidden justify-center gap-1.5 z-20 pointer-events-none lg:hidden">
               {activeProduct.images.map((_, idx) => {
                 const isActive = activeImgIdx === idx;
                 return (
