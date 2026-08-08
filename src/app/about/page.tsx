@@ -8,7 +8,7 @@ const DEFAULT_TEAM = [
   {
     name: 'Shrawan',
     role: 'Founder & Lead Artisan',
-    image: '/images/Shrawan.jpg',
+    image: '/images/Shrawan.webp',
     socials: { youtube: 'https://www.youtube.com/@futuremilestoneindia', instagram: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr', facebook: '#' }
   },
   {
