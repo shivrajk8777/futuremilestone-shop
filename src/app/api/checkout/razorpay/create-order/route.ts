@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { amount } = await request.json();
+    const { amount, currency, inrAmount } = await request.json();
 
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       return NextResponse.json(
@@ -38,18 +38,39 @@ export async function POST(request: NextRequest) {
       key_secret: keySecret,
     });
 
-    // Razorpay amount is in paise (1 INR = 100 paise)
-    const amountInPaise = Math.round(Number(amount) * 100);
+    const targetCurrency = (currency || 'INR').toUpperCase();
     const receipt = `rcpt_${Math.random().toString(36).slice(2, 10)}`;
 
-    const razorpayOrder = await razorpay.orders.create({
-      amount: amountInPaise,
-      currency: 'INR',
-      receipt,
-      notes: {
-        userId,
-      },
-    });
+    let razorpayOrder: any;
+
+    if (targetCurrency !== 'INR') {
+      try {
+        const amountInSubunits = Math.round(Number(amount) * 100);
+        razorpayOrder = await razorpay.orders.create({
+          amount: amountInSubunits,
+          currency: targetCurrency,
+          receipt,
+          notes: { userId },
+        });
+      } catch (err: any) {
+        console.warn(`Razorpay order creation with ${targetCurrency} failed, falling back to INR:`, err?.message || err);
+        const fallbackInr = inrAmount || Math.round(Number(amount) * 83.5);
+        razorpayOrder = await razorpay.orders.create({
+          amount: Math.round(Number(fallbackInr) * 100),
+          currency: 'INR',
+          receipt,
+          notes: { userId },
+        });
+      }
+    } else {
+      const amountInPaise = Math.round(Number(amount) * 100);
+      razorpayOrder = await razorpay.orders.create({
+        amount: amountInPaise,
+        currency: 'INR',
+        receipt,
+        notes: { userId },
+      });
+    }
 
     return NextResponse.json({
       success: true,

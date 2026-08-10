@@ -233,6 +233,7 @@ export default function CheckoutPage() {
   const [checkoutError, setCheckoutError] = useState('');
   const [placingOrder, setPlacingOrder] = useState(false);
   const [paypalLoading, setPaypalLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'paypal'>('razorpay');
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
 
@@ -322,6 +323,46 @@ export default function CheckoutPage() {
     }
   }, [user, loading]);
 
+  // Persist cart updates to localStorage or DB
+  const persistCart = (updatedCart: CartItem[]) => {
+    if (user) {
+      fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart: updatedCart }),
+      }).catch((err) => console.error('Failed to save cart to DB:', err));
+      localStorage.removeItem('cart');
+    } else {
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+    }
+    window.dispatchEvent(new Event('cart-updated'));
+  };
+
+  const handleRemoveItem = (slug: string, material: string, dimension: string) => {
+    const updated = cart.filter((item) => {
+      const itemMat = item.product.selectedMaterial || 'Oak';
+      const itemDim = item.product.selectedDimension || 'Standard';
+      return !(item.product.slug === slug && itemMat === material && itemDim === dimension);
+    });
+    setCart(updated);
+    persistCart(updated);
+  };
+
+  const handleUpdateQuantity = (slug: string, material: string, dimension: string, delta: number) => {
+    const updated = cart
+      .map((item) => {
+        const itemMat = item.product.selectedMaterial || 'Oak';
+        const itemDim = item.product.selectedDimension || 'Standard';
+        if (item.product.slug === slug && itemMat === material && itemDim === dimension) {
+          return { ...item, quantity: Math.max(0, item.quantity + delta) };
+        }
+        return item;
+      })
+      .filter((item) => item.quantity > 0);
+    setCart(updated);
+    persistCart(updated);
+  };
+
   // Set default shipping selection when user details load
   useEffect(() => {
     if (user) {
@@ -366,9 +407,9 @@ export default function CheckoutPage() {
     return () => window.removeEventListener('wheel', handleWheel);
   }, []);
 
-  // Initialize PayPal Buttons when outside India
+  // Initialize PayPal Buttons when PayPal payment method is selected
   useEffect(() => {
-    if (loading || cartLoading || !user || isIndia || cart.length === 0) return;
+    if (loading || cartLoading || !user || paymentMethod !== 'paypal' || cart.length === 0) return;
 
     const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
     if (!clientId) {
@@ -507,7 +548,7 @@ export default function CheckoutPage() {
         } catch { }
       }
     };
-  }, [loading, cartLoading, user, isIndia, cart, country, total, addressOption, selectedCountryIso, selectedSavedId]);
+  }, [loading, cartLoading, user, paymentMethod, cart, country, total, addressOption, selectedCountryIso, selectedSavedId]);
 
 
   if (loading || cartLoading) {
@@ -791,12 +832,19 @@ export default function CheckoutPage() {
     }
 
     try {
-      const convertedAmount = Math.round(total * (country.rate || 83.5));
-      // 1. Create order on server in converted INR amount
+      const selectedCurrency = country.currency || 'USD';
+      const convertedAmount = Math.round(total * (country.rate || 1));
+      const inrEquivalent = Math.round(total * 83.5);
+
+      // 1. Create order on server in selected currency (with INR fallback)
       const res = await fetch('/api/checkout/razorpay/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: convertedAmount }),
+        body: JSON.stringify({
+          amount: convertedAmount,
+          currency: selectedCurrency,
+          inrAmount: inrEquivalent,
+        }),
       });
 
       const orderData = await res.json();
@@ -805,7 +853,7 @@ export default function CheckoutPage() {
       }
 
       // 2. Open Razorpay Modal
-      const options = {
+      const options: any = {
         key: orderData.keyId,
         amount: orderData.amount,
         currency: orderData.currency,
@@ -816,6 +864,24 @@ export default function CheckoutPage() {
           name: shippingDetails.fullName || user.name,
           email: user.email,
           contact: shippingDetails.phone || user.phone || '',
+        },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: 'UPI (GPay, PhonePe, Paytm, QR)',
+                instruments: [
+                  {
+                    method: 'upi',
+                  },
+                ],
+              },
+            },
+            sequence: ['block.upi', 'block.cards', 'block.netbanking', 'block.wallet', 'block.paylater'],
+            preferences: {
+              show_default_blocks: true,
+            },
+          },
         },
         theme: {
           color: '#0f172a',
@@ -942,9 +1008,21 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1 flex flex-col justify-between text-xs">
                       <div>
-                        <div className="flex justify-between font-semibold text-fg-primary">
+                        <div className="flex justify-between items-start font-semibold text-fg-primary gap-2">
                           <h4>{item.product.name}</h4>
-                          <p>{formatPrice(item.product.price * item.quantity)}</p>
+                          <div className="flex items-center gap-2">
+                            <span>{formatPrice(item.product.price * item.quantity)}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveItem(item.product.slug, itemMat, itemDim)}
+                              className="text-fg-secondary/40 hover:text-red-500 transition-colors p-1 -mr-1 cursor-pointer"
+                              title="Remove item"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                         <p className="text-fg-secondary/70 capitalize mt-0.5">{item.product.category} Collection</p>
                         <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
@@ -953,7 +1031,38 @@ export default function CheckoutPage() {
                           <span>{itemDim}</span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-fg-secondary/70 mt-1.5">Qty: {item.quantity}</p>
+
+                      <div className="flex items-center justify-between mt-2 pt-1">
+                        <div className="flex items-center border border-border-accent/40 rounded-lg overflow-hidden bg-bg-primary">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateQuantity(item.product.slug, itemMat, itemDim, -1)}
+                            className="px-2 py-0.5 text-xs font-semibold text-fg-secondary hover:text-fg-primary hover:bg-bg-secondary transition-colors cursor-pointer"
+                            title="Decrease quantity"
+                          >
+                            -
+                          </button>
+                          <span className="px-2.5 py-0.5 text-[10px] font-bold text-fg-primary border-x border-border-accent/40 min-w-[24px] text-center select-none">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateQuantity(item.product.slug, itemMat, itemDim, 1)}
+                            className="px-2 py-0.5 text-xs font-semibold text-fg-secondary hover:text-fg-primary hover:bg-bg-secondary transition-colors cursor-pointer"
+                            title="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(item.product.slug, itemMat, itemDim)}
+                          className="text-[10px] font-medium text-red-500/80 hover:text-red-500 hover:underline transition-all cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1206,7 +1315,50 @@ export default function CheckoutPage() {
             </div>
 
             <div className="p-6 space-y-5">
-              {isIndia ? (
+              {/* Payment Method Selector */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('razorpay')}
+                  className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer text-center ${
+                    paymentMethod === 'razorpay'
+                      ? 'border-fg-primary bg-fg-primary/5 text-fg-primary shadow-sm font-semibold'
+                      : 'border-border-accent/40 bg-bg-primary text-fg-secondary hover:border-border-accent'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-[#0052CC] dark:text-[#3395FF]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.323L12.38 24 2.5 12.338l8.528-5.568-1.579-4.27L0 8.653 14.156 24h.005L24 0h-1.564z"/>
+                    </svg>
+                    <span className="text-xs font-bold font-dm-sans">Razorpay</span>
+                  </div>
+                  <span className="text-[10px] text-fg-secondary leading-tight">
+                    UPI, Credit & Debit Cards
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('paypal')}
+                  className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer text-center ${
+                    paymentMethod === 'paypal'
+                      ? 'border-fg-primary bg-fg-primary/5 text-fg-primary shadow-sm font-semibold'
+                      : 'border-border-accent/40 bg-bg-primary text-fg-secondary hover:border-border-accent'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-4 h-4 text-[#003087]" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .761-.647h6.812c2.474 0 4.397.587 5.397 1.705.952 1.06 1.144 2.585.57 4.53-.024.085-.05.17-.078.256-.84 2.766-2.88 4.417-5.918 4.417H9.79l-1.096 6.643a.641.641 0 0 1-.633.713h-.985z"/>
+                    </svg>
+                    <span className="text-xs font-bold font-dm-sans">PayPal</span>
+                  </div>
+                  <span className="text-[10px] text-fg-secondary leading-tight">
+                    PayPal, Credit & Debit Cards
+                  </span>
+                </button>
+              </div>
+
+              {paymentMethod === 'razorpay' ? (
                 <div className="space-y-4">
                   <button
                     type="button"
@@ -1223,7 +1375,7 @@ export default function CheckoutPage() {
                         <span>Processing Payment...</span>
                       </>
                     ) : (
-                      <span>Pay Now — {formatPrice(total)}</span>
+                      <span>Pay with Razorpay — {formatPrice(total)}</span>
                     )}
                   </button>
                 </div>
