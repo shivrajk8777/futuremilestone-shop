@@ -1,23 +1,17 @@
 import { MongoClient, Db } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.MONGODB_DB;
-
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
-}
-
-if (!MONGODB_DB) {
-  throw new Error("Please define the MONGODB_DB environment variable inside .env.local");
-}
-
 const globalForMongo = globalThis as unknown as {
   __fjordMongoClientPromise?: Promise<MongoClient>;
 };
 
 export async function getMongoClient(): Promise<MongoClient> {
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+  }
+
   if (!globalForMongo.__fjordMongoClientPromise) {
-    const client = new MongoClient(MONGODB_URI as string, {
+    const client = new MongoClient(MONGODB_URI, {
       maxPoolSize: 10,
       minPoolSize: 0,
       retryReads: true,
@@ -31,6 +25,11 @@ export async function getMongoClient(): Promise<MongoClient> {
 }
 
 export async function getDatabase(): Promise<Db> {
+  const MONGODB_DB = process.env.MONGODB_DB;
+  if (!MONGODB_DB) {
+    throw new Error("Please define the MONGODB_DB environment variable inside .env.local");
+  }
   const client = await getMongoClient();
   return client.db(MONGODB_DB);
 }
+
