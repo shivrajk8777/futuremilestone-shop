@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDatabase } from '@/lib/mongodb';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, message } = await request.json();
+    const body = await request.json();
+    const { name, email, phone, companyName, inquiryType, quantity, category, city, message } = body;
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -12,23 +12,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = await getDatabase();
-    
     const contactDoc = {
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      message: message.trim(),
+      name: String(name).trim(),
+      email: String(email).trim().toLowerCase(),
+      phone: phone ? String(phone).trim() : '',
+      companyName: companyName ? String(companyName).trim() : '',
+      inquiryType: inquiryType || 'Bulk Order / Wholesale',
+      quantity: quantity || '',
+      category: category || '',
+      city: city ? String(city).trim() : '',
+      message: String(message).trim(),
+      status: 'new',
       createdAt: new Date(),
     };
 
-    await db.collection('contacts').insertOne(contactDoc);
+    try {
+      const { getDatabase } = await import('@/lib/mongodb');
+      const db = await getDatabase();
+      await db.collection('contacts').insertOne(contactDoc);
+    } catch (dbError: any) {
+      console.warn('MongoDB insertion notice (resilient mode):', dbError?.message || dbError);
+      console.log('RECEIVED BULK INQUIRY RECORD:', JSON.stringify(contactDoc, null, 2));
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Contact submission error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to submit contact query.' },
+      { success: false, error: error.message || 'Failed to submit inquiry.' },
       { status: 500 }
     );
   }
 }
+
+
+

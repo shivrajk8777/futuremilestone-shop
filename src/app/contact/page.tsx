@@ -3,14 +3,28 @@
 import { useState, useRef, useEffect } from 'react';
 
 export default function Contact() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    companyName: '',
+    inquiryType: 'Bulk Order / Wholesale',
+    quantity: '5 - 20 Units',
+    category: 'All Furniture Categories',
+    city: '',
+    message: '',
+  });
+
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) return;
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      setError('Please fill in your Name, Email, and Message.');
+      return;
+    }
 
     setSubmitting(true);
     setError('');
@@ -22,17 +36,28 @@ export default function Contact() {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
-      if (data.success) {
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.success) {
         setSubmitted(true);
-        setFormData({ name: '', email: '', message: '' });
-        setTimeout(() => setSubmitted(false), 5000);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          companyName: '',
+          inquiryType: 'Bulk Order / Wholesale',
+          quantity: '5 - 20 Units',
+          category: 'All Furniture Categories',
+          city: '',
+          message: '',
+        });
+        setTimeout(() => setSubmitted(false), 6000);
       } else {
-        setError(data.error || 'Something went wrong. Please try again.');
+        setError(data?.error || 'Failed to submit inquiry. Please try again.');
       }
     } catch (err) {
-      console.error(err);
-      setError('Failed to send message. Please check your connection and try again.');
+      console.error('Contact form submission error:', err);
+      setError('Connection error. Please check your network and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -91,13 +116,6 @@ export default function Contact() {
     }
   ];
 
-  const socialCards = [
-    { name: 'YouTube', href: 'https://www.youtube.com/@futuremilestoneindia' },
-    { name: 'Instagram', href: '/' },
-    { name: 'Pinterest', href: '/' },
-    { name: 'Facebook', href: '/' }
-  ];
-
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
 
@@ -105,7 +123,7 @@ export default function Contact() {
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
           <img
-            src="/images/tTnxI9bEGHuPLga5HlUAYCJjneY_bc98a1.webp"
+            src="/images/contact.png"
             alt="Future Milestone Furniture Studio"
             className="absolute inset-0 w-full h-full object-cover brightness-[0.95]"
           />
@@ -143,6 +161,7 @@ export default function Contact() {
                 </div>
               )}
 
+              {/* Row 1: Name & Email */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input
                   type="text"
@@ -150,7 +169,7 @@ export default function Contact() {
                   disabled={submitting}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Your Name"
+                  placeholder="Your Name *"
                   className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
                 />
                 <input
@@ -159,19 +178,93 @@ export default function Contact() {
                   disabled={submitting}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Your Email"
+                  placeholder="Your Email *"
                   className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
                 />
               </div>
 
+              {/* Row 2: Phone & Company Name */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  type="tel"
+                  disabled={submitting}
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="Phone / WhatsApp Number"
+                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
+                />
+                <input
+                  type="text"
+                  disabled={submitting}
+                  value={formData.companyName}
+                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                  placeholder="Company / Business Name"
+                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
+                />
+              </div>
+
+              {/* Row 3: Inquiry Type & Quantity */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <select
+                  value={formData.inquiryType}
+                  disabled={submitting}
+                  onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
+                  className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60 cursor-pointer"
+                >
+                  <option value="Bulk Order / Wholesale">Bulk Order / Wholesale</option>
+                  <option value="Hotel & Resort Project">Hotel & Resort Project</option>
+                  <option value="Interior Designer / Architect">Interior Designer / Architect</option>
+                  <option value="Corporate / Office Space">Corporate / Office Space</option>
+                  <option value="Custom Manufacturing">Custom Manufacturing</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                </select>
+                <select
+                  value={formData.quantity}
+                  disabled={submitting}
+                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60 cursor-pointer"
+                >
+                  <option value="5 - 20 Units">5 - 20 Units</option>
+                  <option value="20 - 50 Units">20 - 50 Units</option>
+                  <option value="50 - 100 Units">50 - 100 Units</option>
+                  <option value="100+ Units / Large Project">100+ Units / Large Project</option>
+                </select>
+              </div>
+
+              {/* Row 4: Product Category & City */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <select
+                  value={formData.category}
+                  disabled={submitting}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full bg-bg-primary text-fg-primary border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60 cursor-pointer"
+                >
+                  <option value="All Furniture Categories">All Furniture Categories</option>
+                  <option value="Living Room Furniture">Living Room Furniture</option>
+                  <option value="Dining & Kitchen">Dining & Kitchen</option>
+                  <option value="Bedroom & Wardrobes">Bedroom & Wardrobes</option>
+                  <option value="Outdoor & Patio">Outdoor & Patio</option>
+                  <option value="Custom Woodwork">Custom Woodwork</option>
+                </select>
+                <input
+                  type="text"
+                  disabled={submitting}
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  placeholder="Delivery City / Location"
+                  className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors font-medium disabled:opacity-60"
+                />
+              </div>
+
+              {/* Message */}
               <div>
                 <textarea
                   required
-                  rows={6}
+                  rows={5}
                   disabled={submitting}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Your Message"
+                  placeholder="Your Message / Requirement Details *"
                   className="w-full bg-bg-primary text-fg-primary placeholder:text-fg-secondary/60 border border-border-accent/40 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-fg-primary transition-colors resize-none font-medium disabled:opacity-60"
                 />
               </div>
@@ -265,3 +358,5 @@ export default function Contact() {
     </div>
   );
 }
+
+
