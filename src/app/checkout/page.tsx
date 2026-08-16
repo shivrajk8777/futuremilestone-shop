@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useUser } from '@/context/UserContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useSettings } from '@/context/SettingsContext';
 import { useRouter } from 'next/navigation';
 import { Product } from '@/data/products';
 import Link from 'next/link';
@@ -201,10 +202,12 @@ const INDIAN_STATES = [
 export default function CheckoutPage() {
   const { user, loading, setAuthModalOpen } = useUser();
   const { country, formatPrice } = useCurrency();
+  const { settings } = useSettings();
   const router = useRouter();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartLoading, setCartLoading] = useState(true);
+  const [orderCount, setOrderCount] = useState<number | null>(null);
   const [addressOption, setAddressOption] = useState<'primary' | 'saved' | 'new'>('primary');
   const [selectedSavedId, setSelectedSavedId] = useState<string>('');
   const [successOrder, setSuccessOrder] = useState<{
@@ -277,11 +280,38 @@ export default function CheckoutPage() {
 
   const isIndia = activeShippingCountryIso === 'IN';
 
+  // Fetch past orders to detect first purchase
+  useEffect(() => {
+    if (user) {
+      fetch('/api/orders')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.orders)) {
+            setOrderCount(data.orders.length);
+          } else {
+            setOrderCount(0);
+          }
+        })
+        .catch(() => setOrderCount(0));
+    } else {
+      setOrderCount(null);
+    }
+  }, [user]);
+
   // Pricing calculations
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shipping = subtotal >= 500 ? 0 : 15;
-  const tax = Math.round(subtotal * 0.08);
-  const total = subtotal + shipping + tax;
+  const isFirstOrder = user ? orderCount === 0 : false;
+  const firstOrderDiscountPercent = (settings?.firstOrderDiscountVisible ?? true)
+    ? (Number(settings?.firstOrderDiscountPercentage) || 0)
+    : 0;
+  const firstOrderDiscount = (isFirstOrder && firstOrderDiscountPercent > 0)
+    ? Math.round(subtotal * (firstOrderDiscountPercent / 100) * 100) / 100
+    : 0;
+
+  const discountedSubtotal = Math.max(0, subtotal - firstOrderDiscount);
+  const shipping = 0;
+  const tax = 0;
+  const total = discountedSubtotal + shipping + tax;
 
   // Load cart: from DB when logged in, otherwise from localStorage
   useEffect(() => {
@@ -957,9 +987,11 @@ export default function CheckoutPage() {
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">{cart.length} Item{cart.length !== 1 ? 's' : ''}</p>
-                <p className="text-xs text-fg-secondary">
-                  {shipping === 0 ? '✓ Free shipping' : `+ ${formatPrice(shipping)} shipping`}
-                </p>
+                {shipping > 0 && (
+                  <p className="text-xs text-fg-secondary">
+                    + {formatPrice(shipping)} shipping
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -997,6 +1029,20 @@ export default function CheckoutPage() {
             </div>
 
             <div className="p-6 flex flex-col gap-4">
+              {firstOrderDiscount > 0 && (
+                <div className="bg-green-500/10 border border-green-500/25 text-green-600 dark:text-green-400 p-3.5 rounded-xl flex items-center justify-between gap-3 text-xs font-semibold animate-fade-in shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🎉</span>
+                    <span>
+                      <strong>{firstOrderDiscountPercent}% First Order Discount</strong> applied to your cart!
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-[10px] font-bold uppercase tracking-wider">
+                    First Purchase
+                  </span>
+                </div>
+              )}
+
               {cart.map((item, index) => {
                 const itemMat = item.product.selectedMaterial || 'Oak';
                 const itemDim = item.product.selectedDimension || 'Standard';
@@ -1073,14 +1119,29 @@ export default function CheckoutPage() {
                   <span className="text-fg-secondary font-normal">Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-fg-secondary font-normal">Shipping</span>
-                  <span className={shipping === 0 ? 'text-green-500' : ''}>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-fg-secondary font-normal">Tax (8%)</span>
-                  <span>{formatPrice(tax)}</span>
-                </div>
+                {firstOrderDiscount > 0 && (
+                  <div className="flex justify-between items-center text-green-500">
+                    <span className="flex items-center gap-1.5 font-normal">
+                      <span>First Order Discount ({firstOrderDiscountPercent}%)</span>
+                      <span className="px-1.5 py-0.5 rounded-full bg-green-500/10 text-[9px] font-bold uppercase tracking-wider">
+                        1st Order
+                      </span>
+                    </span>
+                    <span className="font-bold">- {formatPrice(firstOrderDiscount)}</span>
+                  </div>
+                )}
+                {shipping > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-fg-secondary font-normal">Shipping</span>
+                    <span className={shipping === 0 ? 'text-green-500' : ''}>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
+                  </div>
+                )}
+                {tax > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-fg-secondary font-normal">Tax (8%)</span>
+                    <span>{formatPrice(tax)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm font-bold border-t border-border-accent/40 pt-3 mt-1">
                   <span>Total</span>
                   <span>{formatPrice(total)}</span>

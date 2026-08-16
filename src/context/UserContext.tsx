@@ -53,6 +53,21 @@ interface UserContextType {
     country: string;
   }) => Promise<{ success: boolean; error?: string }>;
   deleteAddress: (addressId: string) => Promise<{ success: boolean; error?: string }>;
+  updateAddress: (
+    addressId: string,
+    data: {
+      label: string;
+      fullName: string;
+      phone: string;
+      flat: string;
+      area: string;
+      landmark?: string;
+      pincode: string;
+      city: string;
+      state: string;
+      country: string;
+    }
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -208,6 +223,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateAddress = async (
+    addressId: string,
+    data: {
+      label: string;
+      fullName: string;
+      phone: string;
+      flat: string;
+      area: string;
+      landmark?: string;
+      pincode: string;
+      city: string;
+      state: string;
+      country: string;
+    }
+  ) => {
+    try {
+      const res = await fetch('/api/auth/addresses/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addressId, ...data }),
+      });
+      const resData = await res.json();
+      if (resData.success && resData.user) {
+        setUser(resData.user);
+        return { success: true };
+      }
+      return { success: false, error: resData.error || 'Failed to update address' };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'An error occurred' };
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -221,6 +268,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         updateProfile,
         addAddress,
         deleteAddress,
+        updateAddress,
       }}
     >
       {children}

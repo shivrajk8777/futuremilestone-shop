@@ -1,8 +1,13 @@
 import nodemailer from "nodemailer";
 import { getDatabase } from "./mongodb";
 
+export const ADMIN_EMAILS = [
+  "info@futuremilestone.shop",
+  "support@futuremilestone.shop",
+];
+
 interface SendEmailParams {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
   orderId?: string;
@@ -15,11 +20,13 @@ export async function sendEmail({ to, subject, html, orderId }: SendEmailParams)
   const smtpPass = process.env.SMTP_PASS;
   const smtpFrom = process.env.SMTP_FROM || "no-reply@futuremilestone.shop";
 
+  const recipientString = Array.isArray(to) ? to.join(", ") : to;
+
   let success = false;
   let errorMsg: string | null = null;
 
   console.log("\n=================== SENDING EMAIL (CLIENT) ===================");
-  console.log(`To:      ${to}`);
+  console.log(`To:      ${recipientString}`);
   console.log(`Subject: ${subject}`);
   console.log(`Order ID: ${orderId || "N/A"}`);
   console.log("------------------- HTML CONTENT -------------------");
@@ -40,12 +47,12 @@ export async function sendEmail({ to, subject, html, orderId }: SendEmailParams)
 
       const info = await transporter.sendMail({
         from: smtpFrom,
-        to,
+        to: recipientString,
         subject,
         html,
       });
 
-      console.log(`Email successfully sent via SMTP: ${info.messageId}`);
+      console.log(`Email successfully sent via SMTP to ${recipientString}: ${info.messageId}`);
       success = true;
     } catch (err: any) {
       console.error("SMTP Email transmission failed:", err);
@@ -60,7 +67,7 @@ export async function sendEmail({ to, subject, html, orderId }: SendEmailParams)
   try {
     const db = await getDatabase();
     await db.collection("sent_emails").insertOne({
-      to,
+      to: recipientString,
       subject,
       html,
       orderId,

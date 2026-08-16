@@ -11,6 +11,8 @@ export async function GET() {
     const result = {
       marqueeVisible: settings?.marqueeVisible ?? true,
       marqueeText: settings?.marqueeText ?? 'Save 20% on your first order',
+      firstOrderDiscountVisible: settings?.firstOrderDiscountVisible ?? true,
+      firstOrderDiscountPercentage: Number(settings?.firstOrderDiscountPercentage ?? 20),
       carouselVisible: settings?.carouselVisible ?? true,
       slides: settings?.slides || [],
     };

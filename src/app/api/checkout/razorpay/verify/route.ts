@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, ADMIN_EMAILS } from '@/lib/email';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -186,9 +186,18 @@ export async function POST(request: NextRequest) {
           </html>
         `;
 
+        // Send customer confirmation
         await sendEmail({
           to: user.email,
           subject: `Order Confirmation ${orderNumber}`,
+          html: emailHtml,
+          orderId: result.insertedId.toString(),
+        });
+
+        // Send admin notification
+        await sendEmail({
+          to: ADMIN_EMAILS,
+          subject: `[New Razorpay Order] Order #${orderNumber} received`,
           html: emailHtml,
           orderId: result.insertedId.toString(),
         });

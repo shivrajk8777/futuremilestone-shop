@@ -39,7 +39,7 @@ const INDIAN_STATES = [
 ];
 
 export default function AccountPage() {
-  const { user, loading, updateProfile, addAddress, deleteAddress, setAuthModalOpen } = useUser();
+  const { user, loading, updateProfile, addAddress, deleteAddress, updateAddress, setAuthModalOpen } = useUser();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
   
   // Profile state
@@ -79,6 +79,7 @@ export default function AccountPage() {
   const [addressError, setAddressError] = useState('');
   const [savingAddress, setSavingAddress] = useState(false);
   const [deletingAddressId, setDeletingAddressId] = useState<string | null>(null);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
   const rightColumnRef = useRef<HTMLDivElement>(null);
 
@@ -217,13 +218,44 @@ export default function AccountPage() {
     }
   };
 
+  const resetAddressForm = () => {
+    setEditingAddressId(null);
+    setNewLabel('');
+    setNewFullName('');
+    setNewPhone('');
+    setNewFlat('');
+    setNewArea('');
+    setNewLandmark('');
+    setNewPincode('');
+    setNewCity('');
+    setNewState('');
+    setNewCountry('India');
+    setAddressError('');
+  };
+
+  const handleEditAddress = (addr: any) => {
+    setEditingAddressId(addr.id);
+    setNewLabel(addr.label || '');
+    setNewFullName(addr.fullName || addr.name || '');
+    setNewPhone(addr.phone || '');
+    setNewCountry(addr.country || 'India');
+    setNewFlat(addr.flat || '');
+    setNewArea(addr.area || '');
+    setNewLandmark(addr.landmark || '');
+    setNewPincode(addr.pincode || '');
+    setNewCity(addr.city || '');
+    setNewState(addr.state || '');
+    setShowAddAddress(true);
+    setAddressError('');
+  };
+
   const handleAddressSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddressMessage('');
     setAddressError('');
     setSavingAddress(true);
 
-    const res = await addAddress({
+    const addressData = {
       label: newLabel,
       fullName: newFullName,
       phone: newPhone,
@@ -234,25 +266,25 @@ export default function AccountPage() {
       city: newCity,
       state: newState,
       country: newCountry,
-    });
+    };
+
+    const res = editingAddressId
+      ? await updateAddress(editingAddressId, addressData)
+      : await addAddress(addressData);
+
     setSavingAddress(false);
 
     if (res.success) {
-      setAddressMessage('New address saved successfully!');
-      setNewLabel('');
-      setNewFullName('');
-      setNewPhone('');
-      setNewFlat('');
-      setNewArea('');
-      setNewLandmark('');
-      setNewPincode('');
-      setNewCity('');
-      setNewState('');
-      setNewCountry('India');
+      setAddressMessage(
+        editingAddressId ? 'Location updated successfully!' : 'New address saved successfully!'
+      );
+      resetAddressForm();
       setShowAddAddress(false);
       setTimeout(() => setAddressMessage(''), 4000);
     } else {
-      setAddressError(res.error || 'Failed to save address');
+      setAddressError(
+        res.error || (editingAddressId ? 'Failed to update address' : 'Failed to save address')
+      );
     }
   };
 
@@ -706,7 +738,10 @@ export default function AccountPage() {
                   <div className="w-full">
                     {!showAddAddress ? (
                       <button
-                        onClick={() => setShowAddAddress(true)}
+                        onClick={() => {
+                          resetAddressForm();
+                          setShowAddAddress(true);
+                        }}
                         className="inline-flex items-center gap-1.5 border border-border-accent text-fg-primary bg-bg-primary px-4 py-3 rounded-xl text-xs font-semibold hover:bg-bg-secondary transition-colors cursor-pointer"
                       >
                         <span>+ Add New Address</span>
@@ -714,11 +749,13 @@ export default function AccountPage() {
                     ) : (
                       <div className="border border-border-accent/40 bg-bg-primary rounded-xl p-5 md:p-6 space-y-4 animate-fade-in shadow-sm">
                         <div className="flex justify-between items-center">
-                          <h3 className="text-xs font-bold uppercase tracking-wider text-fg-primary">New Delivery Location</h3>
+                          <h3 className="text-xs font-bold uppercase tracking-wider text-fg-primary">
+                            {editingAddressId ? 'Edit Delivery Location' : 'New Delivery Location'}
+                          </h3>
                           <button
                             onClick={() => {
+                              resetAddressForm();
                               setShowAddAddress(false);
-                              setAddressError('');
                             }}
                             className="text-[10px] font-bold text-fg-secondary hover:text-fg-primary underline cursor-pointer"
                           >
@@ -881,7 +918,9 @@ export default function AccountPage() {
                             disabled={savingAddress}
                             className="w-full bg-fg-primary text-bg-primary py-3 rounded-xl font-semibold text-xs hover:opacity-90 transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                           >
-                            {savingAddress ? 'Saving location...' : 'Save Location'}
+                            {savingAddress
+                              ? (editingAddressId ? 'Updating location...' : 'Saving location...')
+                              : (editingAddressId ? 'Update Location' : 'Save Location')}
                           </button>
                         </form>
                       </div>
@@ -902,13 +941,21 @@ export default function AccountPage() {
                               <span className="px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-wider font-bold bg-fg-primary/5 text-fg-primary border border-border-accent/30">
                                 {addr.label}
                               </span>
-                              <button
-                                onClick={() => handleDeleteAddress(addr.id)}
-                                disabled={deletingAddressId === addr.id}
-                                className="text-[10px] font-bold text-red-500 hover:text-red-600 underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {deletingAddressId === addr.id ? 'Deleting...' : 'Delete'}
-                              </button>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  onClick={() => handleEditAddress(addr)}
+                                  className="text-[10px] font-bold text-fg-primary hover:underline cursor-pointer"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteAddress(addr.id)}
+                                  disabled={deletingAddressId === addr.id}
+                                  className="text-[10px] font-bold text-red-500 hover:text-red-600 underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {deletingAddressId === addr.id ? 'Deleting...' : 'Delete'}
+                                </button>
+                              </div>
                             </div>
                             <div className="space-y-1 text-xs">
                               <p className="font-bold text-fg-primary">{addr.fullName || addr.name || 'Recipient'}</p>

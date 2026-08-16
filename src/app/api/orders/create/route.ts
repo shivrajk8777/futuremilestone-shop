@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
-import { sendEmail } from '@/lib/email';
+import { sendEmail, ADMIN_EMAILS } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -279,9 +279,18 @@ export async function POST(request: NextRequest) {
           </html>
         `;
 
+        // Send confirmation email to customer
         await sendEmail({
           to: user.email,
           subject: `Your Order Confirmation ${orderNumber}`,
+          html: emailHtml,
+          orderId: result.insertedId.toString(),
+        });
+
+        // Send new order alert to admins
+        await sendEmail({
+          to: ADMIN_EMAILS,
+          subject: `[New Order Alert] Order #${orderNumber} received`,
           html: emailHtml,
           orderId: result.insertedId.toString(),
         });

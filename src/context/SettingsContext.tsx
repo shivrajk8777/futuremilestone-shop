@@ -5,6 +5,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 export interface MasterSettings {
   marqueeVisible: boolean;
   marqueeText: string;
+  firstOrderDiscountVisible: boolean;
+  firstOrderDiscountPercentage: number;
   carouselVisible: boolean;
   slides: any[];
 }
@@ -18,6 +20,8 @@ interface SettingsContextType {
 const defaultSettings: MasterSettings = {
   marqueeVisible: true,
   marqueeText: 'Save 20% on your first order',
+  firstOrderDiscountVisible: true,
+  firstOrderDiscountPercentage: 20,
   carouselVisible: true,
   slides: [],
 };
