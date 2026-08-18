@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     const { keyId, keySecret } = getRazorpayKeys();
 
     if (!keyId || !keySecret) {
+      console.error('Razorpay keys missing check:', { keyIdExists: !!keyId, keySecretExists: !!keySecret });
       return NextResponse.json(
         { success: false, error: 'Razorpay keys not configured on server' },
         { status: 500 }

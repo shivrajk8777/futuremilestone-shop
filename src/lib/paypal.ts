@@ -1,22 +1,22 @@
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
-const PAYPAL_MODE = process.env.PAYPAL_MODE || 'sandbox';
-
-const BASE_URL =
-  PAYPAL_MODE === 'live'
-    ? 'https://api-m.paypal.com'
-    : 'https://api-m.sandbox.paypal.com';
+import { getPayPalKeys } from './razorpayKeys';
 
 /**
  * Generate an OAuth 2.0 Access Token from PayPal
  */
 export async function getPayPalAccessToken(): Promise<string> {
-  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+  const { clientId, clientSecret, mode } = getPayPalKeys();
+
+  if (!clientId || !clientSecret) {
     throw new Error('Missing PayPal Client ID or Secret in environment variables.');
   }
 
-  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
-  const response = await fetch(`${BASE_URL}/v1/oauth2/token`, {
+  const baseUrl =
+    mode === 'live'
+      ? 'https://api-m.paypal.com'
+      : 'https://api-m.sandbox.paypal.com';
+
+  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  const response = await fetch(`${baseUrl}/v1/oauth2/token`, {
     method: 'POST',
     body: 'grant_type=client_credentials',
     headers: {
@@ -38,8 +38,10 @@ export async function getPayPalAccessToken(): Promise<string> {
  * Create a PayPal Order
  */
 export async function createPayPalOrder(amount: number, currency: string = 'USD') {
+  const { mode } = getPayPalKeys();
+  const baseUrl = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
   const accessToken = await getPayPalAccessToken();
-  const url = `${BASE_URL}/v2/checkout/orders`;
+  const url = `${baseUrl}/v2/checkout/orders`;
 
   const payload = {
     intent: 'CAPTURE',
@@ -74,8 +76,10 @@ export async function createPayPalOrder(amount: number, currency: string = 'USD'
  * Capture payment for a PayPal Order
  */
 export async function capturePayPalOrder(orderID: string) {
+  const { mode } = getPayPalKeys();
+  const baseUrl = mode === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
   const accessToken = await getPayPalAccessToken();
-  const url = `${BASE_URL}/v2/checkout/orders/${orderID}/capture`;
+  const url = `${baseUrl}/v2/checkout/orders/${orderID}/capture`;
 
   const response = await fetch(url, {
     method: 'POST',

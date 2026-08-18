@@ -441,19 +441,32 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (loading || cartLoading || !user || paymentMethod !== 'paypal' || cart.length === 0) return;
 
-    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-    if (!clientId) {
-      console.error('NEXT_PUBLIC_PAYPAL_CLIENT_ID is missing');
-      return;
-    }
-
     let isMounted = true;
     let buttonsInstance: any = null;
     setPaypalLoading(true);
 
-    const paypalCurrency = getPayPalSupportedCurrency(country.currency);
+    const initPayPal = async () => {
+      let clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
-    loadPayPalScript(clientId, paypalCurrency).then((loaded) => {
+      if (!clientId) {
+        try {
+          const configRes = await fetch('/api/checkout/config');
+          const configData = await configRes.json();
+          clientId = configData.paypalClientId;
+        } catch (e) {
+          console.error('Failed to load PayPal client ID from API config:', e);
+        }
+      }
+
+      if (!clientId) {
+        console.error('NEXT_PUBLIC_PAYPAL_CLIENT_ID is missing');
+        if (isMounted) setPaypalLoading(false);
+        return;
+      }
+
+      const paypalCurrency = getPayPalSupportedCurrency(country.currency);
+
+      const loaded = await loadPayPalScript(clientId, paypalCurrency);
       if (!isMounted) return;
       setPaypalLoading(false);
 
@@ -568,7 +581,9 @@ export default function CheckoutPage() {
           }
         }
       }
-    });
+    };
+
+    initPayPal();
 
     return () => {
       isMounted = false;
@@ -879,6 +894,7 @@ export default function CheckoutPage() {
 
       const orderData = await res.json();
       if (!orderData.success) {
+        console.error('Razorpay order creation failed response:', orderData);
         throw new Error(orderData.error || 'Failed to initiate Razorpay payment.');
       }
 
