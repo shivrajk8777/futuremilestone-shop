@@ -895,24 +895,6 @@ export default function CheckoutPage() {
           email: user.email,
           contact: shippingDetails.phone || user.phone || '',
         },
-        config: {
-          display: {
-            blocks: {
-              upi: {
-                name: 'UPI (GPay, PhonePe, Paytm, QR)',
-                instruments: [
-                  {
-                    method: 'upi',
-                  },
-                ],
-              },
-            },
-            sequence: ['block.upi', 'block.cards', 'block.netbanking', 'block.wallet', 'block.paylater'],
-            preferences: {
-              show_default_blocks: true,
-            },
-          },
-        },
         theme: {
           color: '#0f172a',
         },
