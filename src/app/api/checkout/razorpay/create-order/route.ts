@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { cookies } from 'next/headers';
+import { getRazorpayKeys } from '@/lib/razorpayKeys';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,8 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.trim();
-    const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
+    const { keyId, keySecret } = getRazorpayKeys();
 
     if (!keyId || !keySecret) {
       return NextResponse.json(

@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
 import { sendEmail, ADMIN_EMAILS } from '@/lib/email';
 import crypto from 'crypto';
+import { getRazorpayKeys } from '@/lib/razorpayKeys';
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
+    const { keySecret } = getRazorpayKeys();
     if (!keySecret) {
       return NextResponse.json(
         { success: false, error: 'Server key secret missing' },
