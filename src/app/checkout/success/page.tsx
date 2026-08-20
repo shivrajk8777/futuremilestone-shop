@@ -101,7 +101,7 @@ function CheckoutSuccessSkeleton() {
 function SuccessDetails() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
-  const fallbackOrderNumber = searchParams.get('orderNumber') || '#FJ-XXXXX';
+  const fallbackOrderNumber = searchParams.get('orderNumber') || '#FM-XXXXX';
   const fallbackTotal = searchParams.get('total') || '0';
   const fallbackName = searchParams.get('name') || '';
   const fallbackAddress = searchParams.get('address') || '';

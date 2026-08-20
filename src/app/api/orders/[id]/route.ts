@@ -20,21 +20,31 @@ export async function GET(
     }
 
     let userObjId;
-    let orderObjId;
     try {
       userObjId = new ObjectId(userId);
-      orderObjId = new ObjectId(id);
     } catch (err) {
       return NextResponse.json(
-        { success: false, error: 'Invalid ID format' },
-        { status: 400 }
+        { success: false, error: 'Invalid user session' },
+        { status: 401 }
       );
     }
 
     const db = await getDatabase();
+    
+    // Build flexible query matching by _id or orderNumber (e.g. #FJ-10001, FJ-10001, or Mongo ObjectId)
+    const cleanNumber = id.startsWith('#') ? id : `#${id}`;
+    const queryConditions: any[] = [
+      { orderNumber: cleanNumber },
+      { orderNumber: id },
+    ];
+
+    if (ObjectId.isValid(id)) {
+      queryConditions.push({ _id: new ObjectId(id) });
+    }
+
     const order = await db.collection('orders').findOne({
-      _id: orderObjId,
       userId: userObjId,
+      $or: queryConditions,
     });
 
     if (!order) {

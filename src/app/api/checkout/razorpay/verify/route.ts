@@ -3,6 +3,7 @@ import { getDatabase } from '@/lib/mongodb';
 import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
 import { sendEmail, ADMIN_EMAILS } from '@/lib/email';
+import { generateOrderNumber } from '@/lib/orderNumber';
 import crypto from 'crypto';
 import { getRazorpayKeys } from '@/lib/razorpayKeys';
 
@@ -114,8 +115,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
-    const orderNumber = `#FJ-${rand}`;
+    const orderNumber = await generateOrderNumber(db);
 
     const orderDoc = {
       userId: objId,

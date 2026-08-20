@@ -3,6 +3,7 @@ import { getDatabase } from '@/lib/mongodb';
 import { cookies } from 'next/headers';
 import { ObjectId } from 'mongodb';
 import { sendEmail, ADMIN_EMAILS } from '@/lib/email';
+import { generateOrderNumber } from '@/lib/orderNumber';
 
 export async function POST(request: NextRequest) {
   try {
@@ -83,9 +84,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate random 5-character alphanumeric order number
-    const rand = Math.random().toString(36).slice(2, 7).toUpperCase();
-    const orderNumber = `#FJ-${rand}`;
+    const orderNumber = await generateOrderNumber(db);
 
     const orderDoc = {
       userId: objId,
