@@ -2,6 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useUser } from '@/context/UserContext';
+import { useCurrency } from '@/context/CurrencyContext';
+import { formatOrderPrice } from '@/lib/formatOrderPrice';
 import { Suspense, useState, useEffect, useRef } from 'react';
 
 interface OrderItem {
@@ -12,7 +15,9 @@ interface OrderItem {
 interface Order {
   items: OrderItem[];
   orderNumber: string;
-  total: number;
+  total: number | string;
+  currency?: string;
+  currencySymbol?: string;
   shippingAddress?: {
     name: string;
     addressLine: string;
@@ -194,7 +199,7 @@ function SuccessDetails() {
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Total Paid</p>
-                <p className="text-xl font-bold text-fg-primary font-dm-sans">${displayTotal}</p>
+                <p className="text-xl font-bold text-fg-primary font-dm-sans">{formatOrderPrice(displayTotal, order?.currencySymbol, order?.currency)}</p>
               </div>
             </div>
           </div>

@@ -7,16 +7,18 @@ import Link from 'next/link';
 interface Order {
   id: string;
   orderNumber: string;
+  currency?: string;
+  currencySymbol?: string;
   items: Array<{
     slug: string;
     name: string;
     material: string;
     dimension: string;
     quantity: number;
-    price: number;
+    price: number | string;
     image: string;
   }>;
-  total: number;
+  total: number | string;
   status: string;
   createdAt: string;
   trackingId?: string | null;
@@ -28,6 +30,7 @@ interface Order {
     comment: string;
   }>;
 }
+import { formatOrderPrice } from '@/lib/formatOrderPrice';
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 
@@ -650,7 +653,7 @@ export default function AccountPage() {
                                 </span>
                               </div>
                               <div className="flex items-center gap-3">
-                                <span className="font-bold text-fg-primary">${order.total}</span>
+                                <span className="font-bold text-fg-primary">{formatOrderPrice(order.total, order.currencySymbol, order.currency)}</span>
                                 <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold ${
                                   order.status === 'Cancelled' || order.status === 'Canceled'
                                     ? 'bg-red-500/10 text-red-500'
@@ -682,7 +685,7 @@ export default function AccountPage() {
                                       </div>
                                     </div>
                                     <div className="text-right">
-                                      <p className="font-semibold text-fg-primary">${item.price}</p>
+                                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price, order.currencySymbol, order.currency)}</p>
                                       <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
                                     </div>
                                   </div>

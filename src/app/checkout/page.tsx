@@ -201,7 +201,7 @@ const INDIAN_STATES = [
 
 export default function CheckoutPage() {
   const { user, loading, setAuthModalOpen } = useUser();
-  const { country, formatPrice } = useCurrency();
+  const { country, formatPrice, countries } = useCurrency();
   const { settings } = useSettings();
   const router = useRouter();
 
@@ -211,6 +211,7 @@ export default function CheckoutPage() {
   const [addressOption, setAddressOption] = useState<'primary' | 'saved' | 'new'>('primary');
   const [selectedSavedId, setSelectedSavedId] = useState<string>('');
   const [successOrder, setSuccessOrder] = useState<{
+    id?: string;
     orderNumber: string;
     total: number;
     name: string;
@@ -711,14 +712,20 @@ export default function CheckoutPage() {
 
               <div className="flex flex-col gap-2 pt-2">
                 <Link
-                  href="/orders"
+                  href={successOrder.id ? `/orders/${successOrder.id}` : `/account?tab=orders`}
                   className="w-full bg-fg-primary text-bg-primary py-3.5 rounded-xl text-xs font-bold hover:opacity-90 transition-opacity text-center"
+                >
+                  View Order Tracking
+                </Link>
+                <Link
+                  href="/account?tab=orders"
+                  className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-xl text-xs font-bold hover:bg-bg-secondary transition-colors text-center"
                 >
                   View My Orders
                 </Link>
                 <Link
                   href="/shop"
-                  className="w-full border border-border-accent text-fg-primary bg-bg-primary py-3.5 rounded-xl text-xs font-bold hover:bg-bg-secondary transition-colors text-center"
+                  className="w-full border border-border-accent/40 text-fg-secondary bg-transparent py-2.5 rounded-xl text-xs font-semibold hover:text-fg-primary transition-colors text-center"
                 >
                   Continue Shopping
                 </Link>
@@ -850,6 +857,7 @@ export default function CheckoutPage() {
     const dispName = shippingDetails.fullName || user.name;
     const dispAddr = shippingDetails.addressLine || `${shippingDetails.flat}, ${shippingDetails.area}, ${shippingDetails.city}, ${shippingDetails.state} - ${shippingDetails.pincode}, ${shippingDetails.country}`;
     setSuccessOrder({
+      id: orderData.id || orderData._id || orderData.orderNumber,
       orderNumber: orderData.orderNumber,
       total: total,
       name: dispName,
@@ -878,8 +886,9 @@ export default function CheckoutPage() {
 
     try {
       const selectedCurrency = country.currency || 'USD';
-      const convertedAmount = Math.round(total * (country.rate || 1));
-      const inrEquivalent = Math.round(total * 83.5);
+      const inrRate = countries.find((c) => c.currency === 'INR')?.rate || 95.67;
+      const convertedAmount = Number((total * (country.rate || 1)).toFixed(2));
+      const inrEquivalent = Number((total * inrRate).toFixed(2));
 
       // 1. Create order on server in selected currency (with INR fallback)
       const res = await fetch('/api/checkout/razorpay/create-order', {
@@ -935,6 +944,8 @@ export default function CheckoutPage() {
                   customerName: user.name,
                 })),
                 total: formatPrice(total),
+                currency: country.currency || 'USD',
+                currencySymbol: country.symbol || '$',
                 shippingAddress: shippingDetails,
               }),
             });

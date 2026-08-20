@@ -14,7 +14,7 @@ export interface Country {
 // Static exchange rates (base: USD). Updated periodically.
 export const COUNTRIES: Country[] = [
   { code: 'US', name: 'United States',          flag: '🇺🇸', currency: 'USD', symbol: '$',   rate: 1 },
-  { code: 'IN', name: 'India',                  flag: '🇮🇳', currency: 'INR', symbol: '₹',   rate: 83.5 },
+  { code: 'IN', name: 'India',                  flag: '🇮🇳', currency: 'INR', symbol: '₹',   rate: 95.67 },
   { code: 'PK', name: 'Pakistan',               flag: '🇵🇰', currency: 'PKR', symbol: '₨',   rate: 278 },
   { code: 'BD', name: 'Bangladesh',             flag: '🇧🇩', currency: 'BDT', symbol: '৳',   rate: 110 },
   { code: 'GB', name: 'United Kingdom',         flag: '🇬🇧', currency: 'GBP', symbol: '£',   rate: 0.79 },
@@ -115,66 +115,99 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Load saved preference / IP detect & Live Exchange Rates
+  const countriesListRef = React.useRef<Country[]>(uniqueCountries);
+  useEffect(() => {
+    countriesListRef.current = countriesList;
+  }, [countriesList]);
+
+  // Load saved preference / IP detect & Live Exchange Rates (3-hour cache)
   useEffect(() => {
     let active = true;
+    const THREE_HOURS_MS = 3 * 60 * 60 * 1000;
 
-    // 1. Fetch live rates from open exchange rate API
-    fetch('https://open.er-api.com/v6/latest/USD')
+    const applyRates = (rates: Record<string, number>) => {
+      if (!active) return;
+      const updated = uniqueCountries.map((c) => {
+        const liveRate = rates[c.currency];
+        return liveRate && typeof liveRate === 'number' ? { ...c, rate: liveRate } : c;
+      });
+      countriesListRef.current = updated;
+      setCountriesList(updated);
+      setCountryState((prev) => {
+        const match = updated.find((c) => c.code === prev.code);
+        return match || prev;
+      });
+    };
+
+    // 1. Check local storage cache (3 hours)
+    try {
+      const cachedStr = localStorage.getItem('frankfurter_rates_cache');
+      if (cachedStr) {
+        const cached = JSON.parse(cachedStr);
+        if (cached?.timestamp && Date.now() - cached.timestamp < THREE_HOURS_MS && cached?.rates) {
+          applyRates(cached.rates);
+        }
+      }
+    } catch {}
+
+    // 2. Fetch from Vercel edge-cached Frankfurter Server API route
+    fetch('/api/currency/rates')
       .then((r) => r.json())
       .then((data) => {
-        if (active && data?.result === 'success' && data?.rates) {
-          const updated = uniqueCountries.map((c) => {
-            const liveRate = data.rates[c.currency];
-            return liveRate && typeof liveRate === 'number' ? { ...c, rate: liveRate } : c;
-          });
-          setCountriesList(updated);
-          // Sync active country with live rate
-          setCountryState((prev) => {
-            const match = updated.find((c) => c.code === prev.code);
-            return match || prev;
-          });
+        if (active && data?.success && data?.rates) {
+          applyRates(data.rates);
+          try {
+            localStorage.setItem(
+              'frankfurter_rates_cache',
+              JSON.stringify({ rates: data.rates, timestamp: Date.now() })
+            );
+          } catch {}
         }
       })
-      .catch(() => {/* Use default pre-configured rates */});
+      .catch((err) => {
+        console.error('Failed to load live exchange rates from Frankfurter:', err);
+      });
 
     // 2. Determine User Country via IP Detection Chain (Server API route -> ipapi.co -> ipwho.is -> api.country.is)
     async function detectCountry() {
+      let detectedCode: string | null = null;
+
       try {
         const res = await fetch('/api/geolocation');
         const data = await res.json();
-        if (data?.countryCode) {
-          const found = uniqueCountries.find((c) => c.code === data.countryCode);
-          if (found) return setCountryState(found);
-        }
+        if (data?.countryCode) detectedCode = data.countryCode;
       } catch {}
 
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        if (data?.country_code) {
-          const found = uniqueCountries.find((c) => c.code === data.country_code);
-          if (found) return setCountryState(found);
-        }
-      } catch {}
+      if (!detectedCode) {
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          const data = await res.json();
+          if (data?.country_code) detectedCode = data.country_code;
+        } catch {}
+      }
 
-      try {
-        const res = await fetch('https://ipwho.is/');
-        const data = await res.json();
-        if (data?.country_code) {
-          const found = uniqueCountries.find((c) => c.code === data.country_code);
-          if (found) return setCountryState(found);
-        }
-      } catch {}
+      if (!detectedCode) {
+        try {
+          const res = await fetch('https://ipwho.is/');
+          const data = await res.json();
+          if (data?.country_code) detectedCode = data.country_code;
+        } catch {}
+      }
 
-      try {
-        const res = await fetch('https://api.country.is/');
-        const data = await res.json();
-        if (data?.country) {
-          const found = uniqueCountries.find((c) => c.code === data.country);
-          if (found) return setCountryState(found);
+      if (!detectedCode) {
+        try {
+          const res = await fetch('https://api.country.is/');
+          const data = await res.json();
+          if (data?.country) detectedCode = data.country;
+        } catch {}
+      }
+
+      if (detectedCode && active) {
+        const found = countriesListRef.current.find((c) => c.code === detectedCode) || uniqueCountries.find((c) => c.code === detectedCode);
+        if (found) {
+          setCountryState(found);
         }
-      } catch {}
+      }
     }
 
     detectCountry();
@@ -209,11 +242,14 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         country.currency === 'LBP' ||
         country.currency === 'IQD'
       ) {
-        return `${country.symbol}${Math.round(converted).toLocaleString()}`;
+        return `${country.symbol}${converted.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2,
+        })}`;
       }
       return `${country.symbol}${converted.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       })}`;
     },
     [country]

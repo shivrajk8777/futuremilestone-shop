@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         });
       } catch (err: any) {
         console.warn(`Razorpay order creation with ${targetCurrency} failed, falling back to INR:`, err?.message || err);
-        const fallbackInr = inrAmount || Math.round(Number(amount) * 83.5);
+        const fallbackInr = inrAmount || Number((Number(amount) * 95.67).toFixed(2));
         razorpayOrder = await razorpay.orders.create({
           amount: Math.round(Number(fallbackInr) * 100),
           currency: 'INR',

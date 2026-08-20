@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
       razorpay_signature,
       items,
       total,
+      currency,
+      currencySymbol,
       shippingAddress,
     } = await request.json();
 
@@ -119,7 +121,9 @@ export async function POST(request: NextRequest) {
       userId: objId,
       orderNumber,
       items,
-      total: Number(total) || 0,
+      total: total || '',
+      currency: currency || 'USD',
+      currencySymbol: currencySymbol || '$',
       status: 'Processing',
       paymentMethod: 'Razorpay',
       paymentStatus: 'Paid',

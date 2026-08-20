@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useUser } from '@/context/UserContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { formatOrderPrice } from '@/lib/formatOrderPrice';
 
 interface OrderItem {
   slug: string;
@@ -12,15 +13,17 @@ interface OrderItem {
   material: string;
   dimension: string;
   quantity: number;
-  price: number;
+  price: number | string;
   image: string;
 }
 
 interface Order {
   id: string;
   orderNumber: string;
+  currency?: string;
+  currencySymbol?: string;
   items: OrderItem[];
-  total: number;
+  total: number | string;
   status: string;
   createdAt: string;
   trackingId?: string | null;
@@ -351,7 +354,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Value</p>
-                <p className="text-xl font-bold text-fg-primary font-dm-sans">{formatPrice(order.total)}</p>
+                <p className="text-xl font-bold text-fg-primary font-dm-sans">{formatOrderPrice(order.total, order.currencySymbol, order.currency)}</p>
               </div>
             </div>
           </div>
@@ -717,7 +720,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-fg-primary">{formatPrice(item.price)}</p>
+                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price, order.currencySymbol, order.currency)}</p>
                       <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
                     </div>
                   </div>
