@@ -442,9 +442,8 @@ export default function ProductDetails({ params }: PageProps) {
                   <button
                     key={idx}
                     onClick={() => scrollToImage(idx)}
-                    className={`h-1.5 rounded-full transition-all cursor-pointer pointer-events-auto ${
-                      isActive ? 'w-5 bg-fg-primary' : 'w-1.5 bg-fg-primary/30'
-                    }`}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer pointer-events-auto ${isActive ? 'w-5 bg-fg-primary' : 'w-1.5 bg-fg-primary/30'
+                      }`}
                     aria-label={`Go to slide ${idx + 1}`}
                   />
                 );
@@ -600,11 +599,10 @@ export default function ProductDetails({ params }: PageProps) {
                 <button
                   onClick={handleAddToCart}
                   disabled={currentStock === 0}
-                  className={`font-dm-sans w-full sm:flex-1 h-11 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 shadow-md relative overflow-hidden ${
-                    currentStock === 0
+                  className={`font-dm-sans w-full sm:flex-1 h-11 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 shadow-md relative overflow-hidden ${currentStock === 0
                       ? 'bg-fg-primary/20 text-fg-primary/40 cursor-not-allowed'
                       : 'bg-fg-primary text-bg-primary hover:opacity-90 cursor-pointer'
-                  }`}
+                    }`}
                 >
                   <span>{currentStock === 0 ? 'Out Of Stock' : 'Add To Cart'}</span>
                   {currentStock > 0 && (
@@ -758,7 +756,7 @@ export default function ProductDetails({ params }: PageProps) {
           {/* Share links */}
           <div className="grid grid-cols-2 gap-3 w-full flex-shrink-0">
             <a
-              href="#"
+              href="https://in.pinterest.com/fmfuturemilestone"
               className="font-dm-sans flex items-center justify-between bg-bg-secondary rounded-xl p-4 text-fg-primary hover:bg-fg-primary/5 transition-all border border-border-accent/40"
             >
               <div className="flex items-center gap-2">

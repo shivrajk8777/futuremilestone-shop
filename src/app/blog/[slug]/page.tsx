@@ -248,8 +248,8 @@ export default function BlogPost({ params }: PageProps) {
         {/* Social Share */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { name: 'Pinterest', href: 'https://pinterest.com' },
-            { name: 'Facebook', href: 'https://facebook.com' },
+            { name: 'Pinterest', href: 'https://in.pinterest.com/fmfuturemilestone' },
+            { name: 'Facebook', href: 'https://www.facebook.com/people/Future-Milestone/61593119161356' },
             { name: 'Instagram', href: 'https://www.instagram.com/fmfuturemilestone?igsh=Z2pmY2Y0dW1rZGtr' },
           ].map((social) => (
             <a
