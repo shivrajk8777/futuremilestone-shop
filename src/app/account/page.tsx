@@ -685,8 +685,7 @@ export default function AccountPage() {
                                       </div>
                                     </div>
                                     <div className="text-right">
-                                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price, order.currencySymbol, order.currency)}</p>
-                                      <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
+                                      <p className="text-[10px] text-fg-secondary/70">Qty: {item.quantity}</p>
                                     </div>
                                   </div>
                                 </Link>
@@ -698,12 +697,25 @@ export default function AccountPage() {
                               <span className="text-[10px] text-fg-secondary/60 font-medium">
                                 {order.items.reduce((sum, item) => sum + item.quantity, 0)} {order.items.reduce((sum, item) => sum + item.quantity, 0) === 1 ? 'item' : 'items'}
                               </span>
-                              <Link
-                                href={`/orders/${order.id}`}
-                                className="px-4 py-1.5 border border-border-accent text-fg-primary rounded-lg font-semibold hover:bg-bg-secondary transition-colors cursor-pointer text-[11px]"
-                              >
-                                Track Order
-                              </Link>
+                              <div className="flex items-center gap-2">
+                                {['Dispatched', 'Shipped', 'Delivered'].includes(order.status) && (
+                                  <a
+                                    href={`/orders/${order.id}/invoice`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3.5 py-1.5 bg-fg-primary text-bg-primary rounded-lg font-bold hover:opacity-90 transition-opacity cursor-pointer text-[11px] flex items-center gap-1.5 shadow-sm"
+                                  >
+                                    <span>📄</span>
+                                    <span>Download Bill</span>
+                                  </a>
+                                )}
+                                <Link
+                                  href={`/orders/${order.id}`}
+                                  className="px-4 py-1.5 border border-border-accent text-fg-primary rounded-lg font-semibold hover:bg-bg-secondary transition-colors cursor-pointer text-[11px]"
+                                >
+                                  Track Order
+                                </Link>
+                              </div>
                             </div>
 
                           </div>

@@ -1,7 +1,7 @@
 import { MongoClient, Db } from "mongodb";
 
 const globalForMongo = globalThis as unknown as {
-  __fjordMongoClientPromise?: Promise<MongoClient>;
+  __futuremilestoneMongoClientPromise?: Promise<MongoClient>;
 };
 
 export async function getMongoClient(): Promise<MongoClient> {
@@ -10,7 +10,7 @@ export async function getMongoClient(): Promise<MongoClient> {
     throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
   }
 
-  if (!globalForMongo.__fjordMongoClientPromise) {
+  if (!globalForMongo.__futuremilestoneMongoClientPromise) {
     const client = new MongoClient(MONGODB_URI, {
       maxPoolSize: 10,
       minPoolSize: 0,
@@ -18,10 +18,10 @@ export async function getMongoClient(): Promise<MongoClient> {
       retryWrites: true,
     });
 
-    globalForMongo.__fjordMongoClientPromise = client.connect();
+    globalForMongo.__futuremilestoneMongoClientPromise = client.connect();
   }
 
-  return globalForMongo.__fjordMongoClientPromise;
+  return globalForMongo.__futuremilestoneMongoClientPromise;
 }
 
 export async function getDatabase(): Promise<Db> {

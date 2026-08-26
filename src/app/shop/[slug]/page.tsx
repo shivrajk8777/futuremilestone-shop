@@ -885,7 +885,7 @@ export default function ProductDetails({ params }: PageProps) {
                     </h3>
                     <div className="space-y-4 text-xs md:text-sm text-fg-secondary leading-relaxed font-normal">
                       <p>
-                        Our furniture is thoughtfully crafted to blend timeless Scandinavian design with modern functionality. Each piece is made with meticulous attention to detail, ensuring it fits seamlessly into your home. From the choice of premium materials to the sleek, minimalist aesthetic, we focus on creating furniture that is as practical as it is beautiful.
+                        Our furniture is thoughtfully crafted to blend timeless design with modern functionality. Each piece is made with meticulous attention to detail, ensuring it fits seamlessly into your home. From the choice of premium materials to the sleek, minimalist aesthetic, we focus on creating furniture that is as practical as it is beautiful.
                       </p>
                       <p>
                         Whether you're hosting a gathering or enjoying a quiet evening, our designs are built to enhance your everyday moments with comfort and style.

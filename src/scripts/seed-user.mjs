@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { MongoClient } from 'mongodb';
 
 const mongoUri = "mongodb://127.0.0.1:27017";
-const databaseName = "fjord_admin";
+const databaseName = "futuremilestone_admin";
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');

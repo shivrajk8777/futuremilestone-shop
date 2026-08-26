@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { orderID, items, total, shippingAddress } = await request.json();
+    const { orderID, items, total, currency, currencySymbol, shippingAddress } = await request.json();
 
     if (!orderID) {
       return NextResponse.json(
@@ -81,8 +81,20 @@ export async function POST(request: NextRequest) {
     let cleanShippingAddress = null;
     if (shippingAddress) {
       if (typeof shippingAddress === 'object') {
+        const name = shippingAddress.fullName || shippingAddress.name || '';
+        const parts = [
+          shippingAddress.flat,
+          shippingAddress.area,
+          shippingAddress.landmark ? (shippingAddress.landmark.toLowerCase().startsWith('near') ? shippingAddress.landmark : `Near ${shippingAddress.landmark}`) : '',
+          shippingAddress.city,
+          shippingAddress.state,
+          shippingAddress.pincode && shippingAddress.country ? `${shippingAddress.pincode}, ${shippingAddress.country}` : (shippingAddress.pincode || shippingAddress.country),
+        ].filter(Boolean);
+        const addressLine = shippingAddress.addressLine || (parts.length > 0 ? parts.join(', ') : '');
+
         cleanShippingAddress = {
-          fullName: shippingAddress.fullName || '',
+          name,
+          fullName: name,
           phone: shippingAddress.phone || '',
           flat: shippingAddress.flat || '',
           area: shippingAddress.area || '',
@@ -91,6 +103,7 @@ export async function POST(request: NextRequest) {
           city: shippingAddress.city || '',
           state: shippingAddress.state || '',
           country: shippingAddress.country || '',
+          addressLine,
         };
       } else {
         cleanShippingAddress = shippingAddress;
@@ -105,6 +118,8 @@ export async function POST(request: NextRequest) {
       orderNumber,
       items,
       total: total || '',
+      currency: currency || 'USD',
+      currencySymbol: currencySymbol || '$',
       status: 'Processing',
       paymentMethod: 'PayPal',
       paymentStatus: 'Paid',

@@ -385,12 +385,28 @@ export default function OrderTrackingPage({ params }: PageProps) {
               </span>
             </div>
 
-            <h1 className="font-dm-sans text-3xl font-bold tracking-tight text-fg-primary mt-4">
-              Tracking {order.orderNumber}
-            </h1>
-            <p className="text-xs text-fg-secondary leading-relaxed font-semibold">
-              Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-2">
+              <div>
+                <h1 className="font-dm-sans text-3xl font-bold tracking-tight text-fg-primary">
+                  Tracking {order.orderNumber}
+                </h1>
+                <p className="text-xs text-fg-secondary leading-relaxed font-semibold mt-1">
+                  Placed on {new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                </p>
+              </div>
+
+              {['Dispatched', 'Shipped', 'Delivered'].includes(order.status) && (
+                <a
+                  href={`/orders/${order.id}/invoice`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-fg-primary text-bg-primary rounded-xl text-xs font-bold hover:opacity-90 transition-opacity shadow-sm cursor-pointer"
+                >
+                  <span>📄</span>
+                  <span>Download Bill (PDF)</span>
+                </a>
+              )}
+            </div>
           </div>
 
           {/* ── 1. Delivery Tracker (Stepper) ─────────────────────────────────── */}
@@ -720,8 +736,8 @@ export default function OrderTrackingPage({ params }: PageProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price, order.currencySymbol, order.currency)}</p>
-                      <p className="text-[10px] text-fg-secondary/70 mt-0.5">Qty: {item.quantity}</p>
+                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price * item.quantity, order.currencySymbol, order.currency)}</p>
+                      <p className="text-[10px] text-fg-secondary/70">Qty: {item.quantity}</p>
                     </div>
                   </div>
                 </Link>
@@ -739,8 +755,23 @@ export default function OrderTrackingPage({ params }: PageProps) {
               </div>
               <div className="p-6">
                 <div className="text-xs space-y-1 bg-bg-primary p-4 rounded-xl border border-border-accent/30 leading-relaxed font-semibold">
-                  <span className="font-bold text-fg-primary block">{order.shippingAddress.name}</span>
-                  <p className="text-fg-secondary">{order.shippingAddress.addressLine}</p>
+                  <span className="font-bold text-fg-primary block">
+                    {order.shippingAddress.name || order.shippingAddress.fullName || "Customer"}
+                  </span>
+                  <p className="text-fg-secondary">
+                    {order.shippingAddress.addressLine ||
+                      [
+                        order.shippingAddress.flat,
+                        order.shippingAddress.area,
+                        order.shippingAddress.landmark ? `Near ${order.shippingAddress.landmark}` : "",
+                        order.shippingAddress.city,
+                        order.shippingAddress.state,
+                        order.shippingAddress.pincode,
+                        order.shippingAddress.country,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                  </p>
                   {order.shippingAddress.phone && <p className="text-fg-secondary/70 mt-1 font-semibold">📞 {order.shippingAddress.phone}</p>}
                 </div>
               </div>

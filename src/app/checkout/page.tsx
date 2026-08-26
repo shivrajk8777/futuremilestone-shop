@@ -526,11 +526,14 @@ export default function CheckoutPage() {
                         material: item.product.selectedMaterial || 'Oak',
                         dimension: item.product.selectedDimension || 'Standard',
                         quantity: item.quantity,
-                        price: item.product.price,
+                        price: Number((item.product.price * (country.rate || 1)).toFixed(2)),
+                        basePrice: item.product.price,
                         image: item.product.images[0],
                         customerName: user?.name,
                       })),
                       total: formatPrice(total),
+                      currency: country.currency || 'USD',
+                      currencySymbol: country.symbol || '$',
                       shippingAddress: shippingDetails,
                     }),
                   });
@@ -755,7 +758,7 @@ export default function CheckoutPage() {
               </div>
               <div>
                 <h3 className="font-dm-sans font-bold text-lg text-fg-primary">Your Cart is Empty</h3>
-                <p className="text-xs text-fg-secondary leading-relaxed mt-1.5">Add some handcrafted Scandinavian furniture before proceeding to checkout.</p>
+                <p className="text-xs text-fg-secondary leading-relaxed mt-1.5">Add some handcrafted furniture before proceeding to checkout.</p>
               </div>
               <Link
                 href="/shop"
@@ -913,7 +916,7 @@ export default function CheckoutPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: 'Future Milestone',
-        description: 'Scandinavian Furniture Purchase',
+        description: 'Furniture Purchase',
         order_id: orderData.orderId,
         prefill: {
           name: shippingDetails.fullName || user.name,
@@ -939,7 +942,8 @@ export default function CheckoutPage() {
                   material: item.product.selectedMaterial || 'Oak',
                   dimension: item.product.selectedDimension || 'Standard',
                   quantity: item.quantity,
-                  price: item.product.price,
+                  price: Number((item.product.price * (country.rate || 1)).toFixed(2)),
+                  basePrice: item.product.price,
                   image: item.product.images[0],
                   customerName: user.name,
                 })),

@@ -28,12 +28,12 @@ export const products: Product[] = [
     price: 650,
     category: 'wood',
     tagline: 'Crafting Comfort, Inspired by the North',
-    description: 'Designed for ultimate comfort and aesthetic appeal, the Sona Armchair balances a robust timber framework with soft leather upholstery. Perfect for lounge spaces and modern living rooms looking for a touch of Scandinavian elegance.',
+    description: 'Designed for ultimate comfort and aesthetic appeal, the Sona Armchair balances a robust timber framework with soft leather upholstery. Perfect for lounge spaces and modern living rooms looking for a touch of elegance.',
     features: [
       'Handcrafted solid oak frame',
       'Premium top-grain leather cushioning',
       'Ergonomic lumbar support',
-      'Timeless Scandinavian aesthetic'
+      'Timeless aesthetic'
     ],
     dimensions: 'Height: 82cm | Width: 74cm | Depth: 78cm | Seat Height: 44cm',
     shippingReturns: 'Free shipping on orders over $500. Standard delivery takes 3-7 business days. Easy returns within 30 days of delivery.',
@@ -261,7 +261,7 @@ export const products: Product[] = [
     name: 'Runa Armchair',
     price: 480,
     category: 'dark',
-    tagline: 'Moody Scandinavian Minimalism',
+    tagline: 'Moody Minimalism',
     description: 'A striking statement chair designed to capture attention. The Runa Armchair features a dark charcoal ash frame and matching wool cushions, bringing a clean, moody, and highly sophisticated tone to the modern study or corner.',
     features: [
       'Dark charcoal stained ash frame',

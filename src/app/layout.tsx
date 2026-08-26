@@ -14,7 +14,7 @@ import { ToastProvider } from '@/context/ToastContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 
 export const metadata: Metadata = {
-  title: 'Future Milestone - Scandinavian Furniture',
+  title: 'Future Milestone',
   description: 'A clean and modern Framer E-Commerce template with local state. Designed for flexibility, responsiveness, and premium aesthetics.',
   icons: {
     icon: '/icon.png',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     apple: '/icon.png',
   },
   openGraph: {
-    title: 'Future Milestone - Scandinavian Furniture',
+    title: 'Future Milestone',
     description: 'A clean and modern Framer E-Commerce template ported to Next.js and Tailwind CSS.',
     images: ['/images/1p2B6gt3Cs8RGOysOJc9iQ2xaIg_d5da0f.webp'],
   },
@@ -34,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <SettingsProvider>
         <DynamicBody>
           <CollectionProvider>

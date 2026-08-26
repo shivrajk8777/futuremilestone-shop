@@ -226,7 +226,7 @@ function SuccessDetails() {
                 Order Confirmed
               </h1>
               <p className="text-xs text-fg-secondary leading-relaxed font-medium">
-                Thank you for your purchase. We are preparing your Scandinavian furniture pieces!
+                Thank you for your purchase. We are preparing your furniture pieces!
               </p>
             </div>
 
@@ -239,7 +239,7 @@ function SuccessDetails() {
 
               <div className="flex justify-between border-b border-border-accent/20 pb-2 font-semibold">
                 <span className="text-fg-secondary font-normal">Total Amount</span>
-                <span className="font-bold text-fg-primary">${displayTotal}</span>
+                <span className="font-bold text-fg-primary">{formatOrderPrice(displayTotal, order?.currencySymbol, order?.currency)}</span>
               </div>
 
               <div className="space-y-1">

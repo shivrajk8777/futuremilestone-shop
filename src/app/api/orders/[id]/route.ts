@@ -54,11 +54,97 @@ export async function GET(
       );
     }
 
+    const rawTotal = order.total;
+    let currencySymbol = order.currencySymbol;
+    let currency = order.currency;
+
+    if (typeof rawTotal === 'string') {
+      const symbolMatch = rawTotal.match(/^([₹$€£₨৳])/);
+      if (symbolMatch && !currencySymbol) {
+        currencySymbol = symbolMatch[1];
+      }
+    }
+
+    if (!currencySymbol) {
+      if (currency === 'INR') currencySymbol = '₹';
+      else if (currency === 'EUR') currencySymbol = '€';
+      else if (currency === 'GBP') currencySymbol = '£';
+      else currencySymbol = '$';
+    }
+
+    if (!currency) {
+      if (currencySymbol === '₹') currency = 'INR';
+      else if (currencySymbol === '€') currency = 'EUR';
+      else if (currencySymbol === '£') currency = 'GBP';
+      else currency = 'USD';
+    }
+
+    let items = (order.items || []).map((item: any) => ({ ...item }));
+
+    if (items.length > 0) {
+      const baseSubtotal = items.reduce(
+        (sum: number, item: any) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+        0
+      );
+      const cleanTotalNum =
+        typeof rawTotal === 'number'
+          ? rawTotal
+          : Number(String(rawTotal).replace(/[^0-9.-]+/g, ''));
+
+      if (baseSubtotal > 0 && !isNaN(cleanTotalNum) && cleanTotalNum > 0) {
+        const ratio = cleanTotalNum / baseSubtotal;
+
+        if (Math.abs(ratio - 1) > 0.15) {
+          items = items.map((item: any) => ({
+            ...item,
+            price: Number(((Number(item.price) || 0) * ratio).toFixed(2)),
+          }));
+        }
+      }
+    }
+
+    const rawShippingAddress = order.shippingAddress;
+    let shippingAddress = null;
+    if (rawShippingAddress) {
+      if (typeof rawShippingAddress === 'string') {
+        shippingAddress = {
+          name: 'Customer',
+          fullName: 'Customer',
+          addressLine: rawShippingAddress,
+          phone: '',
+        };
+      } else {
+        const name = rawShippingAddress.fullName || rawShippingAddress.name || 'Customer';
+        const phone = rawShippingAddress.phone || rawShippingAddress.contact || '';
+        let addressLine = rawShippingAddress.addressLine;
+        if (!addressLine) {
+          const parts = [
+            rawShippingAddress.flat,
+            rawShippingAddress.area,
+            rawShippingAddress.landmark ? (rawShippingAddress.landmark.toLowerCase().startsWith('near') ? rawShippingAddress.landmark : `Near ${rawShippingAddress.landmark}`) : '',
+            rawShippingAddress.city,
+            rawShippingAddress.state,
+            rawShippingAddress.pincode && rawShippingAddress.country ? `${rawShippingAddress.pincode}, ${rawShippingAddress.country}` : (rawShippingAddress.pincode || rawShippingAddress.country),
+          ].filter(Boolean);
+          addressLine = parts.length > 0 ? parts.join(', ') : '';
+        }
+        shippingAddress = {
+          ...rawShippingAddress,
+          name,
+          fullName: name,
+          addressLine,
+          phone,
+        };
+      }
+    }
+
     const formattedOrder = {
       id: order._id.toString(),
       orderNumber: order.orderNumber,
-      items: order.items || [],
+      items,
       total: order.total,
+      currency,
+      currencySymbol,
       status: order.status || 'Processing',
       createdAt: order.createdAt,
       trackingId: order.trackingId || null,
@@ -67,7 +153,7 @@ export async function GET(
       deliveryPartnerCode: order.deliveryPartnerCode || null,
       adminMessage: order.adminMessage || null,
       statusTimeline: order.statusTimeline || [],
-      shippingAddress: order.shippingAddress || null,
+      shippingAddress,
     };
 
     return NextResponse.json({

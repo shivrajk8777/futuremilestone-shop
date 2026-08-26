@@ -7,7 +7,7 @@ export async function POST() {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
-  const folder = process.env.CLOUDINARY_UPLOAD_FOLDER || 'fjord/blogs';
+  const folder = process.env.CLOUDINARY_UPLOAD_FOLDER || 'futuremilestone/blogs';
 
   if (!cloudName || !apiKey || !apiSecret) {
     return NextResponse.json({ error: 'Cloudinary not configured' }, { status: 500 });

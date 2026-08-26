@@ -888,7 +888,7 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                     <p className="text-fg-secondary font-medium mb-1">Your cart is empty</p>
-                    <p className="text-xs text-fg-secondary/70 max-w-[200px]">Fill it with beautiful Scandinavian furniture.</p>
+                    <p className="text-xs text-fg-secondary/70 max-w-[200px]">Fill it with beautiful furniture.</p>
                   </div>
                 ) : (
                   cart.map((item) => {
