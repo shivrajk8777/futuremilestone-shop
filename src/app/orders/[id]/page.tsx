@@ -36,8 +36,16 @@ interface Order {
     comment: string;
   }>;
   shippingAddress?: {
-    name: string;
-    addressLine: string;
+    name?: string;
+    fullName?: string;
+    addressLine?: string;
+    flat?: string;
+    area?: string;
+    landmark?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    country?: string;
     phone?: string;
   } | null;
 }
@@ -736,7 +744,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price * item.quantity, order.currencySymbol, order.currency)}</p>
+                      <p className="font-semibold text-fg-primary">{formatOrderPrice((Number(item.price) || 0) * item.quantity, order.currencySymbol, order.currency)}</p>
                       <p className="text-[10px] text-fg-secondary/70">Qty: {item.quantity}</p>
                     </div>
                   </div>
