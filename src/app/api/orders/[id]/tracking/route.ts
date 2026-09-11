@@ -3,6 +3,7 @@ import { getDatabase } from "@/lib/mongodb";
 import { cookies } from "next/headers";
 import { ObjectId } from "mongodb";
 import { trackShipment } from "@/lib/tracking-providers";
+import { sendEmail } from "@/lib/email";
 
 export async function GET(
   request: NextRequest,
