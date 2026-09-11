@@ -114,7 +114,7 @@ export default function OrderInvoicePage({ params }: PageProps) {
     );
   }
 
-  const isDispatched = ['Dispatched', 'Shipped', 'Delivered'].includes(order.status);
+  const isDispatched = ['Dispatched', 'Shipped', 'Out for Delivery', 'Delivered'].includes(order.status);
 
   if (!isDispatched) {
     return (

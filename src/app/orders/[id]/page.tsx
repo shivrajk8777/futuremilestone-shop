@@ -36,9 +36,18 @@ interface Order {
     comment: string;
   }>;
   shippingAddress?: {
-    name: string;
-    addressLine: string;
+    name?: string;
+    fullName?: string;
+    addressLine?: string;
+    flat?: string;
+    area?: string;
+    landmark?: string;
+    city?: string;
+    state?: string;
+    pincode?: string;
+    country?: string;
     phone?: string;
+    [key: string]: any;
   } | null;
 }
 
@@ -211,8 +220,28 @@ export default function OrderTrackingPage({ params }: PageProps) {
               const trackRes = await fetch(`/api/orders/${id}/tracking`);
               if (trackRes.ok) {
                 const trackData = await trackRes.json();
-                if (trackData.success) {
+                if (trackData.success && trackData.tracking) {
                   setTracking(trackData.tracking);
+                  const effectiveStatus = trackData.syncedStatus || trackData.tracking.status;
+                  if (effectiveStatus && ['Out for Delivery', 'Delivered'].includes(effectiveStatus) && effectiveStatus !== data.order.status) {
+                    setOrder((prev) => {
+                      if (!prev) return null;
+                      const existingTimeline = prev.statusTimeline || [];
+                      const alreadyHasStatus = existingTimeline.some(t => t.status === effectiveStatus);
+                      return {
+                        ...prev,
+                        status: effectiveStatus,
+                        statusTimeline: alreadyHasStatus ? existingTimeline : [
+                          ...existingTimeline,
+                          {
+                            status: effectiveStatus,
+                            timestamp: trackData.tracking.checkpoints?.[0]?.timestamp || new Date().toISOString(),
+                            comment: trackData.tracking.checkpoints?.[0]?.description || `Status updated to ${effectiveStatus}.`
+                          }
+                        ]
+                      };
+                    });
+                  }
                 }
               }
             } catch (trackErr) {
@@ -343,14 +372,25 @@ export default function OrderTrackingPage({ params }: PageProps) {
             <div className="bg-bg-primary/80 backdrop-blur-md rounded-xl border border-border-accent/60 px-5 py-4 flex items-center justify-between shadow-lg transition-theme">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Status</p>
-                <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black tracking-widest ${order.status === 'Cancelled' || order.status === 'Canceled'
-                    ? 'bg-red-500/20 text-red-600'
-                    : order.status === 'Delivered'
-                      ? 'bg-green-500/20 text-green-600'
-                      : 'bg-indigo-500/20 text-indigo-600'
-                  }`}>
-                  {order.status}
-                </span>
+                {(() => {
+                  const displayStatus = (tracking?.status === 'Delivered' || order.status === 'Delivered')
+                    ? 'Delivered'
+                    : (tracking?.status === 'Out for Delivery' || order.status === 'Out for Delivery')
+                      ? 'Out for Delivery'
+                      : order.status;
+                  return (
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black tracking-widest ${displayStatus === 'Cancelled' || displayStatus === 'Canceled'
+                        ? 'bg-red-500/20 text-red-600'
+                        : displayStatus === 'Delivered'
+                          ? 'bg-green-500/20 text-green-600'
+                          : displayStatus === 'Out for Delivery'
+                            ? 'bg-amber-500/20 text-amber-500'
+                            : 'bg-indigo-500/20 text-indigo-600'
+                      }`}>
+                      {displayStatus}
+                    </span>
+                  );
+                })()}
               </div>
               <div className="text-right">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-fg-secondary mb-0.5">Order Value</p>
@@ -395,7 +435,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                 </p>
               </div>
 
-              {['Dispatched', 'Shipped', 'Delivered'].includes(order.status) && (
+              {['Dispatched', 'Shipped', 'Out for Delivery', 'Delivered'].includes(order.status) && (
                 <a
                   href={`/orders/${order.id}/invoice`}
                   target="_blank"
@@ -448,62 +488,80 @@ export default function OrderTrackingPage({ params }: PageProps) {
                   const orderedItem = timeline.find(t => t.status === 'Processing');
                   const acceptedItem = timeline.find(t => t.status === 'Accepted');
                   const dispatchedItem = timeline.find(t => t.status === 'Dispatched' || t.status === 'Shipped');
+                  const outForDeliveryItem = timeline.find(t => t.status === 'Out for Delivery');
                   const deliveredItem = timeline.find(t => t.status === 'Delivered');
 
-                  const isAccepted = !!acceptedItem || ['Accepted', 'Dispatched', 'Shipped', 'Delivered'].includes(order.status);
-                  const isDispatched = !!dispatchedItem || ['Dispatched', 'Shipped', 'Delivered'].includes(order.status);
-                  const isDelivered = !!deliveredItem || order.status === 'Delivered';
+                  const isDelivered = !!deliveredItem || order.status === 'Delivered' || tracking?.status === 'Delivered';
+                  const isOutForDelivery = isDelivered || !!outForDeliveryItem || order.status === 'Out for Delivery' || tracking?.status === 'Out for Delivery';
+                  const isDispatched = isOutForDelivery || !!dispatchedItem || ['Dispatched', 'Shipped'].includes(order.status);
+                  const isAccepted = isDispatched || !!acceptedItem || order.status === 'Accepted';
 
                   return (
                     <div className="flex items-center w-full relative justify-between py-2">
-                      <div className="absolute left-[12.5%] right-[12.5%] top-6 -translate-y-1/2 h-0.5 bg-border-accent/60 -z-10">
+                      <div className="absolute left-[10%] right-[10%] top-6 -translate-y-1/2 h-0.5 bg-border-accent/60 -z-10">
                         <div
                           className="h-full bg-green-500 transition-all duration-500"
                           style={{
-                            width: isDelivered ? '100%' : isDispatched ? '66%' : isAccepted ? '33%' : '0%'
+                            width: isDelivered ? '100%' : isOutForDelivery ? '75%' : isDispatched ? '50%' : isAccepted ? '25%' : '0%'
                           }}
                         />
                       </div>
 
+                      {/* Step 1: Ordered */}
                       <div className="flex flex-col items-center flex-1">
                         <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-[13px] shadow-sm z-10">
                           ✓
                         </div>
                         <span className="font-bold text-fg-primary mt-2 text-xs">Ordered</span>
-                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5 text-center">
                           {formatTimelineDate(orderedItem?.timestamp || order.createdAt)}
                         </span>
                       </div>
 
+                      {/* Step 2: Accepted */}
                       <div className="flex flex-col items-center flex-1">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isAccepted ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
                           }`}>
                           {isAccepted ? '✓' : '2'}
                         </div>
                         <span className={`font-bold mt-2 text-xs ${isAccepted ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Accepted</span>
-                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5 text-center">
                           {acceptedItem ? formatTimelineDate(acceptedItem.timestamp) : ''}
                         </span>
                       </div>
 
+                      {/* Step 3: Dispatched */}
                       <div className="flex flex-col items-center flex-1">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isDispatched ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
                           }`}>
                           {isDispatched ? '✓' : '3'}
                         </div>
                         <span className={`font-bold mt-2 text-xs ${isDispatched ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Dispatched</span>
-                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5 text-center">
                           {dispatchedItem ? formatTimelineDate(dispatchedItem.timestamp) : ''}
                         </span>
                       </div>
 
+                      {/* Step 4: Out for Delivery */}
+                      <div className="flex flex-col items-center flex-1">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isOutForDelivery ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
+                          }`}>
+                          {isOutForDelivery ? '✓' : '4'}
+                        </div>
+                        <span className={`font-bold mt-2 text-xs text-center ${isOutForDelivery ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Out for Delivery</span>
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5 text-center">
+                          {outForDeliveryItem ? formatTimelineDate(outForDeliveryItem.timestamp) : ''}
+                        </span>
+                      </div>
+
+                      {/* Step 5: Delivered */}
                       <div className="flex flex-col items-center flex-1">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[13px] shadow-sm z-10 transition-colors ${isDelivered ? 'bg-green-500 text-white' : 'bg-bg-primary text-fg-secondary/40 border border-border-accent'
                           }`}>
-                          {isDelivered ? '✓' : '4'}
+                          {isDelivered ? '✓' : '5'}
                         </div>
                         <span className={`font-bold mt-2 text-xs ${isDelivered ? 'text-fg-primary' : 'text-fg-secondary/40'}`}>Delivered</span>
-                        <span className="text-[9px] text-fg-secondary/60 mt-0.5">
+                        <span className="text-[9px] text-fg-secondary/60 mt-0.5 text-center">
                           {deliveredItem ? formatTimelineDate(deliveredItem.timestamp) : ''}
                         </span>
                       </div>
@@ -736,7 +794,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-fg-primary">{formatOrderPrice(item.price * item.quantity, order.currencySymbol, order.currency)}</p>
+                      <p className="font-semibold text-fg-primary">{formatOrderPrice(Number(item.price) * item.quantity, order.currencySymbol, order.currency)}</p>
                       <p className="text-[10px] text-fg-secondary/70">Qty: {item.quantity}</p>
                     </div>
                   </div>
