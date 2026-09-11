@@ -10,6 +10,8 @@ import { useCurrency } from '@/context/CurrencyContext';
 
 
 
+import pkg from '../../package.json';
+
 const saleBadges: Record<string, string> = {
   sage: '50% OFF',
   skala: '50% OFF',
@@ -31,12 +33,33 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [showLoader, setShowLoader] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
   const [fadeLoader, setFadeLoader] = useState(false);
+  const [shouldAnimateLoader, setShouldAnimateLoader] = useState(false);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
+
+  const LOADER_CACHE_KEY = 'fm_last_loader_timestamp';
+  const LOADER_VERSION_KEY = 'fm_loader_version';
+  const CURRENT_LOADER_VERSION = pkg.version;
+  const LOADER_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
   useEffect(() => {
     setMounted(true);
+    try {
+      const lastShown = localStorage.getItem(LOADER_CACHE_KEY);
+      const storedVersion = localStorage.getItem(LOADER_VERSION_KEY);
+      const now = Date.now();
+
+      const isExpired = !lastShown || (now - parseInt(lastShown, 10)) > LOADER_INTERVAL_MS;
+      const isNewVersion = storedVersion !== CURRENT_LOADER_VERSION;
+
+      if (isExpired || isNewVersion) {
+        setShouldAnimateLoader(true);
+        setShowLoader(true);
+      }
+    } catch (e) {
+      setShowLoader(false);
+    }
   }, []);
 
   const { state: { collections, loading, error, fetched } } = useCollections();
@@ -70,17 +93,23 @@ export default function Home() {
   const isDataReady = !settingsLoading && !isProductsLoading;
 
   useEffect(() => {
-    if (isDataReady && mounted) {
+    if (shouldAnimateLoader && isDataReady && mounted) {
       const timer = setTimeout(() => {
         setFadeLoader(true);
         const removeTimer = setTimeout(() => {
           setShowLoader(false);
+          try {
+            localStorage.setItem(LOADER_CACHE_KEY, Date.now().toString());
+            localStorage.setItem(LOADER_VERSION_KEY, CURRENT_LOADER_VERSION);
+          } catch (e) {
+            console.error('Failed to update loader cache', e);
+          }
         }, 700); // fade out transition duration
         return () => clearTimeout(removeTimer);
       }, 1000); // 1 second minimum duration to appreciate animation
       return () => clearTimeout(timer);
     }
-  }, [isDataReady, mounted]);
+  }, [isDataReady, mounted, shouldAnimateLoader]);
 
   // Re-enable transitions after layout reset
   useEffect(() => {
