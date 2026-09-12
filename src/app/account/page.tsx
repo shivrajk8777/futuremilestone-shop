@@ -33,18 +33,18 @@ interface Order {
 import { formatOrderPrice } from '@/lib/formatOrderPrice';
 
 const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 
-  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 
-  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 
-  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+  'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
+  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh',
   'Lakshadweep', 'Puducherry'
 ];
 
 export default function AccountPage() {
   const { user, loading, updateProfile, addAddress, deleteAddress, updateAddress, setAuthModalOpen } = useUser();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
-  
+
   // Profile state
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -91,7 +91,7 @@ export default function AccountPage() {
     if (user) {
       setName(user.name || '');
       setPhone(user.phone || '');
-      
+
       const addr = user.address;
       if (addr && typeof addr === 'object') {
         setProfileCountry(addr.country || 'India');
@@ -310,7 +310,7 @@ export default function AccountPage() {
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-3 bg-bg-primary select-text transition-theme relative lg:h-screen">
-      
+
       {/* Left Column: Premium Showroom Image */}
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
@@ -324,41 +324,38 @@ export default function AccountPage() {
       </section>
 
       {/* Right Column: Scrollable Content with Tabs */}
-      <div 
-        ref={rightColumnRef} 
+      <div
+        ref={rightColumnRef}
         className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pr-3 lg:pl-0 flex flex-col gap-3 transition-theme lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] lg:overflow-y-auto scrollbar-none"
       >
         <div className="bg-bg-secondary p-8 md:p-12 rounded-xl border border-border-accent/40 transition-theme flex-1 flex flex-col gap-8">
-          
+
           {/* Header & Tabs */}
           <div className="space-y-6">
             <h1 className="font-dm-sans text-3xl md:text-[40px] font-medium tracking-tight text-fg-primary leading-[1.15]">
               Account Details
             </h1>
-            
+
             {user && (
               <div className="flex border-b border-border-accent/40 gap-6 text-xs font-bold uppercase tracking-wider text-fg-secondary">
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={`pb-3 border-b-2 transition-colors cursor-pointer ${
-                    activeTab === 'profile' ? 'border-fg-primary text-fg-primary' : 'border-transparent hover:text-fg-primary'
-                  }`}
+                  className={`pb-3 border-b-2 transition-colors cursor-pointer ${activeTab === 'profile' ? 'border-fg-primary text-fg-primary' : 'border-transparent hover:text-fg-primary'
+                    }`}
                 >
                   Profile
                 </button>
                 <button
                   onClick={() => setActiveTab('orders')}
-                  className={`pb-3 border-b-2 transition-colors cursor-pointer ${
-                    activeTab === 'orders' ? 'border-fg-primary text-fg-primary' : 'border-transparent hover:text-fg-primary'
-                  }`}
+                  className={`pb-3 border-b-2 transition-colors cursor-pointer ${activeTab === 'orders' ? 'border-fg-primary text-fg-primary' : 'border-transparent hover:text-fg-primary'
+                    }`}
                 >
                   Orders
                 </button>
                 <button
                   onClick={() => setActiveTab('addresses')}
-                  className={`pb-3 border-b-2 transition-colors cursor-pointer ${
-                    activeTab === 'addresses' ? 'border-fg-primary text-fg-primary' : 'border-transparent hover:text-fg-primary'
-                  }`}
+                  className={`pb-3 border-b-2 transition-colors cursor-pointer ${activeTab === 'addresses' ? 'border-fg-primary text-fg-primary' : 'border-transparent hover:text-fg-primary'
+                    }`}
                 >
                   Saved Addresses
                 </button>
@@ -390,7 +387,7 @@ export default function AccountPage() {
             </div>
           ) : (
             <div className="w-full flex-grow flex flex-col justify-start">
-              
+
               {/* TAB 1: PROFILE TAB */}
               {activeTab === 'profile' && (
                 <div className="space-y-6 w-full animate-fade-in">
@@ -453,7 +450,7 @@ export default function AccountPage() {
 
                     <div className="space-y-4 border-t border-border-accent/20 pt-4">
                       <h3 className="text-xs font-bold uppercase tracking-wider text-fg-primary">Address Information</h3>
-                      
+
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-bold uppercase tracking-wider text-fg-secondary">Country/Region</label>
                         <select
@@ -639,7 +636,7 @@ export default function AccountPage() {
 
                         return (
                           <div key={order.id} className="border border-border-accent/40 rounded-xl bg-bg-primary overflow-hidden shadow-sm flex flex-col">
-                            
+
                             {/* Order Header */}
                             <div className="px-5 py-4 bg-bg-secondary/70 border-b border-border-accent/40 flex flex-wrap justify-between items-center gap-3 text-xs">
                               <div className="flex items-center gap-3">
@@ -654,11 +651,10 @@ export default function AccountPage() {
                               </div>
                               <div className="flex items-center gap-3">
                                 <span className="font-bold text-fg-primary">{formatOrderPrice(order.total, order.currencySymbol, order.currency)}</span>
-                                <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold ${
-                                  order.status === 'Cancelled' || order.status === 'Canceled'
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold ${order.status === 'Cancelled' || order.status === 'Canceled'
                                     ? 'bg-red-500/10 text-red-500'
                                     : 'bg-green-500/10 text-green-500'
-                                }`}>
+                                  }`}>
                                   {order.status}
                                 </span>
                               </div>
@@ -667,8 +663,8 @@ export default function AccountPage() {
                             {/* Order Items */}
                             <div className="p-5 divide-y divide-border-accent/30 space-y-4">
                               {order.items.map((item, index) => (
-                                <Link 
-                                  key={index} 
+                                <Link
+                                  key={index}
                                   href={`/shop/${item.slug}`}
                                   className={`flex gap-4 group/item hover:opacity-90 transition-opacity ${index > 0 ? 'pt-4' : ''}`}
                                 >
@@ -729,7 +725,7 @@ export default function AccountPage() {
               {/* TAB 3: SAVED ADDRESSES TAB */}
               {activeTab === 'addresses' && (
                 <div className="space-y-6 w-full animate-fade-in">
-                  
+
                   {/* Notifications */}
                   {addressMessage && (
                     <div className="bg-green-500/10 text-green-500 border border-green-500/20 px-5 py-4 rounded-xl text-xs font-semibold flex items-center gap-2">
@@ -988,7 +984,7 @@ export default function AccountPage() {
                                   </>
                                 )}
                               </p>
-                              {addr.phone && <p className="text-fg-secondary/80 font-normal text-[11px] mt-1">📞 {addr.phone}</p>}
+                              {addr.phone && <p className="text-fg-secondary/80 font-normal text-[11px] mt-1"> {addr.phone}</p>}
                             </div>
                           </div>
                         </div>

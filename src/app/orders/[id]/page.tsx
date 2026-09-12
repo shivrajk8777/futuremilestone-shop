@@ -358,8 +358,8 @@ export default function OrderTrackingPage({ params }: PageProps) {
                   src={item.image}
                   alt={item.name}
                   className={`absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-all duration-1000 ease-in-out ${currentIndex === idx
-                      ? 'opacity-100 scale-100 pointer-events-auto'
-                      : 'opacity-0 scale-[0.99] pointer-events-none'
+                    ? 'opacity-100 scale-100 pointer-events-auto'
+                    : 'opacity-0 scale-[0.99] pointer-events-none'
                     }`}
                 />
               ))}
@@ -380,12 +380,12 @@ export default function OrderTrackingPage({ params }: PageProps) {
                       : order.status;
                   return (
                     <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-black tracking-widest ${displayStatus === 'Cancelled' || displayStatus === 'Canceled'
-                        ? 'bg-red-500/20 text-red-600'
-                        : displayStatus === 'Delivered'
-                          ? 'bg-green-500/20 text-green-600'
-                          : displayStatus === 'Out for Delivery'
-                            ? 'bg-amber-500/20 text-amber-500'
-                            : 'bg-indigo-500/20 text-indigo-600'
+                      ? 'bg-red-500/20 text-red-600'
+                      : displayStatus === 'Delivered'
+                        ? 'bg-green-500/20 text-green-600'
+                        : displayStatus === 'Out for Delivery'
+                          ? 'bg-amber-500/20 text-amber-500'
+                          : 'bg-indigo-500/20 text-indigo-600'
                       }`}>
                       {displayStatus}
                     </span>
@@ -606,7 +606,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                 <div className="bg-bg-primary p-5 rounded-xl border border-border-accent/40 space-y-4 text-xs mt-1">
                   <div className="flex justify-between items-center border-b border-border-accent/20 pb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-[18px]">✈️</span>
+
                       <div>
                         <span className="font-bold text-fg-primary block">Live Shipment Status</span>
                         <span className="text-[9px] text-fg-secondary/50 uppercase font-bold tracking-wider">DHL Real-Time Tracker</span>
@@ -616,10 +616,10 @@ export default function OrderTrackingPage({ params }: PageProps) {
                       <span className="text-[10px] text-fg-secondary/60 animate-pulse font-medium">Updating...</span>
                     ) : tracking ? (
                       <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-extrabold tracking-wider border ${tracking.status === "Delivered"
-                          ? "bg-green-500/10 text-green-600 border-green-500/20"
-                          : tracking.status === "Out for Delivery"
-                            ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
-                            : "bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
+                        ? "bg-green-500/10 text-green-600 border-green-500/20"
+                        : tracking.status === "Out for Delivery"
+                          ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                          : "bg-indigo-500/10 text-indigo-600 border-indigo-500/20"
                         }`}>
                         {tracking.status}
                       </span>
@@ -658,8 +658,8 @@ export default function OrderTrackingPage({ params }: PageProps) {
                             <div key={idx} className="relative">
                               {/* Circle dot marker */}
                               <div className={`absolute -left-[21.5px] top-1.5 w-3 h-3 rounded-full border bg-bg-primary transition-all ${isLatest
-                                  ? "border-indigo-600 ring-4 ring-indigo-500/10 bg-indigo-600 scale-110"
-                                  : "border-fg-secondary/30 bg-bg-secondary"
+                                ? "border-indigo-600 ring-4 ring-indigo-500/10 bg-indigo-600 scale-110"
+                                : "border-fg-secondary/30 bg-bg-secondary"
                                 }`} />
                               <div className="flex justify-between items-start gap-4">
                                 <div>
@@ -667,7 +667,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                                     {cp.description}
                                   </span>
                                   <span className="text-[10px] text-fg-secondary/60 mt-0.5 block font-medium">
-                                    📍 {cp.location}
+                                    {cp.location}
                                   </span>
                                 </div>
                                 <span className="text-[10px] text-fg-secondary/60 font-semibold whitespace-nowrap mt-0.5">
@@ -734,11 +734,11 @@ export default function OrderTrackingPage({ params }: PageProps) {
           )}
 
           {/* ── 3. Chronological Log History ─────────────────────────────────── */}
-          {order.statusTimeline && order.statusTimeline.length > 0 && (
+          {/* {order.statusTimeline && order.statusTimeline.length > 0 && (
             <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
               <div className="w-full border-b border-border-accent/40 py-4 flex items-center justify-center">
                 <h2 className="font-dm-sans text-xs font-bold text-fg-primary uppercase tracking-widest text-center">
-                  Log History
+                  Delivery History
                 </h2>
               </div>
               <div className="p-6">
@@ -746,10 +746,10 @@ export default function OrderTrackingPage({ params }: PageProps) {
                   {order.statusTimeline.slice().reverse().map((t, idx) => (
                     <div key={idx} className="relative">
                       <div className={`absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full border bg-bg-primary ${t.status === 'Cancelled' || t.status === 'Canceled'
-                          ? 'border-red-500'
-                          : t.status === 'Delivered'
-                            ? 'border-green-600'
-                            : 'border-fg-primary'
+                        ? 'border-red-500'
+                        : t.status === 'Delivered'
+                          ? 'border-green-600'
+                          : 'border-fg-primary'
                         }`} />
                       <div className="flex justify-between items-start gap-4 text-xs">
                         <div>
@@ -765,7 +765,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* ── 4. Order Items Summary ────────────────────────────────────────── */}
           <div className="w-full bg-bg-secondary border border-border-accent/40 rounded-xl overflow-hidden transition-theme">
@@ -830,7 +830,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                         .filter(Boolean)
                         .join(", ")}
                   </p>
-                  {order.shippingAddress.phone && <p className="text-fg-secondary/70 mt-1 font-semibold">📞 {order.shippingAddress.phone}</p>}
+                  {order.shippingAddress.phone && <p className="text-fg-secondary/70 mt-1 font-semibold"> {order.shippingAddress.phone}</p>}
                 </div>
               </div>
             </div>

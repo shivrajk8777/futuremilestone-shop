@@ -112,17 +112,40 @@ export async function POST(request: NextRequest) {
     try {
       const user = await db.collection('users').findOne({ _id: objId });
       if (user && user.email) {
-        const itemsListHtml = items.map((item: any) => `
-          <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155;">
-              <div style="font-weight: 600; color: #0f172a;">${item.name}</div>
-              ${item.material || item.dimension ? `<div style="font-size: 11px; color: #64748b; margin-top: 2px;">${[item.material, item.dimension].filter(Boolean).join(' • ')}</div>` : ''}
-            </td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: center;">${item.quantity}</td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: right;">$${Number(item.price).toFixed(2)}</td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #0f172a; text-align: right; font-weight: 600;">$${(Number(item.price) * Number(item.quantity)).toFixed(2)}</td>
-          </tr>
-        `).join('');
+        const storeUrl = process.env.NEXT_PUBLIC_STORE_URL || "https://futuremilestone.shop";
+        const logoUrl = "https://res.cloudinary.com/dhkf4qmql/image/upload/futuremilestone/futuremilestone_logo.png";
+
+        const itemsListHtml = items.map((item: any) => {
+          const rawImg = item.image || item.imageUrl || item.thumbnail;
+          let imgUrl = logoUrl;
+          if (rawImg) {
+            if (rawImg.startsWith("http://") || rawImg.startsWith("https://")) {
+              imgUrl = rawImg;
+            } else {
+              imgUrl = `${storeUrl.replace(/\/$/, "")}${rawImg.startsWith("/") ? "" : "/"}${rawImg}`;
+            }
+          }
+
+          const specs = [item.material, item.dimension, item.selectedVariant].filter(Boolean).join(" • ");
+          const qty = item.quantity || 1;
+          const priceVal = typeof item.price === "number" ? item.price : parseFloat(String(item.price).replace(/[^0-9.]/g, "")) || 0;
+          const lineTotal = priceVal * qty;
+
+          return `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 12px 8px; vertical-align: middle; width: 64px;">
+                <img src="${imgUrl}" alt="${item.name}" width="56" height="56" style="width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; display: block;" />
+              </td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #334155;">
+                <div style="font-weight: 600; color: #0f172a; font-size: 14px; line-height: 1.3;">${item.name}</div>
+                ${specs ? `<div style="font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1.3;">${specs}</div>` : ""}
+              </td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #334155; text-align: center;">${qty}</td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #334155; text-align: right; white-space: nowrap;">₹${priceVal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #0f172a; text-align: right; font-weight: 700; white-space: nowrap;">₹${lineTotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            </tr>
+          `;
+        }).join('');
 
         const emailHtml = `
           <!DOCTYPE html>
@@ -132,7 +155,7 @@ export async function POST(request: NextRequest) {
             <title>Order Confirmation - ${orderNumber}</title>
             <style>
               body {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                 background-color: #f8fafc;
                 margin: 0;
                 padding: 0;
@@ -145,22 +168,22 @@ export async function POST(request: NextRequest) {
                 border-radius: 16px;
                 overflow: hidden;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-                border: 1px solid #e2e8f0;
+                border: 1px solid #ececec;
               }
               .header {
-                background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-                padding: 32px 24px;
+                padding: 28px 24px 20px 24px;
                 text-align: center;
-                color: #ffffff;
+                border-bottom: 1px solid #ececec;
               }
               .header h1 {
                 margin: 0;
-                font-size: 24px;
+                font-size: 22px;
                 font-weight: 700;
-                letter-spacing: -0.025em;
+                letter-spacing: -0.02em;
+                color: #0e1011;
               }
               .content {
-                padding: 32px 24px;
+                padding: 28px 24px;
               }
               .greeting {
                 font-size: 18px;
@@ -170,14 +193,15 @@ export async function POST(request: NextRequest) {
                 margin-bottom: 12px;
               }
               .intro {
-                font-size: 15px;
+                font-size: 14px;
                 color: #475569;
                 line-height: 1.6;
                 margin-top: 0;
                 margin-bottom: 24px;
               }
               .order-details-box {
-                background-color: #f1f5f9;
+                background-color: #fafafa;
+                border: 1px solid #ececec;
                 border-radius: 12px;
                 padding: 16px;
                 margin-bottom: 24px;
@@ -188,17 +212,17 @@ export async function POST(request: NextRequest) {
                 margin-bottom: 24px;
               }
               .items-table th {
-                background-color: #f8fafc;
-                border-bottom: 2px solid #e2e8f0;
+                background-color: #fafafa;
+                border-bottom: 1.5px solid #ececec;
                 padding: 10px 8px;
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: 700;
-                color: #475569;
+                color: #64748b;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
               }
               .total-section {
-                border-top: 2px solid #e2e8f0;
+                border-top: 2px solid #ececec;
                 padding-top: 16px;
                 text-align: right;
               }
@@ -209,16 +233,16 @@ export async function POST(request: NextRequest) {
                 font-weight: 600;
               }
               .total-amount {
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: 700;
-                color: #6366f1;
+                color: #0e1011;
               }
               .footer {
-                background-color: #f8fafc;
-                padding: 24px;
+                background-color: #fafafa;
+                padding: 20px 24px;
                 text-align: center;
-                border-top: 1px solid #e2e8f0;
-                font-size: 12px;
+                border-top: 1px solid #ececec;
+                font-size: 11px;
                 color: #94a3b8;
               }
               .footer p {
@@ -229,7 +253,8 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <h1>Future Milestone</h1>
+                <img src="${logoUrl}" alt="Future Milestone" width="42" height="34" style="display: block; margin: 0 auto 10px auto; width: 42px; height: auto; border: 0;" />
+                <h1>futuremilestone</h1>
               </div>
               <div class="content">
                 <h2 class="greeting">Hi ${user.name || 'Customer'},</h2>
@@ -253,7 +278,7 @@ export async function POST(request: NextRequest) {
                 <table class="items-table">
                   <thead>
                     <tr>
-                      <th style="text-align: left;">Product</th>
+                      <th style="text-align: left;" colspan="2">Product</th>
                       <th style="text-align: center;">Qty</th>
                       <th style="text-align: right;">Price</th>
                       <th style="text-align: right;">Total</th>
@@ -266,7 +291,7 @@ export async function POST(request: NextRequest) {
 
                 <div class="total-section">
                   <span class="total-label">Grand Total:</span>
-                  <span class="total-amount">$${Number(total).toFixed(2)}</span>
+                  <span class="total-amount">₹${Number(total).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
               </div>
               <div class="footer">

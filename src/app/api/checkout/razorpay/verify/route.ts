@@ -162,17 +162,40 @@ export async function POST(request: NextRequest) {
     try {
       const user = await db.collection('users').findOne({ _id: objId });
       if (user && user.email) {
-        const itemsListHtml = items.map((item: any) => `
-          <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155;">
-              <div style="font-weight: 600; color: #0f172a;">${item.name}</div>
-              ${item.material || item.dimension ? `<div style="font-size: 11px; color: #64748b; margin-top: 2px;">${[item.material, item.dimension].filter(Boolean).join(' • ')}</div>` : ''}
-            </td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: center;">${item.quantity}</td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #334155; text-align: right;">₹${Number(item.price).toFixed(2)}</td>
-            <td style="padding: 12px 8px; font-size: 14px; color: #0f172a; text-align: right; font-weight: 600;">₹${(Number(item.price) * Number(item.quantity)).toFixed(2)}</td>
-          </tr>
-        `).join('');
+        const storeUrl = process.env.NEXT_PUBLIC_STORE_URL || "https://futuremilestone.shop";
+        const logoUrl = "https://res.cloudinary.com/dhkf4qmql/image/upload/futuremilestone/futuremilestone_logo.png";
+
+        const itemsListHtml = items.map((item: any) => {
+          const rawImg = item.image || item.imageUrl || item.thumbnail;
+          let imgUrl = logoUrl;
+          if (rawImg) {
+            if (rawImg.startsWith("http://") || rawImg.startsWith("https://")) {
+              imgUrl = rawImg;
+            } else {
+              imgUrl = `${storeUrl.replace(/\/$/, "")}${rawImg.startsWith("/") ? "" : "/"}${rawImg}`;
+            }
+          }
+
+          const specs = [item.material, item.dimension, item.selectedVariant].filter(Boolean).join(" • ");
+          const qty = item.quantity || 1;
+          const priceVal = typeof item.price === "number" ? item.price : parseFloat(String(item.price).replace(/[^0-9.]/g, "")) || 0;
+          const lineTotal = priceVal * qty;
+
+          return `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 12px 8px; vertical-align: middle; width: 64px;">
+                <img src="${imgUrl}" alt="${item.name}" width="56" height="56" style="width: 56px; height: 56px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; display: block;" />
+              </td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #334155;">
+                <div style="font-weight: 600; color: #0f172a; font-size: 14px; line-height: 1.3;">${item.name}</div>
+                ${specs ? `<div style="font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1.3;">${specs}</div>` : ""}
+              </td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #334155; text-align: center;">${qty}</td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #334155; text-align: right; white-space: nowrap;">₹${priceVal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+              <td style="padding: 12px 8px; vertical-align: middle; font-size: 14px; color: #0f172a; text-align: right; font-weight: 700; white-space: nowrap;">₹${lineTotal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            </tr>
+          `;
+        }).join('');
 
         const emailHtml = `
           <!DOCTYPE html>
@@ -181,24 +204,35 @@ export async function POST(request: NextRequest) {
             <meta charset="utf-8">
             <title>Order Confirmation - ${orderNumber}</title>
           </head>
-          <body style="font-family: Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
-              <h2 style="color: #0f172a; margin-top: 0;">Order Confirmation ${orderNumber}</h2>
-              <p>Hi ${user.name || 'Customer'}, thank you for your payment via Razorpay! Your order has been placed.</p>
-              <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead>
-                  <tr style="background: #f1f5f9; text-align: left;">
-                    <th style="padding: 10px;">Item</th>
-                    <th style="padding: 10px; text-align: center;">Qty</th>
-                    <th style="padding: 10px; text-align: right;">Price</th>
-                    <th style="padding: 10px; text-align: right;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${itemsListHtml}
-                </tbody>
-              </table>
-              <h3 style="text-align: right; color: #0f172a; margin-top: 20px;">Total Paid: ₹${Number(total).toFixed(2)}</h3>
+          <body style="font-family: 'DM Sans', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 16px; border: 1px solid #ececec;">
+              <div style="text-align: center; border-bottom: 1px solid #ececec; padding-bottom: 20px; margin-bottom: 25px;">
+                <img src="${logoUrl}" alt="Future Milestone" width="42" height="34" style="display: block; margin: 0 auto 10px auto; width: 42px; height: auto; border: 0;" />
+                <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #0e1011;">futuremilestone</h2>
+              </div>
+              <h3 style="color: #0f172a; margin-top: 0; font-size: 18px; font-weight: 600;">Order Confirmation ${orderNumber}</h3>
+              <p style="font-size: 14px; color: #334155; line-height: 1.6;">Hi ${user.name || 'Customer'}, thank you for your payment via Razorpay! Your order has been placed successfully.</p>
+              
+              <div style="margin: 20px 0; background-color: #fafafa; border: 1px solid #ececec; border-radius: 12px; padding: 16px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="border-bottom: 1.5px solid #ececec; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+                      <th style="padding: 0 8px 8px 8px;" colspan="2">Item</th>
+                      <th style="padding: 0 8px 8px 8px; text-align: center;">Qty</th>
+                      <th style="padding: 0 8px 8px 8px; text-align: right;">Price</th>
+                      <th style="padding: 0 8px 8px 8px; text-align: right;">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${itemsListHtml}
+                  </tbody>
+                </table>
+              </div>
+              <h3 style="text-align: right; color: #0f172a; margin-top: 20px; font-size: 16px;">Total Paid: ₹${Number(total).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+              <div style="border-top: 1px solid #ececec; margin-top: 25px; padding-top: 20px; text-align: center; font-size: 11px; color: #94a3b8;">
+                <p style="margin: 0;">This is an automated notification from Futuremilestone. Please do not reply directly to this email.</p>
+                <p style="margin: 5px 0 0 0;">&copy; ${new Date().getFullYear()} Future Milestone. All rights reserved.</p>
+              </div>
             </div>
           </body>
           </html>

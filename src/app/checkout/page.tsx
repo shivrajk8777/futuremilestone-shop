@@ -1191,7 +1191,7 @@ export default function CheckoutPage() {
                         user.address
                       )}
                     </p>
-                    {user.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {user.phone}</p>}
+                    {user.phone && <p className="text-fg-secondary/70 mt-0.5">{user.phone}</p>}
                   </div>
                 </label>
               )}
@@ -1221,7 +1221,7 @@ export default function CheckoutPage() {
                             `${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state} - ${addr.pincode}, ${addr.country}`
                           )}
                         </p>
-                        {addr.phone && <p className="text-fg-secondary/70 mt-0.5">📞 {addr.phone}</p>}
+                        {addr.phone && <p className="text-fg-secondary/70 mt-0.5">{addr.phone}</p>}
                       </div>
                     </label>
                   ))}
@@ -1394,15 +1394,14 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('razorpay')}
-                  className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer text-center ${
-                    paymentMethod === 'razorpay'
-                      ? 'border-fg-primary bg-fg-primary/5 text-fg-primary shadow-sm font-semibold'
-                      : 'border-border-accent/40 bg-bg-primary text-fg-secondary hover:border-border-accent'
-                  }`}
+                  className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer text-center ${paymentMethod === 'razorpay'
+                    ? 'border-fg-primary bg-fg-primary/5 text-fg-primary shadow-sm font-semibold'
+                    : 'border-border-accent/40 bg-bg-primary text-fg-secondary hover:border-border-accent'
+                    }`}
                 >
                   <div className="flex items-center gap-1.5">
                     <svg className="w-4 h-4 text-[#0052CC] dark:text-[#3395FF]" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.323L12.38 24 2.5 12.338l8.528-5.568-1.579-4.27L0 8.653 14.156 24h.005L24 0h-1.564z"/>
+                      <path d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.323L12.38 24 2.5 12.338l8.528-5.568-1.579-4.27L0 8.653 14.156 24h.005L24 0h-1.564z" />
                     </svg>
                     <span className="text-xs font-bold font-dm-sans">Razorpay</span>
                   </div>
@@ -1414,15 +1413,14 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('paypal')}
-                  className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer text-center ${
-                    paymentMethod === 'paypal'
-                      ? 'border-fg-primary bg-fg-primary/5 text-fg-primary shadow-sm font-semibold'
-                      : 'border-border-accent/40 bg-bg-primary text-fg-secondary hover:border-border-accent'
-                  }`}
+                  className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer text-center ${paymentMethod === 'paypal'
+                    ? 'border-fg-primary bg-fg-primary/5 text-fg-primary shadow-sm font-semibold'
+                    : 'border-border-accent/40 bg-bg-primary text-fg-secondary hover:border-border-accent'
+                    }`}
                 >
                   <div className="flex items-center gap-1.5">
                     <svg className="w-4 h-4 text-[#003087]" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .761-.647h6.812c2.474 0 4.397.587 5.397 1.705.952 1.06 1.144 2.585.57 4.53-.024.085-.05.17-.078.256-.84 2.766-2.88 4.417-5.918 4.417H9.79l-1.096 6.643a.641.641 0 0 1-.633.713h-.985z"/>
+                      <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .761-.647h6.812c2.474 0 4.397.587 5.397 1.705.952 1.06 1.144 2.585.57 4.53-.024.085-.05.17-.078.256-.84 2.766-2.88 4.417-5.918 4.417H9.79l-1.096 6.643a.641.641 0 0 1-.633.713h-.985z" />
                     </svg>
                     <span className="text-xs font-bold font-dm-sans">PayPal</span>
                   </div>

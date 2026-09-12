@@ -174,6 +174,7 @@ export async function POST(request: NextRequest) {
       <body>
         <div class="container">
           <div class="header">
+            <img src="https://res.cloudinary.com/dhkf4qmql/image/upload/futuremilestone/futuremilestone_logo.png" alt="Future Milestone" width="42" height="34" style="display: block; margin: 0 auto 10px auto; width: 42px; height: auto; border: 0;" />
             <h1>Future Milestone</h1>
           </div>
           <div class="content">
