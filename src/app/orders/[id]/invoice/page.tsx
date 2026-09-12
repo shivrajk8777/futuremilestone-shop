@@ -176,9 +176,10 @@ export default function OrderInvoicePage({ params }: PageProps) {
             <h1 className="text-2xl font-extrabold tracking-tight uppercase leading-none">FUTURE MILESTONE</h1>
             <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold block mt-1.5">Official Tax Invoice & Bill</span>
             <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">
-              108 Studio Lane, Industrial Area,<br />
-              Mumbai, MH, 400013<br />
-              support@futuremilestone.shop
+              A-50, Kanaram Nagar, Sikar Road, Jaipur Rajasthan India 302039
+              <br />
+              Email: info@futuremilestone.shop | Phone: +91-7073803090 <br />
+              https://www.futuremilestone.shop/
             </p>
           </div>
 
