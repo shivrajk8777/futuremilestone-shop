@@ -169,12 +169,12 @@ export default function OrderInvoicePage({ params }: PageProps) {
       </div>
 
       {/* Invoice Printable Sheet */}
-      <div className="max-w-[850px] mx-auto bg-white border border-gray-200 p-8 md:p-12 shadow-sm rounded-2xl print:border-none print:shadow-none print:p-0">
+      <div id="invoice-printable-card" className="max-w-[850px] mx-auto bg-white border border-gray-200 p-8 md:p-12 shadow-sm rounded-2xl print:border-none print:shadow-none print:p-0">
 
         {/* Invoice Brand Header */}
         <div className="flex justify-between items-start gap-6 border-b-2 border-black pb-6 mb-8">
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight uppercase leading-none">FUTURE MILESTONE</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight uppercase leading-none text-black">FUTURE MILESTONE</h1>
 
             <p className="text-[11px] text-gray-500 mt-3 leading-relaxed">
               A-50, Kanaram Nagar, Sikar Road, Jaipur Rajasthan India 302039<br />
@@ -317,17 +317,37 @@ export default function OrderInvoicePage({ params }: PageProps) {
           }
           @page {
             size: A4 portrait;
-            margin: 8mm 10mm;
+            margin: 10mm 12mm;
           }
-          .no-print {
+          /* Completely hide entire site layout, headers, navbars, footers, buttons, widgets */
+          nav, header, footer, aside, [role="navigation"], .no-print, #chat-widget, .chat-widget, [class*="ChatWidget"], [class*="SocialBar"], [class*="Footer"], [class*="Navbar"] {
             display: none !important;
           }
           html, body {
             background-color: white !important;
+            background: white !important;
             color: black !important;
             padding: 0 !important;
             margin: 0 !important;
             width: 100% !important;
+          }
+          body * {
+            visibility: hidden !important;
+          }
+          #invoice-printable-card, #invoice-printable-card * {
+            visibility: visible !important;
+          }
+          #invoice-printable-card {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            background: white !important;
           }
           .min-h-screen {
             min-height: auto !important;

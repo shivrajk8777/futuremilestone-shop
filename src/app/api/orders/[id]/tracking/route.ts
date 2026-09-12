@@ -148,7 +148,7 @@ export async function GET(
 
                 <p>We hope you love your new furniture pieces. Thank you for choosing Futuremilestone!</p>
                 <div style="border-top: 1px solid #ececec; margin-top: 25px; padding-top: 20px; text-align: center; font-size: 11px; color: #94a3b8;">
-                  <p style="margin: 0;">This is an automated notification from Futuremilestone. Please do not reply directly to this email.</p>
+                  <p style="margin: 0;">This is an automated notification from Future Milestone. Please do not reply directly to this email.</p>
                   <p style="margin: 5px 0 0 0;">&copy; ${new Date().getFullYear()} Future Milestone. All rights reserved.</p>
                 </div>
               </div>

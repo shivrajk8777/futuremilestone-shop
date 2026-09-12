@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
               </div>
               <h3 style="text-align: right; color: #0f172a; margin-top: 20px; font-size: 16px;">Total Paid: ₹${Number(total).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
               <div style="border-top: 1px solid #ececec; margin-top: 25px; padding-top: 20px; text-align: center; font-size: 11px; color: #94a3b8;">
-                <p style="margin: 0;">This is an automated notification from Futuremilestone. Please do not reply directly to this email.</p>
+                <p style="margin: 0;">This is an automated notification from Future Milestone. Please do not reply directly to this email.</p>
                 <p style="margin: 5px 0 0 0;">&copy; ${new Date().getFullYear()} Future Milestone. All rights reserved.</p>
               </div>
             </div>
