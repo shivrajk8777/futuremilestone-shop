@@ -529,28 +529,37 @@ export default function ProductDetails({ params }: PageProps) {
             </div>
 
             {/* Dimension Selector */}
-            <div className="space-y-3 pt-4 border-t border-border-accent/60 animate-fade-in relative">
-              <span className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary">
+            <div className="space-y-2 pt-4 border-t border-border-accent/60 animate-fade-in relative">
+              <label htmlFor="dimension-select" className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary block">
                 Dimension
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {dimensionsList.map((dim) => {
-                  const isActive = selectedDimension?.id === dim.id;
-                  const firstPrice = dimensionsList[0]?.price || 0;
-                  const priceDiff = dim.price - firstPrice;
-                  return (
-                    <button
-                      key={dim.id}
-                      onClick={() => setSelectedDimension(dim)}
-                      className={`font-dm-sans px-5 py-2.5 rounded-sm border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
-                        ? 'bg-fg-primary border-fg-primary text-bg-primary shadow-md'
-                        : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
-                        }`}
-                    >
-                      {dim.label} {priceDiff > 0 ? `(+${formatPrice(priceDiff)})` : ''}
-                    </button>
-                  );
-                })}
+              </label>
+              <div className="relative">
+                <select
+                  id="dimension-select"
+                  value={selectedDimension?.id || ''}
+                  onChange={(e) => {
+                    const selected = dimensionsList.find((dim) => dim.id === e.target.value);
+                    if (selected) {
+                      setSelectedDimension(selected);
+                    }
+                  }}
+                  className="w-full appearance-none bg-bg-primary text-fg-primary border border-border-accent/60 rounded-md px-4 py-3 pr-10 text-xs sm:text-sm font-dm-sans font-medium focus:outline-none focus:border-fg-primary focus:ring-1 focus:ring-fg-primary transition-all cursor-pointer shadow-sm hover:border-fg-primary/60"
+                >
+                  {dimensionsList.map((dim) => {
+                    const firstPrice = dimensionsList[0]?.price || 0;
+                    const priceDiff = dim.price - firstPrice;
+                    return (
+                      <option key={dim.id} value={dim.id} className="bg-bg-primary text-fg-primary py-1">
+                        {dim.label} {priceDiff > 0 ? `(+${formatPrice(priceDiff)})` : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-fg-secondary">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
               </div>
             </div>
 
