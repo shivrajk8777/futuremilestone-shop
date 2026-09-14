@@ -3,7 +3,7 @@ import { getDatabase } from "./mongodb";
 
 export const ADMIN_EMAILS = [
   "info@futuremilestone.shop",
-  "support@futuremilestone.shop",
+  "info@futuremilestone.shop",
 ];
 
 interface SendEmailParams {

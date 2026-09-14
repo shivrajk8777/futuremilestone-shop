@@ -58,7 +58,7 @@ export default function Footer() {
             <div className="space-y-5">
 
               <p className="text-xs text-bg-primary/50 font-medium">
-                © FM{' '}
+                © {' '}
                 <a
                   href="#"
                   target="_blank"

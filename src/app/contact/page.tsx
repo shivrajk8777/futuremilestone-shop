@@ -105,14 +105,14 @@ export default function Contact() {
   const showrooms = [
     {
       city: 'Jaipur Office',
-      address: 'A-50, Kanaram Nagar,\nSikar Road,\nJaipur - 302039',
+      address: 'A-50, Kanaram Nagar,\nSikar Road Jaipur,\n Rajasthan, India - 302039',
       mapUrl: 'https://maps.google.com/?q=A-50,+Kanaram+Nagar,+Sikar+Road,+Jaipur+-+302039'
     },
     {
       city: 'Get In Touch',
       isContactDetails: true,
       phone: '+91-7073803090',
-      email: 'support@futuremilestone.shop'
+      email: 'info@futuremilestone.shop'
     }
   ];
 
@@ -305,7 +305,7 @@ export default function Contact() {
                     </h2>
                     <div className="space-y-2 text-sm">
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-xs text-fg-secondary font-medium">Call Us</span>
+                        <span className="text-xs text-fg-secondary font-medium">Call Us/WhatsApp/FaceTime</span>
                         <a href={`tel:${showroom.phone}`} className="text-fg-primary hover:underline font-semibold transition-all">
                           {showroom.phone}
                         </a>
@@ -338,14 +338,14 @@ export default function Contact() {
                     </p>
                   </div>
                   <div>
-                    <a
+                    {/* <a
                       href={showroom.mapUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center bg-fg-primary text-bg-primary px-4 py-2 rounded-lg text-xs font-medium hover:opacity-90 transition-opacity shadow-sm"
                     >
                       Get Direction ↗
-                    </a>
+                    </a> */}
                   </div>
                 </>
               )}
