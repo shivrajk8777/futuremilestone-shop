@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          const specs = [item.material, item.dimension, item.selectedVariant].filter(Boolean).join(" • ");
+          const specs = [item.color || item.material, item.dimension, item.selectedVariant].filter(Boolean).join(" • ");
           const qty = item.quantity || 1;
           const priceVal = typeof item.price === "number" ? item.price : parseFloat(String(item.price).replace(/[^0-9.]/g, "")) || 0;
           const lineTotal = priceVal * qty;

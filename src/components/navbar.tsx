@@ -24,7 +24,7 @@ export default function Navbar() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const searchAbortRef = useRef<AbortController | null>(null);
-  const [cart, setCart] = useState<{ product: Product & { selectedMaterial?: string; selectedDimension?: string }; quantity: number }[]>([]);
+  const [cart, setCart] = useState<{ product: Product & { selectedColor?: string; selectedMaterial?: string; selectedDimension?: string; image?: string }; quantity: number }[]>([]);
   const [hoveredLink, setHoveredLink] = useState<'collections' | 'about' | null>(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
@@ -63,7 +63,7 @@ export default function Navbar() {
 
   /** Save the given cart to the DB (fire-and-forget, only when logged in). */
   const saveCartToDB = async (
-    cartItems: { product: Product & { selectedMaterial?: string; selectedDimension?: string }; quantity: number }[]
+    cartItems: { product: Product & { selectedColor?: string; selectedMaterial?: string; selectedDimension?: string; image?: string }; quantity: number }[]
   ) => {
     try {
       await fetch('/api/cart', {
@@ -109,10 +109,10 @@ export default function Navbar() {
             // Merge: for each local item, add to DB cart or increment quantity
             const merged = [...dbCart];
             for (const localItem of localCart) {
-              const lMat = localItem.product.selectedMaterial || 'Oak';
+              const lMat = (localItem.product as any).selectedColor || localItem.product.selectedMaterial || 'Oak';
               const lDim = localItem.product.selectedDimension || 'Standard';
               const existingIdx = merged.findIndex((m) => {
-                const mMat = m.product.selectedMaterial || 'Oak';
+                const mMat = (m.product as any).selectedColor || m.product.selectedMaterial || 'Oak';
                 const mDim = m.product.selectedDimension || 'Standard';
                 return m.product.slug === localItem.product.slug && mMat === lMat && mDim === lDim;
               });
@@ -223,12 +223,12 @@ export default function Navbar() {
     window.dispatchEvent(new Event('cart-updated'));
   };
 
-  const updateQuantity = (slug: string, material: string, dimension: string, delta: number) => {
+  const updateQuantity = (slug: string, materialOrColor: string, dimension: string, delta: number) => {
     const updated = cart
       .map((item) => {
-        const itemMat = item.product.selectedMaterial || 'Oak';
+        const itemCol = (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak';
         const itemDim = item.product.selectedDimension || 'Standard';
-        if (item.product.slug === slug && itemMat === material && itemDim === dimension) {
+        if (item.product.slug === slug && itemCol === materialOrColor && itemDim === dimension) {
           return { ...item, quantity: Math.max(0, item.quantity + delta) };
         }
         return item;
@@ -238,11 +238,11 @@ export default function Navbar() {
     persistCart(updated);
   };
 
-  const removeFromCart = (slug: string, material: string, dimension: string) => {
+  const removeFromCart = (slug: string, materialOrColor: string, dimension: string) => {
     const updated = cart.filter((item) => {
-      const itemMat = item.product.selectedMaterial || 'Oak';
+      const itemCol = (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak';
       const itemDim = item.product.selectedDimension || 'Standard';
-      return !(item.product.slug === slug && itemMat === material && itemDim === dimension);
+      return !(item.product.slug === slug && itemCol === materialOrColor && itemDim === dimension);
     });
     setCart(updated);
     persistCart(updated);
@@ -892,14 +892,15 @@ export default function Navbar() {
                   </div>
                 ) : (
                   cart.map((item) => {
-                    const itemMat = item.product.selectedMaterial || 'Oak';
+                    const itemColor = item.product.selectedColor || item.product.selectedMaterial || 'Oak';
                     const itemDim = item.product.selectedDimension || 'Standard';
-                    const itemKey = `${item.product.slug}-${itemMat}-${itemDim}`;
+                    const itemImg = item.product.image || item.product.images?.[0] || '/images/placeholder.png';
+                    const itemKey = `${item.product.slug}-${itemColor}-${itemDim}`;
                     return (
                       <div key={itemKey} className="flex gap-4 pb-6 border-b border-border-accent">
                         <div className="w-20 h-20 bg-bg-secondary rounded-lg overflow-hidden flex-shrink-0 relative">
                           <img
-                            src={item.product.images[0]}
+                            src={itemImg}
                             alt={item.product.name}
                             className="object-cover w-full h-full"
                           />
@@ -912,7 +913,7 @@ export default function Navbar() {
                             </div>
                             <p className="text-xs text-fg-secondary mt-1 capitalize">{item.product.category} Collection</p>
                             <div className="flex gap-2 text-[10px] text-fg-secondary/80 mt-1.5 font-medium uppercase tracking-wider">
-                              <span>{itemMat}</span>
+                              <span className="font-semibold text-fg-primary">{itemColor}</span>
                               <span>•</span>
                               <span>{itemDim}</span>
                             </div>
@@ -920,21 +921,21 @@ export default function Navbar() {
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center border border-border-accent rounded">
                               <button
-                                onClick={() => updateQuantity(item.product.slug, itemMat, itemDim, -1)}
+                                onClick={() => updateQuantity(item.product.slug, itemColor, itemDim, -1)}
                                 className="px-2 py-1 text-fg-secondary hover:text-fg-primary cursor-pointer"
                               >
                                 -
                               </button>
                               <span className="px-2 text-fg-primary font-medium">{item.quantity}</span>
                               <button
-                                onClick={() => updateQuantity(item.product.slug, itemMat, itemDim, 1)}
+                                onClick={() => updateQuantity(item.product.slug, itemColor, itemDim, 1)}
                                 className="px-2 py-1 text-fg-secondary hover:text-fg-primary cursor-pointer"
                               >
                                 +
                               </button>
                             </div>
                             <button
-                              onClick={() => removeFromCart(item.product.slug, itemMat, itemDim)}
+                              onClick={() => removeFromCart(item.product.slug, itemColor, itemDim)}
                               className="text-fg-secondary hover:text-red-500 font-medium underline cursor-pointer"
                             >
                               Remove

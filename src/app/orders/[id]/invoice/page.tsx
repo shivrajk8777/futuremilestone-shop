@@ -8,6 +8,7 @@ import { formatOrderPrice } from '@/lib/formatOrderPrice';
 interface OrderItem {
   slug: string;
   name: string;
+  color?: string;
   material: string;
   dimension: string;
   quantity: number;
@@ -264,7 +265,7 @@ export default function OrderInvoicePage({ params }: PageProps) {
                       </div>
                     </td>
                     <td className="py-3 text-gray-500 text-[11.5px] capitalize">
-                      {[item.material, item.dimension].filter(Boolean).join(' • ')}
+                      {[item.color || item.material, item.dimension].filter(Boolean).join(' • ')}
                     </td>
                     <td className="py-3 text-right text-gray-700">{formatOrderPrice(itemPrice, order.currencySymbol, order.currency)}</td>
                     <td className="py-3 text-center font-bold text-gray-900">{itemQty}</td>

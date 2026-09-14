@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Country, State } from 'country-state-city';
 
 interface CartItem {
-  product: Product & { selectedMaterial?: string; selectedDimension?: string };
+  product: Product & { selectedColor?: string; selectedMaterial?: string; selectedDimension?: string; image?: string };
   quantity: number;
 }
 
@@ -369,22 +369,22 @@ export default function CheckoutPage() {
     window.dispatchEvent(new Event('cart-updated'));
   };
 
-  const handleRemoveItem = (slug: string, material: string, dimension: string) => {
+  const handleRemoveItem = (slug: string, colorOrMaterial: string, dimension: string) => {
     const updated = cart.filter((item) => {
-      const itemMat = item.product.selectedMaterial || 'Oak';
+      const itemCol = (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak';
       const itemDim = item.product.selectedDimension || 'Standard';
-      return !(item.product.slug === slug && itemMat === material && itemDim === dimension);
+      return !(item.product.slug === slug && itemCol === colorOrMaterial && itemDim === dimension);
     });
     setCart(updated);
     persistCart(updated);
   };
 
-  const handleUpdateQuantity = (slug: string, material: string, dimension: string, delta: number) => {
+  const handleUpdateQuantity = (slug: string, colorOrMaterial: string, dimension: string, delta: number) => {
     const updated = cart
       .map((item) => {
-        const itemMat = item.product.selectedMaterial || 'Oak';
+        const itemCol = (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak';
         const itemDim = item.product.selectedDimension || 'Standard';
-        if (item.product.slug === slug && itemMat === material && itemDim === dimension) {
+        if (item.product.slug === slug && itemCol === colorOrMaterial && itemDim === dimension) {
           return { ...item, quantity: Math.max(0, item.quantity + delta) };
         }
         return item;
@@ -523,12 +523,13 @@ export default function CheckoutPage() {
                       items: cart.map(item => ({
                         slug: item.product.slug,
                         name: item.product.name,
-                        material: item.product.selectedMaterial || 'Oak',
+                        color: (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak',
+                        material: item.product.selectedMaterial || (item.product as any).selectedColor || 'Oak',
                         dimension: item.product.selectedDimension || 'Standard',
                         quantity: item.quantity,
                         price: Number((item.product.price * (country.rate || 1)).toFixed(2)),
                         basePrice: item.product.price,
-                        image: item.product.images[0],
+                        image: item.product.image || item.product.images[0],
                         customerName: user?.name,
                       })),
                       total: formatPrice(total),
@@ -939,12 +940,13 @@ export default function CheckoutPage() {
                 items: cart.map(item => ({
                   slug: item.product.slug,
                   name: item.product.name,
-                  material: item.product.selectedMaterial || 'Oak',
+                  color: (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak',
+                  material: item.product.selectedMaterial || (item.product as any).selectedColor || 'Oak',
                   dimension: item.product.selectedDimension || 'Standard',
                   quantity: item.quantity,
                   price: Number((item.product.price * (country.rate || 1)).toFixed(2)),
                   basePrice: item.product.price,
-                  image: item.product.images[0],
+                  image: item.product.image || item.product.images[0],
                   customerName: user.name,
                 })),
                 total: formatPrice(total),
@@ -1057,13 +1059,14 @@ export default function CheckoutPage() {
               )}
 
               {cart.map((item, index) => {
-                const itemMat = item.product.selectedMaterial || 'Oak';
+                const itemColor = (item.product as any).selectedColor || item.product.selectedMaterial || 'Oak';
                 const itemDim = item.product.selectedDimension || 'Standard';
-                const itemKey = `${item.product.slug}-${itemMat}-${itemDim}`;
+                const itemImg = item.product.image || item.product.images?.[0] || '/images/placeholder.png';
+                const itemKey = `${item.product.slug}-${itemColor}-${itemDim}`;
                 return (
                   <div key={itemKey} className={`flex gap-4 ${index > 0 ? 'pt-4 border-t border-border-accent/30' : ''}`}>
                     <div className="w-16 h-16 bg-bg-primary rounded-lg overflow-hidden border border-border-accent/30 flex-shrink-0">
-                      <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+                      <img src={itemImg} alt={item.product.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 flex flex-col justify-between text-xs">
                       <div>
@@ -1073,7 +1076,7 @@ export default function CheckoutPage() {
                             <span>{formatPrice(item.product.price * item.quantity)}</span>
                             <button
                               type="button"
-                              onClick={() => handleRemoveItem(item.product.slug, itemMat, itemDim)}
+                              onClick={() => handleRemoveItem(item.product.slug, itemColor, itemDim)}
                               className="text-fg-secondary/40 hover:text-red-500 transition-colors p-1 -mr-1 cursor-pointer"
                               title="Remove item"
                             >
@@ -1085,7 +1088,7 @@ export default function CheckoutPage() {
                         </div>
                         <p className="text-fg-secondary/70 capitalize mt-0.5">{item.product.category} Collection</p>
                         <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
-                          <span>{itemMat}</span>
+                          <span className="font-semibold text-fg-primary">{itemColor}</span>
                           <span>•</span>
                           <span>{itemDim}</span>
                         </div>
@@ -1095,7 +1098,7 @@ export default function CheckoutPage() {
                         <div className="flex items-center border border-border-accent/40 rounded-lg overflow-hidden bg-bg-primary">
                           <button
                             type="button"
-                            onClick={() => handleUpdateQuantity(item.product.slug, itemMat, itemDim, -1)}
+                            onClick={() => handleUpdateQuantity(item.product.slug, itemColor, itemDim, -1)}
                             className="px-2 py-0.5 text-xs font-semibold text-fg-secondary hover:text-fg-primary hover:bg-bg-secondary transition-colors cursor-pointer"
                             title="Decrease quantity"
                           >
@@ -1106,7 +1109,7 @@ export default function CheckoutPage() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => handleUpdateQuantity(item.product.slug, itemMat, itemDim, 1)}
+                            onClick={() => handleUpdateQuantity(item.product.slug, itemColor, itemDim, 1)}
                             className="px-2 py-0.5 text-xs font-semibold text-fg-secondary hover:text-fg-primary hover:bg-bg-secondary transition-colors cursor-pointer"
                             title="Increase quantity"
                           >
@@ -1116,7 +1119,7 @@ export default function CheckoutPage() {
 
                         <button
                           type="button"
-                          onClick={() => handleRemoveItem(item.product.slug, itemMat, itemDim)}
+                          onClick={() => handleRemoveItem(item.product.slug, itemColor, itemDim)}
                           className="text-[10px] font-medium text-red-500/80 hover:text-red-500 hover:underline transition-all cursor-pointer"
                         >
                           Remove

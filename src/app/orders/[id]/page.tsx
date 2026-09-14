@@ -10,6 +10,7 @@ import { formatOrderPrice } from '@/lib/formatOrderPrice';
 interface OrderItem {
   slug: string;
   name: string;
+  color?: string;
   material: string;
   dimension: string;
   quantity: number;
@@ -788,7 +789,7 @@ export default function OrderTrackingPage({ params }: PageProps) {
                     <div>
                       <h4 className="font-semibold text-fg-primary group-hover/item:underline decoration-fg-primary transition-all">{item.name}</h4>
                       <div className="flex gap-2 text-[9px] text-fg-secondary/80 mt-1 uppercase font-medium">
-                        <span>{item.material}</span>
+                        <span>{item.color || item.material}</span>
                         <span>•</span>
                         <span>{item.dimension}</span>
                       </div>

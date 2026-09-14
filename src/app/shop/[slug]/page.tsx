@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useRef } from 'react';
+import { useState, useEffect, use, useRef, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { products, Product, ProductDetailSection } from '@/data/products';
@@ -116,6 +116,7 @@ export default function ProductDetails({ params }: PageProps) {
   const [loading, setLoading] = useState(!staticProduct);
   const [notFoundState, setNotFoundState] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState<ColorItem | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<string>('Oak');
   const [addedNotification, setAddedNotification] = useState(false);
 
@@ -143,7 +144,10 @@ export default function ProductDetails({ params }: PageProps) {
           const data = await res.json();
           if (data.success && data.product) {
             setDbProduct(data.product);
-            if (data.product.materialsList && data.product.materialsList.length > 0) {
+            if (data.product.colorsList && data.product.colorsList.length > 0) {
+              setSelectedColor(data.product.colorsList[0]);
+              setSelectedMaterial(data.product.colorsList[0].name);
+            } else if (data.product.materialsList && data.product.materialsList.length > 0) {
               setSelectedMaterial(data.product.materialsList[0].name);
             }
             setLoading(false);
@@ -202,6 +206,19 @@ export default function ProductDetails({ params }: PageProps) {
     originalPrice?: number;
   }
 
+  interface MaterialItem {
+    id: string;
+    name: string;
+    stock: number;
+  }
+
+  interface ColorItem {
+    id: string;
+    name: string;
+    image?: string;
+    galleryImages: string[];
+  }
+
   // Active product definition combining database or static fallback details
   const activeProduct = {
     slug: slug,
@@ -235,9 +252,75 @@ export default function ProductDetails({ params }: PageProps) {
     }))
     : defaultDimensions;
 
-  const materialsList: string[] = dbProduct?.materialsList && dbProduct.materialsList.length > 0
-    ? dbProduct.materialsList.map((m: any) => String(m.name))
-    : ['Oak', 'Teak'];
+  // Resolve materials list
+  const materialsList: MaterialItem[] = useMemo(() => {
+    if (dbProduct?.materialsList && dbProduct.materialsList.length > 0) {
+      return dbProduct.materialsList.map((m: any, idx: number) => ({
+        id: String(m.id || idx),
+        name: String(m.name || 'Standard'),
+        stock: Number(m.stock) || 0,
+      }));
+    }
+    return [
+      { id: '1', name: 'Solid Teak Wood', stock: 100 },
+      { id: '2', name: 'Oak', stock: 50 },
+    ];
+  }, [dbProduct]);
+
+  // Resolve color variants list
+  const colorsList: ColorItem[] = useMemo(() => {
+    if (dbProduct?.colorsList && dbProduct.colorsList.length > 0) {
+      return dbProduct.colorsList.map((c: any, idx: number) => ({
+        id: String(c.id || idx),
+        name: String(c.name || `Color ${idx + 1}`),
+        image: c.image || '',
+        galleryImages: Array.isArray(c.galleryImages) && c.galleryImages.length > 0
+          ? c.galleryImages
+          : (c.image ? [c.image] : []),
+      }));
+    }
+    return [];
+  }, [dbProduct]);
+
+  // Keep selectedMaterial aligned
+  useEffect(() => {
+    if (!selectedMaterial && materialsList.length > 0) {
+      setSelectedMaterial(materialsList[0].name);
+    }
+  }, [materialsList, selectedMaterial]);
+
+  // Keep selectedColor aligned
+  useEffect(() => {
+    if (colorsList.length > 0) {
+      if (!selectedColor || !colorsList.some((c) => c.id === selectedColor.id)) {
+        setSelectedColor(colorsList[0]);
+      }
+    } else {
+      setSelectedColor(null);
+    }
+  }, [colorsList, selectedColor]);
+
+  // Calculate dynamic gallery images according to the selected color
+  const displayImages: string[] = useMemo(() => {
+    if (selectedColor && selectedColor.galleryImages && selectedColor.galleryImages.length > 0) {
+      return selectedColor.galleryImages;
+    }
+    if (selectedColor && selectedColor.image) {
+      return [selectedColor.image];
+    }
+    if (activeProduct.images && activeProduct.images.length > 0) {
+      return activeProduct.images;
+    }
+    return ['/images/placeholder.png'];
+  }, [selectedColor, activeProduct.images]);
+
+  const handleSelectColor = (col: ColorItem) => {
+    setSelectedColor(col);
+    setActiveImgIdx(0);
+    if (galleryScrollRef.current) {
+      galleryScrollRef.current.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  };
 
   // Initialize selectedDimension if needed
   useEffect(() => {
@@ -255,12 +338,8 @@ export default function ProductDetails({ params }: PageProps) {
   const currentOriginalPrice = selectedDimension ? (selectedDimension.originalPrice ?? selectedDimension.price) : activeProduct.originalPrice;
 
   // Compute active stock based on selected material
-  const activeMaterialObj = dbProduct?.materialsList?.find(
-    (m: any) => m.name === selectedMaterial
-  );
-  const currentStock = activeMaterialObj !== undefined && activeMaterialObj !== null && 'stock' in activeMaterialObj
-    ? Number(activeMaterialObj.stock)
-    : 8;
+  const selectedMaterialObj = materialsList.find((m) => m.name === selectedMaterial) || materialsList[0];
+  const currentStock = selectedMaterialObj ? Number(selectedMaterialObj.stock) : 8;
 
   // Update quantity/variant state if the product changes
   useEffect(() => {
@@ -271,9 +350,12 @@ export default function ProductDetails({ params }: PageProps) {
       setSelectedDimension(null);
     }
     if (materialsList.length > 0) {
-      setSelectedMaterial(materialsList[0]);
+      setSelectedMaterial(materialsList[0].name);
+    }
+    if (colorsList.length > 0) {
+      setSelectedColor(colorsList[0]);
     } else {
-      setSelectedMaterial('Oak');
+      setSelectedColor(null);
     }
     setActiveImgIdx(0);
   }, [activeProduct.slug, dbProduct]);
@@ -283,13 +365,13 @@ export default function ProductDetails({ params }: PageProps) {
     if (quantity > currentStock && currentStock > 0) {
       setQuantity(currentStock);
     }
-  }, [selectedMaterial, currentStock, quantity]);
+  }, [selectedColor, currentStock, quantity]);
 
   // Handle intersection observer to highlight active thumbnail as user scrolls gallery
   useEffect(() => {
     const scrollContainer = galleryScrollRef.current;
     const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
-    const observers = activeProduct.images.map((_, idx) => {
+    const observers = displayImages.map((_, idx) => {
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
@@ -311,7 +393,7 @@ export default function ProductDetails({ params }: PageProps) {
         if (el) observer.unobserve(el);
       });
     };
-  }, [activeProduct.images]);
+  }, [displayImages]);
 
   const scrollToImage = (idx: number) => {
     setActiveImgIdx(idx);
@@ -327,11 +409,18 @@ export default function ProductDetails({ params }: PageProps) {
       warning('Dimension Required', 'Please select a dimension before adding to cart.');
       return;
     }
-    // Build cart entry
+
+    const currentColorName = selectedColor?.name || 'Default';
+    const currentColorImage = selectedColor?.image || displayImages[0] || activeProduct.images[0];
+
+    // Build cart entry with selectedMaterial, selectedColor, and color thumbnail
     const cartProduct = {
       ...activeProduct,
       price: currentPrice,
-      selectedMaterial,
+      selectedMaterial: selectedMaterial,
+      selectedColor: currentColorName,
+      image: currentColorImage,
+      images: displayImages,
       selectedDimension: selectedDimension.label,
     };
 
@@ -340,18 +429,21 @@ export default function ProductDetails({ params }: PageProps) {
       try {
         const res = await fetch('/api/cart');
         const data = await res.json();
-        const dbCart: { product: Product & { selectedMaterial?: string; selectedDimension?: string }; quantity: number }[] = data.success ? (data.cart ?? []) : [];
+        const dbCart: { product: Product & { selectedMaterial?: string; selectedColor?: string; selectedDimension?: string; image?: string }; quantity: number }[] = data.success ? (data.cart ?? []) : [];
 
         const existingIdx = dbCart.findIndex((item) =>
           item.product.slug === activeProduct.slug &&
-          (item.product.selectedMaterial || 'Oak') === selectedMaterial &&
+          (item.product.selectedMaterial || '') === selectedMaterial &&
+          (item.product.selectedColor || '') === currentColorName &&
           (item.product.selectedDimension || 'Standard') === cartProduct.selectedDimension
         );
         if (existingIdx !== -1) {
           dbCart[existingIdx].quantity += quantity;
           dbCart[existingIdx].product.price = currentPrice;
+          dbCart[existingIdx].product.image = currentColorImage;
+          dbCart[existingIdx].product.images = displayImages;
         } else {
-          dbCart.push({ product: cartProduct, quantity });
+          dbCart.push({ product: cartProduct as any, quantity });
         }
 
         await fetch('/api/cart', {
@@ -367,7 +459,7 @@ export default function ProductDetails({ params }: PageProps) {
     } else {
       // ── Guest: use localStorage ──────────────────────────────────────────────
       const savedCart = localStorage.getItem('cart');
-      let cartList: { product: Product & { selectedMaterial?: string; selectedDimension?: string }; quantity: number }[] = [];
+      let cartList: { product: Product & { selectedMaterial?: string; selectedColor?: string; selectedDimension?: string; image?: string }; quantity: number }[] = [];
 
       if (savedCart) {
         try {
@@ -379,14 +471,17 @@ export default function ProductDetails({ params }: PageProps) {
 
       const existingIdx = cartList.findIndex((item) =>
         item.product.slug === activeProduct.slug &&
-        (item.product.selectedMaterial || 'Oak') === selectedMaterial &&
+        (item.product.selectedMaterial || '') === selectedMaterial &&
+        (item.product.selectedColor || '') === currentColorName &&
         (item.product.selectedDimension || 'Standard') === cartProduct.selectedDimension
       );
       if (existingIdx !== -1) {
         cartList[existingIdx].quantity += quantity;
         cartList[existingIdx].product.price = currentPrice;
+        cartList[existingIdx].product.image = currentColorImage;
+        cartList[existingIdx].product.images = displayImages;
       } else {
-        cartList.push({ product: cartProduct, quantity });
+        cartList.push({ product: cartProduct as any, quantity });
       }
 
       localStorage.setItem('cart', JSON.stringify(cartList));
@@ -423,20 +518,20 @@ export default function ProductDetails({ params }: PageProps) {
         <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-0 lg:pr-0 flex-shrink-0 transition-theme h-auto">
           <div className="h-full lg:h-auto rounded-2xl lg:rounded-none overflow-hidden lg:overflow-visible relative lg:border-none w-full lg:bg-transparent lg:shadow-none flex flex-col gap-3">
             <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-visible scrollbar-none h-full lg:h-auto snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
-              {activeProduct.images.map((img, idx) => (
+              {displayImages.map((img, idx) => (
                 <div
-                  key={idx}
+                  key={`${img}-${idx}`}
                   id={`image-${idx}`}
                   className="w-full aspect-square lg:aspect-auto lg:h-screen flex-shrink-0 snap-center relative rounded-2xl overflow-hidden lg:bg-bg-secondary/40"
                 >
-                  <img src={img} alt={`${activeProduct.name} view ${idx + 1}`} className="object-cover w-full h-full" />
+                  <img src={img} alt={`${activeProduct.name} - ${selectedColor?.name || 'view'} ${idx + 1}`} className="object-cover w-full h-full transition-opacity duration-300" />
                 </div>
               ))}
             </div>
 
-            {/* Mobile Dots Indicators (Mobile only - hidden per design spec) */}
+            {/* Mobile Dots Indicators */}
             <div className="absolute bottom-4 left-0 right-0 hidden justify-center gap-1.5 z-20 pointer-events-none lg:hidden">
-              {activeProduct.images.map((_, idx) => {
+              {displayImages.map((_, idx) => {
                 const isActive = activeImgIdx === idx;
                 return (
                   <button
@@ -452,12 +547,12 @@ export default function ProductDetails({ params }: PageProps) {
 
             {/* Floating Sticky Thumbnails panel (Desktop only) */}
             <div className="hidden lg:flex absolute lg:sticky bottom-6 lg:bottom-8 left-0 right-0 justify-center z-20 pointer-events-none">
-              <div className="bg-bg-primary/95 backdrop-blur-md p-2.5 rounded-2xl border border-border-accent/80 shadow-lg flex gap-2 pointer-events-auto transition-theme">
-                {activeProduct.images.map((img, idx) => {
+              <div className="bg-bg-primary/95 backdrop-blur-md p-2.5 rounded-2xl border border-border-accent/80 shadow-lg flex gap-2 pointer-events-auto transition-theme max-w-[90vw] overflow-x-auto scrollbar-none">
+                {displayImages.map((img, idx) => {
                   const isActive = activeImgIdx === idx;
                   return (
                     <button
-                      key={idx}
+                      key={`${img}-${idx}`}
                       onClick={() => scrollToImage(idx)}
                       className={`w-12 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer relative flex-shrink-0 ${isActive ? 'border-fg-primary scale-105 shadow-sm' : 'border-transparent opacity-60 hover:opacity-100'
                         }`}
@@ -506,27 +601,75 @@ export default function ProductDetails({ params }: PageProps) {
               </p>
             </div>
 
-            {/* Material Selector */}
-            <div className="space-y-3 pt-4 border-t border-border-accent/60">
-              <span className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary">Material</span>
-              <div className="flex gap-2">
-                {materialsList.map((mat) => {
-                  const isActive = selectedMaterial === mat;
-                  return (
-                    <button
-                      key={mat}
-                      onClick={() => setSelectedMaterial(mat)}
-                      className={`font-dm-sans px-5 py-2.5 rounded-sm border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
-                        ? 'bg-fg-primary border-fg-primary text-bg-primary shadow-md'
-                        : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
-                        }`}
-                    >
-                      {mat}
-                    </button>
-                  );
-                })}
+            {/* Material Selector (shown just like previously) */}
+            {materialsList.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-border-accent/60 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <span className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary">
+                    Material: <span className="text-fg-primary font-bold">{selectedMaterial}</span>
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {materialsList.map((mat) => {
+                    const isActive = selectedMaterial === mat.name;
+                    return (
+                      <button
+                        key={mat.id}
+                        onClick={() => setSelectedMaterial(mat.name)}
+                        className={`font-dm-sans px-4 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${isActive
+                          ? 'bg-fg-primary border-fg-primary text-bg-primary shadow-md scale-[1.02]'
+                          : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
+                          }`}
+                      >
+                        {mat.name}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Color Variant Selector (just below Material) */}
+            {colorsList.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-border-accent/60 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <span className="font-dm-sans text-xs font-bold tracking-wider text-fg-secondary">
+                    Color / Finish: <span className="text-fg-primary font-bold">{selectedColor?.name || 'Default'}</span>
+                  </span>
+                  {selectedColor && selectedColor.galleryImages?.length > 0 && (
+                    <span className="text-[11px] text-fg-secondary">
+                      {selectedColor.galleryImages.length} {selectedColor.galleryImages.length === 1 ? 'photo' : 'photos'}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {colorsList.map((col) => {
+                    const isActive = selectedColor?.id === col.id;
+                    return (
+                      <button
+                        key={col.id}
+                        onClick={() => handleSelectColor(col)}
+                        className={`font-dm-sans px-4 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer flex items-center gap-2.5 ${isActive
+                          ? 'bg-fg-primary border-fg-primary text-bg-primary shadow-md scale-[1.02]'
+                          : 'bg-fg-primary/5 border-fg-primary/10 text-fg-primary hover:bg-fg-primary/10'
+                          }`}
+                      >
+                        {col.image ? (
+                          <img
+                            src={col.image}
+                            alt={col.name}
+                            className="w-4 h-4 rounded-full object-cover border border-white/40 flex-shrink-0"
+                          />
+                        ) : (
+                          <span className="w-3.5 h-3.5 rounded-full bg-current opacity-30 flex-shrink-0" />
+                        )}
+                        <span>{col.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Dimension Selector */}
             <div className="space-y-2 pt-4 border-t border-border-accent/60 animate-fade-in relative">
@@ -545,15 +688,11 @@ export default function ProductDetails({ params }: PageProps) {
                   }}
                   className="w-full appearance-none bg-bg-primary text-fg-primary border border-border-accent/60 rounded-md px-4 py-3 pr-10 text-xs sm:text-sm font-dm-sans font-medium focus:outline-none focus:border-fg-primary focus:ring-1 focus:ring-fg-primary transition-all cursor-pointer shadow-sm hover:border-fg-primary/60"
                 >
-                  {dimensionsList.map((dim) => {
-                    const firstPrice = dimensionsList[0]?.price || 0;
-                    const priceDiff = dim.price - firstPrice;
-                    return (
-                      <option key={dim.id} value={dim.id} className="bg-bg-primary text-fg-primary py-1">
-                        {dim.label} {priceDiff > 0 ? `(+${formatPrice(priceDiff)})` : ''}
-                      </option>
-                    );
-                  })}
+                  {dimensionsList.map((dim) => (
+                    <option key={dim.id} value={dim.id} className="bg-bg-primary text-fg-primary py-1">
+                      {dim.label} ({formatPrice(dim.price)})
+                    </option>
+                  ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-fg-secondary">
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">

@@ -51,6 +51,7 @@ export async function GET(
         ? [product.imageUrl, ...product.galleryImages].filter(Boolean)
         : (product.imageUrl ? [product.imageUrl] : []),
       materialsList: Array.isArray(product.materials) ? product.materials : [],
+      colorsList: Array.isArray(product.colors) ? product.colors : [],
       dimensionsList: discounted.dimensionsList,
       details: Array.isArray(product.details) ? product.details : [],
       dimensionsInfo: product.dimensionsInfo ?? {
