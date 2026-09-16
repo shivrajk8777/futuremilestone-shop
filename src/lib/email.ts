@@ -13,6 +13,19 @@ interface SendEmailParams {
   orderId?: string;
 }
 
+let sentEmailsIndexPromise: Promise<any> | undefined;
+
+async function ensureSentEmailsIndex(collection: any) {
+  if (!sentEmailsIndexPromise) {
+    sentEmailsIndexPromise = collection
+      .createIndex({ sentAt: 1 }, { expireAfterSeconds: 86400, name: "sentAt_ttl_24h" })
+      .catch((err: any) => {
+        console.error("Failed to ensure TTL index on sent_emails:", err);
+      });
+  }
+  await sentEmailsIndexPromise;
+}
+
 export async function sendEmail({ to, subject, html, orderId }: SendEmailParams) {
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = Number(process.env.SMTP_PORT) || 587;
@@ -63,10 +76,13 @@ export async function sendEmail({ to, subject, html, orderId }: SendEmailParams)
     success = true;
   }
 
-  // Persist email logs in db
+  // Persist email logs in db (with 24h automatic TTL expiration)
   try {
     const db = await getDatabase();
-    await db.collection("sent_emails").insertOne({
+    const collection = db.collection("sent_emails");
+    await ensureSentEmailsIndex(collection);
+
+    await collection.insertOne({
       to: recipientString,
       subject,
       html,

@@ -7,10 +7,8 @@ import { useCollections } from '@/context/CollectionContext';
 import { useProducts } from '@/context/ProductContext';
 import { useSettings } from '@/context/SettingsContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { optimizeCloudinaryUrl } from '@/lib/image-utils';
 
-
-
-import pkg from '../../package.json';
 
 const saleBadges: Record<string, string> = {
   sage: '50% OFF',
@@ -33,34 +31,12 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(1);
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [showLoader, setShowLoader] = useState(false);
-  const [fadeLoader, setFadeLoader] = useState(false);
-  const [shouldAnimateLoader, setShouldAnimateLoader] = useState(false);
   const favoritesCarouselRef = useRef<HTMLDivElement>(null);
-
-  const LOADER_CACHE_KEY = 'fm_last_loader_timestamp';
-  const LOADER_VERSION_KEY = 'fm_loader_version';
-  const CURRENT_LOADER_VERSION = pkg.version;
-  const LOADER_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
   useEffect(() => {
     setMounted(true);
-    try {
-      const lastShown = localStorage.getItem(LOADER_CACHE_KEY);
-      const storedVersion = localStorage.getItem(LOADER_VERSION_KEY);
-      const now = Date.now();
-
-      const isExpired = !lastShown || (now - parseInt(lastShown, 10)) > LOADER_INTERVAL_MS;
-      const isNewVersion = storedVersion !== CURRENT_LOADER_VERSION;
-
-      if (isExpired || isNewVersion) {
-        setShouldAnimateLoader(true);
-        setShowLoader(true);
-      }
-    } catch (e) {
-      setShowLoader(false);
-    }
   }, []);
+
 
   const { state: { collections, loading, error, fetched } } = useCollections();
   const { state: productState } = useProducts();
@@ -90,26 +66,6 @@ export default function Home() {
   const favorites = favoritesList.length > 0 ? favoritesList : (productState.productsByCategory['all'] || []).slice(0, 8);
   const isProductsLoading = productState.loading['all'] || productState.loading['favorites'] || !productState.initialFetched;
 
-  const isDataReady = !settingsLoading && !isProductsLoading;
-
-  useEffect(() => {
-    if (shouldAnimateLoader && isDataReady && mounted) {
-      const timer = setTimeout(() => {
-        setFadeLoader(true);
-        const removeTimer = setTimeout(() => {
-          setShowLoader(false);
-          try {
-            localStorage.setItem(LOADER_CACHE_KEY, Date.now().toString());
-            localStorage.setItem(LOADER_VERSION_KEY, CURRENT_LOADER_VERSION);
-          } catch (e) {
-            console.error('Failed to update loader cache', e);
-          }
-        }, 700); // fade out transition duration
-        return () => clearTimeout(removeTimer);
-      }, 1000); // 1 second minimum duration to appreciate animation
-      return () => clearTimeout(timer);
-    }
-  }, [isDataReady, mounted, shouldAnimateLoader]);
 
   // Re-enable transitions after layout reset
   useEffect(() => {
@@ -186,31 +142,6 @@ export default function Home() {
 
   return (
     <div className={`flex flex-col gap-3 pb-3 ${showMarquee ? '' : 'pt-3'}`}>
-      {showLoader && (
-        <div
-          className={`fixed inset-0 z-[9999] bg-[#0e1011] flex flex-col items-center justify-center transition-all duration-700 ease-in-out ${fadeLoader ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
-        >
-          <div className="flex flex-col items-center gap-4">
-            {/* Brand Logo */}
-            <div className="relative w-16 h-16">
-              <img
-                src="/images/menu-icon-light.svg"
-                alt="fm Logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            {/* Brand Title */}
-            <span className="font-dm-sans font-bold text-white text-sm tracking-wider">
-              future milestone
-            </span>
-            {/* Modern Slim Progress Bar */}
-            <div className="w-16 h-[2.5px] bg-white/20 rounded-full overflow-hidden relative mt-1">
-              <div className="absolute inset-y-0 left-0 bg-neutral-300 w-full origin-left animate-loader-fill" />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 1. Top Announcement Marquee */}
       {showMarquee && (
@@ -239,7 +170,7 @@ export default function Home() {
       )}
 
       {/* 2. Section Hero (Slideshow) */}
-      {!settingsLoading && settings.carouselVisible && activeSlides.length > 0 && (
+      {!settingsLoading && settings.carouselVisible && activeSlides.length > 0 ? (
         <section className="relative h-[290px] sm:h-[400px] md:h-[520px] lg:h-[calc(99vh-76px)] w-full overflow-hidden group rounded-xl border border-border-accent/40">
           {/* Slides */}
           <div
@@ -262,8 +193,11 @@ export default function Home() {
               return (
                 <div key={idx} className="relative w-full h-full flex-shrink-0">
                   <img
-                    src={slide.bgImage}
+                    src={optimizeCloudinaryUrl(slide.bgImage, { width: 1400 })}
                     alt={slide.name}
+                    fetchPriority={idx === 1 ? 'high' : 'auto'}
+                    loading={idx === 1 ? 'eager' : 'lazy'}
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
                   />
                   <div className="absolute inset-0 bg-black/10" />
@@ -334,7 +268,9 @@ export default function Home() {
             })}
           </div>
         </section>
-      )}
+      ) : settingsLoading && settings.carouselVisible ? (
+        <div className="relative h-[290px] sm:h-[400px] md:h-[520px] lg:h-[calc(99vh-76px)] w-full rounded-xl border border-border-accent/40 bg-bg-secondary animate-pulse" />
+      ) : null}
 
       {/* 3. Section Benefits (Hidden on mobile) */}
       <section className="hidden md:flex bg-fg-primary text-bg-primary rounded-xl px-6 md:px-8 lg:px-12 py-6 justify-center gap-8 md:gap-12 lg:gap-16 items-center shadow-sm transition-theme">
@@ -440,8 +376,10 @@ export default function Home() {
                 >
                   {/* Product Background Image */}
                   <img
-                    src={product.images[0]}
+                    src={optimizeCloudinaryUrl(product.images[0], { width: 600 })}
                     alt={product.name}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
                   />
 
@@ -565,8 +503,10 @@ export default function Home() {
               <div className="w-full h-[250px] md:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                 {collections[0].imageUrl && (
                   <img
-                    src={collections[0].imageUrl}
+                    src={optimizeCloudinaryUrl(collections[0].imageUrl, { width: 800 })}
                     alt={collections[0].name}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute md:absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                   />
                 )}
@@ -615,8 +555,10 @@ export default function Home() {
                 <div className="w-full sm:w-1/2 h-[220px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                   {collections[1].imageUrl && (
                     <img
-                      src={collections[1].imageUrl}
+                      src={optimizeCloudinaryUrl(collections[1].imageUrl, { width: 600 })}
                       alt={collections[1].name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                     />
                   )}
@@ -657,8 +599,10 @@ export default function Home() {
                 <div className="w-full sm:w-1/2 h-[220px] sm:h-full rounded-xl overflow-hidden relative border border-border-accent/40 group">
                   {collections[2].imageUrl && (
                     <img
-                      src={collections[2].imageUrl}
+                      src={optimizeCloudinaryUrl(collections[2].imageUrl, { width: 600 })}
                       alt={collections[2].name}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                     />
                   )}
@@ -701,8 +645,10 @@ export default function Home() {
         {/* Right staged Image card */}
         <div className="w-full md:w-[55%] lg:w-[60%] h-[300px] md:h-full rounded-xl overflow-hidden relative border border-border-accent/40 order-first md:order-none">
           <img
-            src="/images/home-about.jpg"
+            src="/images/home-about.webp"
             alt="Staged Interior Design"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         </div>

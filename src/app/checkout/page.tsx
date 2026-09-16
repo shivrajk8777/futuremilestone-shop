@@ -90,8 +90,10 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
     return (
       <>
         <img
-          src="/images/about.png"
+          src="/images/about.webp"
           alt="Checkout"
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
         />
         <div className="absolute inset-0 bg-black/10" />
@@ -102,7 +104,7 @@ function CheckoutSlideshow({ items }: { items: SlideshowItem[] }) {
   return (
     <>
       {items.map((item, idx) => {
-        const imageUrl = item.image || "/images/about.png";
+        const imageUrl = item.image || "/images/about.webp";
         return (
           <img
             key={idx}

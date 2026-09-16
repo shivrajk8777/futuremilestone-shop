@@ -345,8 +345,10 @@ export default function OrderTrackingPage({ params }: PageProps) {
           {items.length === 0 ? (
             <>
               <img
-                src="/images/about.png"
+                src="/images/about.webp"
                 alt="Order Tracking"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 w-full h-full object-cover brightness-[0.92] transition-transform duration-700 group-hover:scale-[1.01]"
               />
               <div className="absolute inset-0 bg-black/10" />

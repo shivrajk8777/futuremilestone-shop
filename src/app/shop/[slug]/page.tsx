@@ -7,6 +7,7 @@ import { products, Product, ProductDetailSection } from '@/data/products';
 import { useUser } from '@/context/UserContext';
 import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { optimizeCloudinaryUrl } from '@/lib/image-utils';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -524,7 +525,14 @@ export default function ProductDetails({ params }: PageProps) {
                   id={`image-${idx}`}
                   className="w-full aspect-square lg:aspect-auto lg:h-screen flex-shrink-0 snap-center relative rounded-2xl overflow-hidden lg:bg-bg-secondary/40"
                 >
-                  <img src={img} alt={`${activeProduct.name} - ${selectedColor?.name || 'view'} ${idx + 1}`} className="object-cover w-full h-full transition-opacity duration-300" />
+                  <img
+                    src={optimizeCloudinaryUrl(img, { width: 1200 })}
+                    alt={`${activeProduct.name} - ${selectedColor?.name || 'view'} ${idx + 1}`}
+                    fetchPriority={idx === 0 ? 'high' : 'auto'}
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    className="object-cover w-full h-full transition-opacity duration-300"
+                  />
                 </div>
               ))}
             </div>
@@ -557,7 +565,13 @@ export default function ProductDetails({ params }: PageProps) {
                       className={`w-12 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer relative flex-shrink-0 ${isActive ? 'border-fg-primary scale-105 shadow-sm' : 'border-transparent opacity-60 hover:opacity-100'
                         }`}
                     >
-                      <img src={img} alt={`thumbnail ${idx}`} className="w-full h-full object-cover" />
+                      <img
+                        src={optimizeCloudinaryUrl(img, { width: 120 })}
+                        alt={`thumbnail ${idx}`}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   );
                 })}

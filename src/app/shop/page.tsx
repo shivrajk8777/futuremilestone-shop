@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCollections } from '@/context/CollectionContext';
 import { useProducts } from '@/context/ProductContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { optimizeCloudinaryUrl } from '@/lib/image-utils';
 
 const saleBadges: Record<string, string> = {
   sage: '50% OFF',
@@ -189,8 +190,10 @@ function ShopContent() {
                   {/* Product Background Image */}
                   {product.images && product.images[0] ? (
                     <img
-                      src={product.images[0]}
+                      src={optimizeCloudinaryUrl(product.images[0], { width: 600 })}
                       alt={product.name}
+                      loading="lazy"
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover transition-[transform,filter] duration-700 group-hover:scale-[1.03] group-hover:blur-[6px]"
                     />
                   ) : (

@@ -14,6 +14,7 @@ import { ToastProvider } from '@/context/ToastContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.futuremilestone.shop'),
   title: 'Future Milestone',
   description: 'A clean and modern Framer E-Commerce template with local state. Designed for flexibility, responsiveness, and premium aesthetics.',
   icons: {

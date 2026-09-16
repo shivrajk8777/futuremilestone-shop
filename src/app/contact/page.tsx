@@ -123,8 +123,11 @@ export default function Contact() {
       <section className="w-full lg:w-[calc(50%-6px)] py-3 px-3 lg:py-3 lg:pl-3 lg:pr-0 flex items-stretch h-[400px] md:h-[600px] lg:h-[calc(100vh-24px)] lg:max-h-[calc(100vh-24px)] flex-shrink-0 transition-theme">
         <div className="h-full rounded-xl overflow-hidden relative border border-border-accent/40 w-full group shadow-sm">
           <img
-            src="/images/contact.png"
+            src="/images/contact.webp"
             alt="Future Milestone Furniture Studio"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover brightness-[0.95]"
           />
           <div className="absolute inset-0 bg-black/5" />
