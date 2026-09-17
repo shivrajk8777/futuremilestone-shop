@@ -102,7 +102,17 @@ export default function Contact() {
     return () => window.removeEventListener('wheel', handleWheel);
   }, []);
 
-  const showrooms = [
+interface Showroom {
+  city: string;
+  address?: string;
+  mapUrl?: string;
+  isContactDetails?: boolean;
+  phone?: string;
+  emails?: string[];
+  email?: string;
+}
+
+  const showrooms: Showroom[] = [
     {
       city: 'Jaipur Office',
       address: 'A-50, Kanaram Nagar,\nSikar Road Jaipur,\n Rajasthan, India - 302039',
@@ -112,6 +122,7 @@ export default function Contact() {
       city: 'Get In Touch',
       isContactDetails: true,
       phone: '+91-7073803090',
+      emails: ['info@futuremilestone.shop', 'shop.futuremilestone@gmail.com'],
       email: 'info@futuremilestone.shop'
     }
   ];
@@ -313,11 +324,17 @@ export default function Contact() {
                           {showroom.phone}
                         </a>
                       </div>
-                      <div className="flex flex-col gap-0.5 pt-1">
+                      <div className="flex flex-col gap-1 pt-1">
                         <span className="text-xs text-fg-secondary font-medium">Email Us</span>
-                        <a href={`mailto:${showroom.email}`} className="text-fg-primary hover:underline font-semibold transition-all break-all">
-                          {showroom.email}
-                        </a>
+                        {(showroom.emails || (showroom.email ? [showroom.email] : [])).map((mail) => (
+                          <a
+                            key={mail}
+                            href={`mailto:${mail}`}
+                            className="text-fg-primary hover:underline font-semibold transition-all break-all"
+                          >
+                            {mail}
+                          </a>
+                        ))}
                       </div>
                     </div>
                   </div>
