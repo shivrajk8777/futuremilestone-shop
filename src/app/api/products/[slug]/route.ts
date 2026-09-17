@@ -47,9 +47,14 @@ export async function GET(
       features: Array.isArray(product.materials) ? product.materials.map((m: any) => m.name) : [],
       dimensions: dims,
       shippingReturns: 'Free shipping on orders over $500. Standard delivery takes 3-7 business days. Easy returns within 30 days of delivery.',
-      images: Array.isArray(product.galleryImages) && product.galleryImages.length > 0
-        ? [product.imageUrl, ...product.galleryImages].filter(Boolean)
-        : (product.imageUrl ? [product.imageUrl] : []),
+      images: Array.from(
+        new Set(
+          [
+            product.imageUrl,
+            ...(Array.isArray(product.galleryImages) ? product.galleryImages : [])
+          ].filter(Boolean)
+        )
+      ),
       materialsList: Array.isArray(product.materials) ? product.materials : [],
       colorsList: Array.isArray(product.colors) ? product.colors : [],
       dimensionsList: discounted.dimensionsList,

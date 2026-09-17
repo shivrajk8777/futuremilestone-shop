@@ -277,7 +277,7 @@ export default function ProductDetails({ params }: PageProps) {
         image: c.image || '',
         galleryImages: Array.isArray(c.galleryImages) && c.galleryImages.length > 0
           ? c.galleryImages
-          : (c.image ? [c.image] : []),
+          : [],
       }));
     }
     return [];
@@ -304,16 +304,18 @@ export default function ProductDetails({ params }: PageProps) {
   // Calculate dynamic gallery images according to the selected color
   const displayImages: string[] = useMemo(() => {
     if (selectedColor && selectedColor.galleryImages && selectedColor.galleryImages.length > 0) {
+      const isFirstColor = colorsList.length > 0 && selectedColor.id === colorsList[0].id;
+      const primaryThumb = activeProduct.images && activeProduct.images[0];
+      if (isFirstColor && primaryThumb && !selectedColor.galleryImages.includes(primaryThumb)) {
+        return [primaryThumb, ...selectedColor.galleryImages];
+      }
       return selectedColor.galleryImages;
-    }
-    if (selectedColor && selectedColor.image) {
-      return [selectedColor.image];
     }
     if (activeProduct.images && activeProduct.images.length > 0) {
       return activeProduct.images;
     }
     return ['/images/placeholder.png'];
-  }, [selectedColor, activeProduct.images]);
+  }, [selectedColor, colorsList, activeProduct.images]);
 
   const handleSelectColor = (col: ColorItem) => {
     setSelectedColor(col);
@@ -412,7 +414,7 @@ export default function ProductDetails({ params }: PageProps) {
     }
 
     const currentColorName = selectedColor?.name || 'Default';
-    const currentColorImage = selectedColor?.image || displayImages[0] || activeProduct.images[0];
+    const currentColorImage = displayImages[0] || activeProduct.images[0] || selectedColor?.image || '';
 
     // Build cart entry with selectedMaterial, selectedColor, and color thumbnail
     const cartProduct = {

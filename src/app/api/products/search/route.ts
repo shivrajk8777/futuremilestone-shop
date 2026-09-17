@@ -75,12 +75,14 @@ export async function GET(request: NextRequest) {
         discount: discounted.discount,
         category: item.collectionSlug ?? '',
         tagline: item.introText ?? '',
-        images:
-          Array.isArray(item.galleryImages) && item.galleryImages.length > 0
-            ? [item.imageUrl, ...item.galleryImages].filter(Boolean)
-            : item.imageUrl
-            ? [item.imageUrl]
-            : [],
+        images: Array.from(
+          new Set(
+            [
+              item.imageUrl,
+              ...(Array.isArray(item.galleryImages) ? item.galleryImages : [])
+            ].filter(Boolean)
+          )
+        ),
       };
     });
 

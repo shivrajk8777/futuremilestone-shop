@@ -60,9 +60,14 @@ export async function GET(request: NextRequest) {
         features: Array.isArray(item.materials) ? item.materials.map((m: any) => m.name) : [],
         dimensions: dims,
         shippingReturns: 'Free shipping on orders over $500. Standard delivery takes 3-7 business days. Easy returns within 30 days of delivery.',
-        images: Array.isArray(item.galleryImages) && item.galleryImages.length > 0
-          ? [item.imageUrl, ...item.galleryImages].filter(Boolean)
-          : (item.imageUrl ? [item.imageUrl] : []),
+        images: Array.from(
+          new Set(
+            [
+              item.imageUrl,
+              ...(Array.isArray(item.galleryImages) ? item.galleryImages : [])
+            ].filter(Boolean)
+          )
+        ),
       };
     });
 
