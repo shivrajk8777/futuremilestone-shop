@@ -7,8 +7,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || undefined;
     const favorites = searchParams.get('favorites') === 'true';
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    const limit = parseInt(searchParams.get('limit') || '8', 10);
+    const pageParam = parseInt(searchParams.get('page') || '1', 10);
+    const page = !isNaN(pageParam) && pageParam > 0 ? pageParam : 1;
+    const limitParam = parseInt(searchParams.get('limit') || '8', 10);
+    const limit = !isNaN(limitParam) && limitParam > 0 ? limitParam : 8;
 
     const db = await getDatabase();
     

@@ -62,6 +62,10 @@ function productReducer(state: ProductState, action: ProductAction): ProductStat
           ...state.productsByCategory,
           [action.category]: action.products,
         },
+        pages: {
+          ...state.pages,
+          [action.category]: 1,
+        },
         hasMore: {
           ...state.hasMore,
           [action.category]: action.products.length >= 8,
@@ -78,26 +82,30 @@ function productReducer(state: ProductState, action: ProductAction): ProductStat
         ...state,
         loading: { ...state.loading, [action.category]: true },
       };
-    case 'FETCH_MORE_SUCCESS':
+    case 'FETCH_MORE_SUCCESS': {
+      const currentProducts = state.productsByCategory[action.category] || [];
+      const existingKeys = new Set(currentProducts.map((p) => p.id || p.slug));
+      const newProducts = action.products.filter((p) => !existingKeys.has(p.id || p.slug));
       return {
         ...state,
         loading: { ...state.loading, [action.category]: false },
         productsByCategory: {
           ...state.productsByCategory,
           [action.category]: [
-            ...state.productsByCategory[action.category],
-            ...action.products,
+            ...currentProducts,
+            ...newProducts,
           ],
         },
         pages: {
           ...state.pages,
-          [action.category]: state.pages[action.category] + 1,
+          [action.category]: (state.pages[action.category] || 1) + 1,
         },
         hasMore: {
           ...state.hasMore,
-          [action.category]: action.products.length >= 8,
+          [action.category]: action.products.length >= 8 && newProducts.length > 0,
         },
       };
+    }
     case 'FETCH_MORE_FAILURE':
       return {
         ...state,
@@ -188,7 +196,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const nextPage = state.pages[category] + 1;
+    const currentPage = state.pages[category] || 1;
+    const nextPage = currentPage + 1;
     dispatch({ type: 'FETCH_MORE_START', category });
 
     try {

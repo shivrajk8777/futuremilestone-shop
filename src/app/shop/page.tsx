@@ -98,7 +98,11 @@ function ShopContent() {
     };
   }, [selectedCategory, hasMore, isMoreLoading, fetchMoreProducts]);
 
-  const filteredProducts = [...productsList].sort((a, b) => {
+  const uniqueProducts = Array.from(
+    new Map(productsList.map((p) => [p.id || p.slug, p])).values()
+  );
+
+  const filteredProducts = [...uniqueProducts].sort((a, b) => {
     if (sortBy === 'price-asc') return a.price - b.price;
     if (sortBy === 'price-desc') return b.price - a.price;
     return 0;
@@ -184,7 +188,7 @@ function ShopContent() {
               {filteredProducts.map((product) => (
                 <Link
                   href={`/shop/${product.slug}`}
-                  key={product.slug}
+                  key={product.id || product.slug}
                   className="block w-full bg-bg-secondary/40 rounded-xl overflow-hidden group aspect-[8/11] relative border border-border-accent/40 animate-fade-in"
                 >
                   {/* Product Background Image */}
