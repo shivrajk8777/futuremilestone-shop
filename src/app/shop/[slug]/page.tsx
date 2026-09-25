@@ -15,8 +15,7 @@ interface PageProps {
 
 // Sale badge per slug — matches reference design
 const saleBadges: Record<string, string> = {
-  sage: '50% OFF',
-  skala: '50% OFF',
+
 };
 
 function ProductDetailSkeleton() {
@@ -764,8 +763,8 @@ export default function ProductDetails({ params }: PageProps) {
                   onClick={handleAddToCart}
                   disabled={currentStock === 0}
                   className={`font-dm-sans w-full sm:flex-1 h-11 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 shadow-md relative overflow-hidden ${currentStock === 0
-                      ? 'bg-fg-primary/20 text-fg-primary/40 cursor-not-allowed'
-                      : 'bg-fg-primary text-bg-primary hover:opacity-90 cursor-pointer'
+                    ? 'bg-fg-primary/20 text-fg-primary/40 cursor-not-allowed'
+                    : 'bg-fg-primary text-bg-primary hover:opacity-90 cursor-pointer'
                     }`}
                 >
                   <span>{currentStock === 0 ? 'Out Of Stock' : 'Add To Cart'}</span>

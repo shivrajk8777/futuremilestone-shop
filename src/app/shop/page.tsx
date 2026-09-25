@@ -9,9 +9,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { optimizeCloudinaryUrl } from '@/lib/image-utils';
 
 const saleBadges: Record<string, string> = {
-  sage: '50% OFF',
-  skala: '50% OFF',
-  lykke: '54% OFF',
+
 };
 
 function ShopSkeletonGrid() {
