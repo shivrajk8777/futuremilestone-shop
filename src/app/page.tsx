@@ -198,12 +198,12 @@ export default function Home() {
                     fetchPriority={idx === 1 ? 'high' : 'auto'}
                     loading={idx === 1 ? 'eager' : 'lazy'}
                     decoding="async"
-                    className="absolute inset-0 w-full h-full object-fill brightness-[0.8] dark:brightness-[0.7]"
+                    className="absolute inset-0 w-full h-full object-cover brightness-[0.8] dark:brightness-[0.7]"
                   />
                   <div className="absolute inset-0 bg-black/10" />
 
                   {/* Product Content Card (Hidden on mobile/responsive mode, visible on md+) */}
-                  <div className={`absolute bottom-3 left-4 right-4 md:right-auto md:bottom-10 md:left-10 lg:bottom-12 lg:left-12 md:max-w-[360px] lg:max-w-[400px] bg-bg-primary rounded-xl p-3 md:p-8 lg:p-5 hidden md:flex flex-col gap-1.5 md:gap-6 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25, 1.1, 0.5, 1)] transition-theme ${isActive && mounted
+                  <div className={`absolute bottom-3 left-4 right-4 md:right-auto md:bottom-10 md:left-10 lg:bottom-12 lg:left-12 md:max-w-[360px] lg:max-w-[400px] bg-bg-primary rounded-xl p-3 md:p-8 lg:p-10 hidden md:flex flex-col gap-1.5 md:gap-6 shadow-2xl transition-[transform,opacity,background-color,border-color] duration-[1000ms] [transition-timing-function:cubic-bezier(0.25, 1.1, 0.5, 1)] transition-theme ${isActive && mounted
                     ? 'translate-x-0 opacity-100'
                     : 'translate-x-[20px] md:translate-x-[40px] opacity-0 pointer-events-none'
                     }`}>
