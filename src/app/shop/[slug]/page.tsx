@@ -917,7 +917,7 @@ export default function ProductDetails({ params }: PageProps) {
           </div>
 
           {/* Share links */}
-          <div className="grid grid-cols-2 gap-3 w-full flex-shrink-0">
+          {/* <div className="grid grid-cols-2 gap-3 w-full flex-shrink-0">
             <a
               href="https://in.pinterest.com/fmfuturemilestone"
               className="font-dm-sans flex items-center justify-between bg-bg-secondary rounded-xl p-4 text-fg-primary hover:bg-fg-primary/5 transition-all border border-border-accent/40"
@@ -948,7 +948,7 @@ export default function ProductDetails({ params }: PageProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 17L17 7M17 7H7M17 7V17" />
               </svg>
             </a>
-          </div>
+          </div> */}
 
         </div>
       </div>
