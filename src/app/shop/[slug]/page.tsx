@@ -645,7 +645,7 @@ export default function ProductDetails({ params }: PageProps) {
             {/* Mobile Dots Indicators matching reference design */}
             {displayImages.length > 1 && (
               <div className="absolute bottom-4 sm:bottom-5 left-0 right-0 flex justify-center items-center z-20 pointer-events-none lg:hidden">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full shadow-xs pointer-events-auto border border-black/5 dark:border-white/10">
+                <div className="flex items-center gap-1.5 px-2.5 py-1">
                   {displayImages.map((_, idx) => {
                     const isActive = activeImgIdx === idx;
                     return (
