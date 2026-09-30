@@ -12,7 +12,7 @@ import { UserProvider } from '@/context/UserContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.futuremilestone.shop'),
@@ -37,6 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <GoogleTagManager gtmId="GTM-KV2S4JTD" />
       <SettingsProvider>
         <DynamicBody>
           <CollectionProvider>
