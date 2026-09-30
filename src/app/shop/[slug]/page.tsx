@@ -369,19 +369,94 @@ export default function ProductDetails({ params }: PageProps) {
     }
   }, [selectedColor, currentStock, quantity]);
 
-  // Handle intersection observer to highlight active thumbnail as user scrolls gallery
+  // Drag & Swipe refs for smooth mobile / responsive gallery dragging
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const scrollLeftRef = useRef(0);
+  const hasDraggedRef = useRef(false);
+
+  // Handle real-time scroll on mobile to instantly update active indicator
+  const handleGalleryScroll = () => {
+    const container = galleryScrollRef.current;
+    if (!container) return;
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) return;
+    const scrollLeft = container.scrollLeft;
+
+    let closestIdx = 0;
+    let minDiff = Infinity;
+    for (let i = 0; i < displayImages.length; i++) {
+      const child = document.getElementById(`image-${i}`);
+      if (child) {
+        const childLeft = child.offsetLeft - container.offsetLeft;
+        const diff = Math.abs(scrollLeft - childLeft);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = i;
+        }
+      }
+    }
+
+    if (closestIdx !== activeImgIdx) {
+      setActiveImgIdx(closestIdx);
+    }
+  };
+
+  // Mouse drag handlers for smooth swiping in responsive mode
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) return;
+    const container = galleryScrollRef.current;
+    if (!container) return;
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    startXRef.current = e.pageX;
+    scrollLeftRef.current = container.scrollLeft;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    const container = galleryScrollRef.current;
+    if (!container) return;
+    const walk = e.pageX - startXRef.current;
+    if (Math.abs(walk) > 4) {
+      hasDraggedRef.current = true;
+    }
+    container.scrollLeft = scrollLeftRef.current - walk;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    const container = galleryScrollRef.current;
+    if (!container) return;
+    if (hasDraggedRef.current) {
+      let closestIdx = 0;
+      let minDiff = Infinity;
+      for (let i = 0; i < displayImages.length; i++) {
+        const child = document.getElementById(`image-${i}`);
+        if (child) {
+          const childLeft = child.offsetLeft - container.offsetLeft;
+          const diff = Math.abs(container.scrollLeft - childLeft);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestIdx = i;
+          }
+        }
+      }
+      scrollToImage(closestIdx);
+    }
+  };
+
+  // Handle intersection observer to highlight active thumbnail as user scrolls gallery on desktop
   useEffect(() => {
-    const scrollContainer = galleryScrollRef.current;
-    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
     const observers = displayImages.map((_, idx) => {
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
+          if (typeof window !== 'undefined' && window.innerWidth >= 1024 && entry.isIntersecting) {
             setActiveImgIdx(idx);
           }
         },
         {
-          root: isDesktop ? null : scrollContainer,
+          root: null,
           threshold: 0.5,
         }
       );
@@ -399,9 +474,28 @@ export default function ProductDetails({ params }: PageProps) {
 
   const scrollToImage = (idx: number) => {
     setActiveImgIdx(idx);
+    const container = galleryScrollRef.current;
+    if (!container) return;
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
     const el = document.getElementById(`image-${idx}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (isDesktop) {
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    } else {
+      if (el) {
+        const targetLeft = el.offsetLeft - container.offsetLeft;
+        container.scrollTo({
+          left: targetLeft,
+          behavior: 'smooth',
+        });
+      } else {
+        const slideWidth = container.clientWidth;
+        container.scrollTo({
+          left: idx * slideWidth,
+          behavior: 'smooth',
+        });
+      }
     }
   };
 
@@ -519,12 +613,21 @@ export default function ProductDetails({ params }: PageProps) {
         {/* Left Column: Image gallery */}
         <section className="w-full lg:w-[calc(58%-6px)] py-3 px-3 lg:py-3 lg:pl-0 lg:pr-0 flex-shrink-0 transition-theme h-auto">
           <div className="h-full lg:h-auto rounded-2xl lg:rounded-none overflow-hidden lg:overflow-visible relative lg:border-none w-full lg:bg-transparent lg:shadow-none flex flex-col gap-3">
-            <div ref={galleryScrollRef} className="flex lg:flex-col gap-4 lg:gap-3 overflow-x-auto lg:overflow-visible scrollbar-none h-full lg:h-auto snap-x snap-mandatory lg:snap-none pb-4 lg:pb-0">
+            <div
+              ref={galleryScrollRef}
+              onScroll={handleGalleryScroll}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
+              className="flex lg:flex-col overflow-x-auto lg:overflow-visible scrollbar-none h-full lg:h-auto snap-x snap-mandatory lg:snap-none scroll-smooth touch-pan-x select-none cursor-grab active:cursor-grabbing w-full pb-0"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
               {displayImages.map((img, idx) => (
                 <div
                   key={`${img}-${idx}`}
                   id={`image-${idx}`}
-                  className="w-full aspect-square lg:aspect-auto lg:h-screen flex-shrink-0 snap-center relative rounded-2xl overflow-hidden lg:bg-bg-secondary/40"
+                  className="w-full min-w-full aspect-square lg:aspect-auto lg:h-screen flex-shrink-0 snap-start lg:snap-none relative rounded-2xl overflow-hidden lg:bg-bg-secondary/40 select-none"
                 >
                   <img
                     src={optimizeCloudinaryUrl(img, { width: 1200 })}
@@ -532,27 +635,39 @@ export default function ProductDetails({ params }: PageProps) {
                     fetchPriority={idx === 0 ? 'high' : 'auto'}
                     loading={idx === 0 ? 'eager' : 'lazy'}
                     decoding="async"
-                    className="object-cover w-full h-full transition-opacity duration-300"
+                    draggable={false}
+                    className="object-cover w-full h-full transition-opacity duration-300 pointer-events-none select-none"
                   />
                 </div>
               ))}
             </div>
 
-            {/* Mobile Dots Indicators */}
-            <div className="absolute bottom-4 left-0 right-0 hidden justify-center gap-1.5 z-20 pointer-events-none lg:hidden">
-              {displayImages.map((_, idx) => {
-                const isActive = activeImgIdx === idx;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => scrollToImage(idx)}
-                    className={`h-1.5 rounded-full transition-all cursor-pointer pointer-events-auto ${isActive ? 'w-5 bg-fg-primary' : 'w-1.5 bg-fg-primary/30'
-                      }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                );
-              })}
-            </div>
+            {/* Mobile Dots Indicators matching reference design */}
+            {displayImages.length > 1 && (
+              <div className="absolute bottom-4 sm:bottom-5 left-0 right-0 flex justify-center items-center z-20 pointer-events-none lg:hidden">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full shadow-xs pointer-events-auto border border-black/5 dark:border-white/10">
+                  {displayImages.map((_, idx) => {
+                    const isActive = activeImgIdx === idx;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => scrollToImage(idx)}
+                        className="py-1 px-0.5 cursor-pointer flex items-center justify-center focus:outline-none transition-transform active:scale-90"
+                        aria-label={`Go to slide ${idx + 1}`}
+                      >
+                        <span
+                          className={`block rounded-full transition-all duration-300 ease-out ${isActive
+                            ? 'w-5 h-1.5 bg-neutral-900 dark:bg-white'
+                            : 'w-1.5 h-1.5 bg-neutral-900/30 dark:bg-white/40 hover:bg-neutral-900/60 dark:hover:bg-white/70'
+                            }`}
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Floating Sticky Thumbnails panel (Desktop only) */}
             <div className="hidden lg:flex absolute lg:sticky bottom-6 lg:bottom-8 left-0 right-0 justify-center z-20 pointer-events-none">
