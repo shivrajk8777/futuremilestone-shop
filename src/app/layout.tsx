@@ -17,7 +17,7 @@ import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.futuremilestone.shop'),
   title: 'Future Milestone',
-  description: 'A clean and modern Framer E-Commerce template with local state. Designed for flexibility, responsiveness, and premium aesthetics.',
+  description: 'Crafting Timeless Wooden Artistry for Every Space.',
   icons: {
     icon: '/icon.png',
     shortcut: '/icon.png',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Future Milestone',
-    description: 'A clean and modern Framer E-Commerce template ported to Next.js and Tailwind CSS.',
+    description: 'Crafting Timeless Wooden Artistry for Every Space.',
     images: ['/images/1p2B6gt3Cs8RGOysOJc9iQ2xaIg_d5da0f.webp'],
   },
 };
