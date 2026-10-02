@@ -28,6 +28,11 @@ export const metadata: Metadata = {
     description: 'Crafting Timeless Wooden Artistry for Every Space.',
     images: ['/images/1p2B6gt3Cs8RGOysOJc9iQ2xaIg_d5da0f.webp'],
   },
+  verification: {
+    other: {
+      'p:domain_verify': '0676ecc28996e8d320fce75ccd32200a',
+    },
+  },
 };
 
 export default function RootLayout({
