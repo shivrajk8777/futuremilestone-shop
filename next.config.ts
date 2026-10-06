@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "futuremilestone.shop",
+          },
+        ],
         destination: "https://www.futuremilestone.shop/:path*",
         permanent: true,
       },

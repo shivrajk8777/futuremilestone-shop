@@ -26,7 +26,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Future Milestone',
     description: 'Crafting Timeless Wooden Artistry for Every Space.',
-    images: ['/images/1p2B6gt3Cs8RGOysOJc9iQ2xaIg_d5da0f.webp'],
+    url: 'https://www.futuremilestone.shop',
+    siteName: 'Future Milestone',
+    type: 'website',
+    images: [
+      {
+        url: '/images/home-about.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Future Milestone Wooden Artistry',
+      },
+    ],
   },
   verification: {
     other: {
