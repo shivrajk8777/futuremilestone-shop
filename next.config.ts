@@ -15,6 +15,19 @@ const nextConfig: NextConfig = {
     ],
     minimumCacheTTL: 2592000,
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        destination: "https://www.futuremilestone.shop/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
+
+
 };
 
 export default nextConfig;
